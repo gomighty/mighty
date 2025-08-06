@@ -1,0 +1,27 @@
+{
+  "name": "@gomighty/core",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "A framework for building apps with Astro and the backend of your choice.",
+  "keywords": ["astro", "framework", "typescript", "mighty", "inertiajs"],
+  "homepage": "https://go-mighty.vercel.app",
+  "bugs": {
+    "url": "https://github.com/gomighty/mighty/issues"
+  },
+  "author": "Amine Ilidrissi",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gomighty/mighty.git"
+  },
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build-pkg": "bun build src/index.ts --outdir ./dist --minify --target node"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

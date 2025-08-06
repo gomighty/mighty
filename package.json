@@ -1,0 +1,11 @@
+{
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "scripts": {
+    "build-pkg": "bun --filter '*' build-pkg"
+  }
+}
