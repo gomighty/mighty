@@ -18,7 +18,13 @@
   },
   "description": "A framework for building apps with Astro and the backend of your choice.",
   "homepage": "https://go-mighty.vercel.app",
-  "keywords": ["astro", "framework", "typescript", "mighty", "inertiajs"],
+  "keywords": [
+    "astro",
+    "framework",
+    "typescript",
+    "mighty",
+    "inertiajs"
+  ],
   "license": "MIT",
   "scripts": {
     "build-pkg": "bun build src/index.ts --outdir ./dist --minify --target node"
