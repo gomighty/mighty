@@ -6,9 +6,17 @@
     "type": "git",
     "url": "git+https://github.com/gomighty/mighty.git"
   },
-  "module": "src/index.ts",
+  "exports": {
+    "dev": "src/dev/index.ts"
+  },
   "dependencies": {
-    "astro": "5.12.8"
+    "@hono/node-server": "^1.18.1",
+    "@hono/zod-validator": "^0.7.2",
+    "astro": "5.12.8",
+    "body-parser": "^2.2.0",
+    "fetch-to-node": "^2.1.0",
+    "hono": "^4.9.0",
+    "zod": "^4.0.15"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -27,7 +35,11 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build-pkg": "bun build src/index.ts --outdir ./dist --minify --target node"
+    "test": "vitest"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@types/body-parser": "^1.19.6",
+    "vitest": "^3.2.4"
+  }
 }
