@@ -8,6 +8,8 @@
     "typescript": "^5.9.2"
   },
   "scripts": {
-    "build-pkg": "bun --filter '*' build-pkg"
+    "ci:biome": "biome ci",
+    "ci:vitest": "bun run --filter '*' vitest --reporter=github-actions",
+    "vitest": "bun run --filter '*' vitest --reporter=verbose"
   }
 }
