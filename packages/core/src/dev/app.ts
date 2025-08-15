@@ -9,8 +9,8 @@ import {
 import type { ElementContent } from "hast";
 import { Hono } from "hono";
 import { isRunnableDevEnvironment, type ViteDevServer } from "vite";
+import { getStylesForURL } from "@/dev/css";
 import { MightyRenderRequestSchema } from "@/schemas";
-import { getStylesForURL } from "@/dev/styles";
 import type { MightyServerOptions } from "@/types";
 import { adaptConnectMiddleware } from "@/utils/adaptConnectMiddleware";
 import { dotStringToPath } from "@/utils/dotStringToPath";

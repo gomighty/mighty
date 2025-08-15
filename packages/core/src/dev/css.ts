@@ -1,3 +1,10 @@
+/**
+ * This file contains a slightly altered version of Astro's `getStylesForURL` function.
+ * https://github.com/withastro/astro/blob/f2490aba420a8999c0e8d12b9e1e69d4e33ae29e/packages/astro/src/vite-plugin-astro-server/css.ts
+ * We could simplify the logic here by removing unneeded logic,
+ * but we want to be able to patch in changes from upstream as smoothly as possible.
+ */
+
 import npath from "node:path";
 import { isCSSRequest, type ModuleNode, type ViteDevServer } from "vite";
 
@@ -7,77 +14,9 @@ interface ImportedStyle {
   content: string;
 }
 
-const rawRE = /(?:\?|&)raw(?:&|$)/;
-const inlineRE = /(?:\?|&)inline\b/;
-
-const isBuildableCSSRequest = (request: string): boolean =>
-  isCSSRequest(request) && !rawRE.test(request) && !inlineRE.test(request);
-
-const inlineQueryRE = /(?:\?|&)inline(?:$|&)/;
-
-export async function getStylesForURL(
-  filePath: string,
-  viteServer: ViteDevServer,
-): Promise<{
-  urls: Set<string>;
-  styles: ImportedStyle[];
-  crawledFiles: Set<string>;
-}> {
-  const importedCssUrls = new Set<string>();
-  // Map of url to injected style object. Use a `url` key to deduplicate styles
-  const importedStylesMap = new Map<string, ImportedStyle>();
-  const crawledFiles = new Set<string>();
-
-  // Mighty addition: import the module beforehand to make sure we can crawl the graph
-  await viteServer.ssrLoadModule(filePath);
-
-  for await (const importedModule of crawlGraph(viteServer, filePath, true)) {
-    if (importedModule.file) {
-      crawledFiles.add(importedModule.file);
-    }
-    if (isBuildableCSSRequest(importedModule.url)) {
-      // In dev, we inline all styles if possible
-      let css = "";
-      // If this is a plain CSS module, the default export should be a string
-      if (typeof importedModule.ssrModule?.default === "string") {
-        css = importedModule.ssrModule.default;
-      }
-      // Else try to load it
-      else {
-        let modId = importedModule.url;
-        // Mark url with ?inline so Vite will return the CSS as plain string, even for CSS modules
-        if (!inlineQueryRE.test(importedModule.url)) {
-          if (importedModule.url.includes("?")) {
-            modId = importedModule.url.replace("?", "?inline&");
-          } else {
-            modId += "?inline";
-          }
-        }
-        try {
-          // The SSR module is possibly not loaded. Load it if it's null.
-          const ssrModule = await viteServer.ssrLoadModule(modId);
-          css = ssrModule.default;
-        } catch {
-          // The module may not be inline-able, e.g. SCSS partials. Skip it as it may already
-          // be inlined into other modules if it happens to be in the graph.
-          continue;
-        }
-      }
-
-      importedStylesMap.set(importedModule.url, {
-        id: wrapId(importedModule.id ?? importedModule.url),
-        url: wrapId(importedModule.url),
-        content: css,
-      });
-    }
-  }
-
-  return {
-    urls: importedCssUrls,
-    styles: [...importedStylesMap.values()],
-    crawledFiles,
-  };
-}
+const VALID_ID_PREFIX = `/@id/`;
+const NULL_BYTE_PLACEHOLDER = `__x00__`;
+const NULL_BYTE_REGEX = /^\0/;
 
 function wrapId(id: string): string {
   return id.replace(
@@ -85,10 +24,6 @@ function wrapId(id: string): string {
     `${VALID_ID_PREFIX}${NULL_BYTE_PLACEHOLDER}`,
   );
 }
-
-const VALID_ID_PREFIX = `/@id/`;
-const NULL_BYTE_PLACEHOLDER = `__x00__`;
-const NULL_BYTE_REGEX = /^\0/;
 
 function unwrapId(id: string): string {
   return id.startsWith(VALID_ID_PREFIX)
@@ -120,6 +55,15 @@ const specialQueriesRE = /(?:\?|&)(?:url|raw|direct)(?:&|$)/;
  */
 function hasSpecialQueries(id: string): boolean {
   return specialQueriesRE.test(id);
+}
+
+function isImportedBy(parent: string, entry: ModuleNode) {
+  for (const importer of entry.importers) {
+    if (importer.id === parent) {
+      return true;
+    }
+  }
+  return false;
 }
 
 async function* crawlGraph(
@@ -230,11 +174,74 @@ async function* crawlGraph(
   }
 }
 
-function isImportedBy(parent: string, entry: ModuleNode) {
-  for (const importer of entry.importers) {
-    if (importer.id === parent) {
-      return true;
+const rawRE = /(?:\?|&)raw(?:&|$)/;
+const inlineRE = /(?:\?|&)inline\b/;
+
+const isBuildableCSSRequest = (request: string): boolean =>
+  isCSSRequest(request) && !rawRE.test(request) && !inlineRE.test(request);
+
+const inlineQueryRE = /(?:\?|&)inline(?:$|&)/;
+
+export async function getStylesForURL(
+  filePath: string,
+  viteServer: ViteDevServer,
+): Promise<{
+  urls: Set<string>;
+  styles: ImportedStyle[];
+  crawledFiles: Set<string>;
+}> {
+  const importedCssUrls = new Set<string>();
+  // Map of url to injected style object. Use a `url` key to deduplicate styles
+  const importedStylesMap = new Map<string, ImportedStyle>();
+  const crawledFiles = new Set<string>();
+
+  // Mighty addition: import the module beforehand to make sure we can crawl the graph
+  await viteServer.ssrLoadModule(filePath);
+
+  for await (const importedModule of crawlGraph(viteServer, filePath, true)) {
+    if (importedModule.file) {
+      crawledFiles.add(importedModule.file);
+    }
+    if (isBuildableCSSRequest(importedModule.url)) {
+      // In dev, we inline all styles if possible
+      let css = "";
+      // If this is a plain CSS module, the default export should be a string
+      if (typeof importedModule.ssrModule?.default === "string") {
+        css = importedModule.ssrModule.default;
+      }
+      // Else try to load it
+      else {
+        let modId = importedModule.url;
+        // Mark url with ?inline so Vite will return the CSS as plain string, even for CSS modules
+        if (!inlineQueryRE.test(importedModule.url)) {
+          if (importedModule.url.includes("?")) {
+            modId = importedModule.url.replace("?", "?inline&");
+          } else {
+            modId += "?inline";
+          }
+        }
+        try {
+          // The SSR module is possibly not loaded. Load it if it's null.
+          const ssrModule = await viteServer.ssrLoadModule(modId);
+          css = ssrModule.default;
+        } catch {
+          // The module may not be inline-able, e.g. SCSS partials. Skip it as it may already
+          // be inlined into other modules if it happens to be in the graph.
+          continue;
+        }
+      }
+
+      importedStylesMap.set(importedModule.url, {
+        id: wrapId(importedModule.id ?? importedModule.url),
+        url: wrapId(importedModule.url),
+        content: css,
+      });
     }
   }
-  return false;
+
+  return {
+    urls: importedCssUrls,
+    styles: [...importedStylesMap.values()],
+    crawledFiles,
+  };
 }
