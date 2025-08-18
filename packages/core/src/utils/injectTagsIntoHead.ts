@@ -1,4 +1,4 @@
-import type { ElementContent } from "hast";
+import type { Element } from "hast";
 import { toHtml } from "hast-util-to-html";
 import rehypeParse from "rehype-parse";
 import { unified } from "unified";
@@ -6,7 +6,7 @@ import { EXIT, visit } from "unist-util-visit";
 
 export function injectTagsIntoHead(
   result: string,
-  children: ElementContent[],
+  children: Element[],
   fragment: boolean,
 ) {
   const processor = unified().use(rehypeParse, { fragment });

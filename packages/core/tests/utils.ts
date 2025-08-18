@@ -16,13 +16,18 @@ export function getFixture(fixtureName: string) {
 
   return {
     startDevServer: async (params?: MightyServerOptions) => {
-      const { app, viteServer } = await createDevHonoApp({
-        config: {
-          root: fixtureRoot,
-          logLevel: "warn",
-          ...params,
+      const { app, viteServer } = await createDevHonoApp(
+        {
+          config: {
+            root: fixtureRoot,
+            logLevel: "warn",
+            ...params,
+          },
         },
-      });
+        () => {
+          return `http://host-placeholder.test`;
+        },
+      );
 
       return {
         app,

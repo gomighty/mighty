@@ -84,7 +84,7 @@ describe("dev hono app", () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        component: "index",
+        component: "page",
         props: {
           title: "Hello World",
         },
@@ -95,7 +95,9 @@ describe("dev hono app", () => {
 
     const output = await response.text();
 
-    expect(output).toBe("<!DOCTYPE html><p>Hello World</p>");
+    expect(output).toBe(
+      '<!DOCTYPE html><html><head><script type="module" src="http://host-placeholder.test/@vite/client"></script></head> <body> <p>Hello World</p> </body></html>',
+    );
   });
 
   it("can render a page with styles", async () => {
@@ -112,6 +114,10 @@ describe("dev hono app", () => {
     expect(response.status).toBe(200);
 
     const output = await response.text();
+
+    expect(output).toContain(
+      '<script type="module" src="http://host-placeholder.test/@vite/client"></script>',
+    );
 
     const styleContent = getContentFromMatchingTags({
       html: output,
@@ -136,6 +142,10 @@ describe("dev hono app", () => {
     expect(response.status).toBe(200);
 
     const output = await response.text();
+
+    expect(output).toContain(
+      '<script type="module" src="http://host-placeholder.test/@vite/client"></script>',
+    );
 
     const styleContent = getContentFromMatchingTags({
       html: output,

@@ -6,8 +6,9 @@ import {
   type AstroInlineConfig,
   dev as astroDev,
 } from "astro";
-import type { ElementContent } from "hast";
+import type { Element } from "hast";
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { isRunnableDevEnvironment, type ViteDevServer } from "vite";
 import { getStylesForURL } from "@/dev/css";
 import { MightyRenderRequestSchema } from "@/schemas";
@@ -18,8 +19,12 @@ import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
 import type { MightyRenderFunction } from "./render-dev";
 
 export async function createDevHonoApp(
-  options?: MightyServerOptions,
-): Promise<{ app: Hono; viteServer: ViteDevServer }> {
+  options: MightyServerOptions,
+  getHostAddress: () => string,
+): Promise<{
+  app: Hono;
+  viteServer: ViteDevServer;
+}> {
   let finalConfig: AstroConfig;
   let viteServer: ViteDevServer;
 
@@ -27,6 +32,7 @@ export async function createDevHonoApp(
     vite: {
       server: {
         middlewareMode: true,
+        cors: false,
       },
     },
     adapter: {
@@ -72,6 +78,7 @@ export async function createDevHonoApp(
   }>(path.join(__dirname, "./render-dev.ts"));
 
   const app = new Hono();
+  app.use(cors());
 
   app.post(
     "/render",
@@ -98,21 +105,36 @@ export async function createDevHonoApp(
           props,
           partial,
         }),
-        getStylesForURL(componentPath, viteServer).then(
-          (styles): ElementContent[] =>
-            styles.styles.map((style) => ({
-              type: "element",
-              tagName: "style",
-              properties: {
-                type: "text/css",
-                "data-vite-dev-id": style.id,
-              },
-              children: [{ type: "text", value: style.content }],
-            })),
+        getStylesForURL(componentPath, viteServer).then((styles): Element[] =>
+          styles.styles.map((style) => ({
+            type: "element",
+            tagName: "style",
+            properties: {
+              type: "text/css",
+              "data-vite-dev-id": style.id,
+            },
+            children: [{ type: "text", value: style.content }],
+          })),
         ),
       ]);
 
-      return c.html(injectTagsIntoHead(renderedComponent, styleTags, partial));
+      const viteClientScript: Element = {
+        type: "element",
+        tagName: "script",
+        properties: {
+          type: "module",
+          src: `${getHostAddress()}/@vite/client`,
+        },
+        children: [],
+      };
+
+      return c.html(
+        injectTagsIntoHead(
+          renderedComponent,
+          [...styleTags, viteClientScript],
+          partial,
+        ),
+      );
     },
   );
 
