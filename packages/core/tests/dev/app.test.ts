@@ -261,5 +261,12 @@ describe("dev alpinejs", () => {
     expect(output).toContain(
       '<script type="module" src="http://host-placeholder.test/@id/astro:scripts/page.js"></script>',
     );
+
+    const scriptResponse = await app.request("/@id/astro:scripts/page.js", {
+      headers: { host: "localhost" },
+    });
+    expect(scriptResponse.status).toBe(200);
+    const scriptContent = await scriptResponse.text();
+    expect(scriptContent).toContain("Alpine.start()");
   });
 });
