@@ -3,11 +3,12 @@ import { serveHonoApp } from "../runtime";
 import type { MightyServer, MightyServerOptions } from "../types";
 import { createDevHonoApp } from "./app";
 
-let hostAddress: AddressInfo;
-
 export async function dev(
   options?: MightyServerOptions,
 ): Promise<MightyServer> {
+  // biome-ignore lint/style/useConst: we can't use const because we need to assign the variable later
+  let hostAddress: AddressInfo;
+
   const { app, viteServer } = await createDevHonoApp(options ?? {}, () => {
     return `http://${hostAddress.address}:${hostAddress.port}`;
   });
