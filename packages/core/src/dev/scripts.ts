@@ -1,11 +1,51 @@
-import type { RunnableDevEnvironment } from "vite";
+import type { AstroIntegration, InjectedScriptStage } from "astro";
+import {
+  getAstroSampleConfig,
+  getAstroSampleIntegrationLogger,
+} from "@/utils/astroDefaults";
 
-export async function isPageScriptInjected(viteDevEnv: RunnableDevEnvironment) {
-  try {
-    const module = await viteDevEnv.runner.import("astro:scripts/page.js");
-    return Object.keys(module).length > 0;
-  } catch {
-    // The script contents threw while being executed, which means there IS a script injected
-    return true;
-  }
+type InjectedScript = {
+  stage: InjectedScriptStage;
+  content: string;
+};
+
+export async function getInjectedScriptsFromIntegrations(
+  integrations: AstroIntegration[],
+): Promise<InjectedScript[]> {
+  const sampleConfig = await getAstroSampleConfig();
+  const sampleLogger = getAstroSampleIntegrationLogger();
+
+  return integrations
+    .map((integration) => {
+      let injectedScript: InjectedScript | undefined;
+      const injectScriptFn = (stage: InjectedScriptStage, content: string) => {
+        injectedScript = { stage, content };
+      };
+
+      try {
+        integration.hooks["astro:config:setup"]?.({
+          config: sampleConfig,
+          command: "dev",
+          isRestart: false,
+          updateConfig: () => sampleConfig,
+          addRenderer: () => {},
+          addClientDirective: () => {},
+          addMiddleware: () => {},
+          addDevToolbarApp: () => {},
+          addWatchFile: () => {},
+          injectScript: injectScriptFn,
+          injectRoute: () => {},
+          createCodegenDir: () => new URL(""),
+          logger: sampleLogger,
+        });
+      } catch {
+        // Something went wrong with our mock integration call, we'll just ignore the error
+      }
+
+      return injectedScript;
+    })
+    .filter(
+      (injectedScript): injectedScript is InjectedScript =>
+        injectedScript !== undefined,
+    );
 }

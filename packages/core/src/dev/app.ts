@@ -21,7 +21,7 @@ import type {
   MightyStartContainerFunction,
 } from "./render-dev";
 import { loadRenderersFromIntegrations } from "./renderers";
-import { isPageScriptInjected } from "./scripts";
+import { getInjectedScriptsFromIntegrations } from "./scripts";
 
 export async function createDevHonoApp(
   options: MightyServerOptions,
@@ -107,7 +107,13 @@ export async function createDevHonoApp(
 
   await createContainer(loadedRenderers, getHostAddress);
 
-  const getPageScripts: () => Element[] = (await isPageScriptInjected(ssrEnv))
+  const injectedScripts = await getInjectedScriptsFromIntegrations(
+    finalConfig.integrations,
+  );
+
+  const getPageScripts: () => Element[] = injectedScripts.some(
+    (script) => script.stage === "page",
+  )
     ? () => [
         {
           type: "element",
