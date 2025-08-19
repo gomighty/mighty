@@ -224,3 +224,42 @@ describe("dev react renderer", () => {
     );
   });
 });
+
+describe("dev alpinejs", () => {
+  let app: Hono;
+  let stop: () => Promise<void>;
+
+  const fixture = getFixture("alpinejs");
+
+  beforeEach(async () => {
+    ({ app, stop } = await fixture.startDevServer());
+  });
+
+  afterEach(async () => {
+    await stop();
+  });
+
+  it("can render a page with alpinejs", async () => {
+    const response = await app.request("/render", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        component: "basic",
+        props: {
+          initialCount: 0,
+        },
+        partial: false,
+      }),
+    });
+
+    expect(response.status).toBe(200);
+
+    const output = await response.text();
+
+    expect(output).toContain(
+      '<script type="module" src="http://host-placeholder.test/@id/astro:scripts/page.js"></script>',
+    );
+  });
+});

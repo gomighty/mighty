@@ -4,8 +4,23 @@ import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 
 let container: AstroContainer | undefined;
 
-export async function createContainer(renderers: SSRLoadedRenderer[]) {
-  container = await AstroContainer.create({ renderers });
+export async function createContainer(
+  renderers: SSRLoadedRenderer[],
+  getHostAddress: () => string,
+) {
+  container = await AstroContainer.create({
+    renderers,
+    async resolve(s) {
+      const address = getHostAddress();
+      if (s.startsWith("astro:scripts")) {
+        return `${address}/@id/${s}`;
+      }
+      if (s.startsWith("/@id")) {
+        return `${address}${s}`;
+      }
+      return `${address}/${s}`;
+    },
+  });
 }
 
 export type MightyStartContainerFunction = typeof createContainer;

@@ -21,6 +21,7 @@ import type {
   MightyStartContainerFunction,
 } from "./render-dev";
 import { loadRenderersFromIntegrations } from "./renderers";
+import { isPageScriptInjected } from "./scripts";
 
 export async function createDevHonoApp(
   options: MightyServerOptions,
@@ -104,7 +105,21 @@ export async function createDevHonoApp(
     createContainer: MightyStartContainerFunction;
   }>(path.join(__dirname, "./render-dev.ts"));
 
-  await createContainer(loadedRenderers);
+  await createContainer(loadedRenderers, getHostAddress);
+
+  const getPageScripts: () => Element[] = (await isPageScriptInjected(ssrEnv))
+    ? () => [
+        {
+          type: "element",
+          tagName: "script",
+          properties: {
+            type: "module",
+            src: `${getHostAddress()}/@id/astro:scripts/page.js`,
+          },
+          children: [],
+        },
+      ]
+    : () => [];
 
   const app = new Hono();
   app.use(cors());
@@ -160,7 +175,7 @@ export async function createDevHonoApp(
       return c.html(
         injectTagsIntoHead(
           renderedComponent,
-          [...styleTags, viteClientScript],
+          [...styleTags, viteClientScript, ...getPageScripts()],
           partial,
         ),
       );
