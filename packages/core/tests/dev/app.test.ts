@@ -158,3 +158,39 @@ describe("dev hono app", () => {
     ]);
   });
 });
+
+describe("dev react renderer", () => {
+  let app: Hono;
+  let stop: () => Promise<void>;
+
+  const fixture = getFixture("react-renderer");
+
+  beforeEach(async () => {
+    ({ app, stop } = await fixture.startDevServer());
+  });
+
+  afterEach(async () => {
+    await stop();
+  });
+
+  it("can render a react component", async () => {
+    const response = await app.request("/render", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        component: "index",
+        props: {
+          title: "Hello World",
+        },
+      }),
+    });
+
+    expect(response.status).toBe(200);
+
+    const output = await response.text();
+
+    expect(output).toBe('<h1>Hello World</h1><button type="button">0</button>');
+  });
+});

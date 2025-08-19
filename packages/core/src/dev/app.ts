@@ -16,7 +16,11 @@ import type { MightyServerOptions } from "@/types";
 import { adaptConnectMiddleware } from "@/utils/adaptConnectMiddleware";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
-import type { MightyRenderFunction } from "./render-dev";
+import type {
+  MightyRenderFunction,
+  MightyStartContainerFunction,
+} from "./render-dev";
+import { loadRenderersFromIntegrations } from "./renderers";
 
 export async function createDevHonoApp(
   options: MightyServerOptions,
@@ -63,6 +67,11 @@ export async function createDevHonoApp(
 
   await astroDev({ ...userConfig, ...mightyConfig });
 
+  // @ts-expect-error - finalConfig is defined at this point
+  if (!finalConfig) {
+    throw new Error("finalConfig is not defined");
+  }
+
   // @ts-expect-error viteServer is defined at this point
   if (!viteServer) {
     throw new Error("viteServer is not defined");
@@ -73,9 +82,18 @@ export async function createDevHonoApp(
     throw new Error("ssrEnv is not RunnableDevEnvironment");
   }
 
-  const { render } = await ssrEnv.runner.import<{
+  // We need to import the renderers here and not in the render-dev.ts file. Not sure why...
+  const loadedRenderers = await loadRenderersFromIntegrations(
+    finalConfig.integrations,
+    ssrEnv,
+  );
+
+  const { render, createContainer } = await ssrEnv.runner.import<{
     render: MightyRenderFunction;
+    createContainer: MightyStartContainerFunction;
   }>(path.join(__dirname, "./render-dev.ts"));
+
+  await createContainer(loadedRenderers);
 
   const app = new Hono();
   app.use(cors());

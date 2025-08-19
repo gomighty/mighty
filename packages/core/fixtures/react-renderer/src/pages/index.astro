@@ -1,0 +1,11 @@
+---
+import { Counter } from "../components/Counter";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<Counter title={title} />

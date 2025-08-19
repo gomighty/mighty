@@ -1,7 +1,14 @@
+import type { SSRLoadedRenderer } from "astro";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 
-const container = await AstroContainer.create();
+let container: AstroContainer | undefined;
+
+export async function createContainer(renderers: SSRLoadedRenderer[]) {
+  container = await AstroContainer.create({ renderers });
+}
+
+export type MightyStartContainerFunction = typeof createContainer;
 
 export async function render({
   componentPath,
@@ -12,6 +19,10 @@ export async function render({
   props: Record<string, unknown>;
   partial: boolean;
 }) {
+  if (!container) {
+    throw new Error("Container not created");
+  }
+
   const component: AstroComponentFactory = (
     await import(/* @vite-ignore */ componentPath)
   ).default;
