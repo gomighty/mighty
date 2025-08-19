@@ -180,7 +180,7 @@ describe("dev react renderer", () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        component: "index",
+        component: "basic",
         props: {
           title: "Hello World",
         },
@@ -192,5 +192,35 @@ describe("dev react renderer", () => {
     const output = await response.text();
 
     expect(output).toBe('<h1>Hello World</h1><button type="button">0</button>');
+  });
+
+  it("can render a react component and hydrate it", async () => {
+    const response = await app.request("/render", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        component: "clientload",
+        props: {
+          title: "Hello World",
+        },
+      }),
+    });
+
+    expect(response.status).toBe(200);
+
+    const output = await response.text();
+
+    const astroIslandContent = getContentFromMatchingTags({
+      html: output,
+      tag: "astro-island",
+      fragment: true,
+    });
+
+    expect(astroIslandContent.length).toBe(1);
+    expect(astroIslandContent[0]).toContain(
+      '<h1>Hello World</h1><button type="button">0</button>',
+    );
   });
 });
