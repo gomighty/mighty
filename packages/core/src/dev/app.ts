@@ -38,6 +38,17 @@ export async function createDevHonoApp(
         middlewareMode: true,
         cors: false,
       },
+      plugins: [
+        {
+          name: "mighty-remove-unhandled-rejection-listener-hack",
+          closeBundle() {
+            // HACK: We remove the "unhandledRejection" event listener added by Astro
+            // https://github.com/withastro/astro/blob/eadc9dd277d0075d7bff0e33c7a86f3fb97fdd61/packages/astro/src/vite-plugin-astro-server/plugin.ts#L125
+            // The original removal logic assumes a Vite server is running, which is not the case in middleware mode
+            process.removeAllListeners("unhandledRejection");
+          },
+        },
+      ],
     },
     adapter: {
       name: "mighty-adapter",
