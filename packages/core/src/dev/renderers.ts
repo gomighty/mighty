@@ -1,9 +1,6 @@
 import type { AstroIntegration, AstroRenderer, SSRLoadedRenderer } from "astro";
 import type { RunnableDevEnvironment } from "vite";
-import {
-  getAstroSampleConfig,
-  getAstroSampleIntegrationLogger,
-} from "@/utils/astroDefaults";
+import { executeIntegrationsConfigSetup } from "@/utils/integrations";
 
 async function loadRenderers(
   renderers: AstroRenderer[],
@@ -35,39 +32,12 @@ export async function loadRenderersFromIntegrations(
   integrations: AstroIntegration[],
   viteDevEnv: RunnableDevEnvironment,
 ): Promise<SSRLoadedRenderer[]> {
-  const sampleConfig = await getAstroSampleConfig();
-  const sampleLogger = getAstroSampleIntegrationLogger();
-
-  const renderers = integrations
-    .map((integration) => {
-      let renderer: AstroRenderer | undefined;
-      const addRendererFn = (r: AstroRenderer) => {
-        renderer = r;
-      };
-
-      try {
-        integration.hooks["astro:config:setup"]?.({
-          config: sampleConfig,
-          command: "dev",
-          isRestart: false,
-          updateConfig: () => sampleConfig,
-          addRenderer: addRendererFn,
-          addClientDirective: () => {},
-          addMiddleware: () => {},
-          addDevToolbarApp: () => {},
-          addWatchFile: () => {},
-          injectScript: () => {},
-          injectRoute: () => {},
-          createCodegenDir: () => new URL(""),
-          logger: sampleLogger,
-        });
-      } catch {
-        // Something went wrong with our mock integration call, we'll just ignore the error
-      }
-
-      return renderer;
-    })
-    .filter((renderer): renderer is AstroRenderer => renderer !== undefined);
+  const renderers: AstroRenderer[] = [];
+  await executeIntegrationsConfigSetup(integrations, {
+    addRenderer: (renderer: AstroRenderer) => {
+      renderers.push(renderer);
+    },
+  });
 
   return loadRenderers(renderers, viteDevEnv);
 }
