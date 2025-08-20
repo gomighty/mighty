@@ -270,3 +270,42 @@ describe("dev alpinejs", () => {
     expect(scriptContent).toContain("Alpine.start()");
   });
 });
+
+describe("dev partytown", () => {
+  let app: Hono;
+  let stop: () => Promise<void>;
+
+  const fixture = getFixture("partytown");
+
+  beforeEach(async () => {
+    ({ app, stop } = await fixture.startDevServer());
+  });
+
+  afterEach(async () => {
+    await stop();
+  });
+
+  it("can render a page with partytown", async () => {
+    const response = await app.request("/render", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        component: "basic",
+        partial: false,
+      }),
+    });
+
+    expect(response.status).toBe(200);
+
+    const output = await response.text();
+
+    const scripts = getContentFromMatchingTags({
+      html: output,
+      tag: "script",
+      fragment: false,
+    });
+    expect(scripts).arrayMatching([/partytown/, /^$/]);
+  });
+});

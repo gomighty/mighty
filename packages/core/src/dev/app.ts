@@ -111,6 +111,15 @@ export async function createDevHonoApp(
     finalConfig.integrations,
   );
 
+  const headInlineScriptTags: Element[] = injectedScripts
+    .filter((script) => script.stage === "head-inline")
+    .map((script) => ({
+      type: "element",
+      tagName: "script",
+      properties: {},
+      children: [{ type: "text", value: script.content }],
+    }));
+
   const getPageScripts: () => Element[] = injectedScripts.some(
     (script) => script.stage === "page",
   )
@@ -181,7 +190,12 @@ export async function createDevHonoApp(
       return c.html(
         injectTagsIntoHead(
           renderedComponent,
-          [...styleTags, viteClientScript, ...getPageScripts()],
+          [
+            ...styleTags,
+            viteClientScript,
+            ...getPageScripts(),
+            ...headInlineScriptTags,
+          ],
           partial,
         ),
       );
