@@ -13,26 +13,28 @@ export async function executeIntegrationsConfigSetup(
   const sampleConfig = await getAstroSampleConfig();
   const sampleLogger = getAstroSampleIntegrationLogger();
 
-  integrations.forEach((integration) => {
-    try {
-      integration.hooks["astro:config:setup"]?.({
-        config: sampleConfig,
-        command: "dev",
-        isRestart: false,
-        updateConfig: () => sampleConfig,
-        addRenderer: () => {},
-        addClientDirective: () => {},
-        addMiddleware: () => {},
-        addDevToolbarApp: () => {},
-        addWatchFile: () => {},
-        injectScript: () => {},
-        injectRoute: () => {},
-        createCodegenDir: () => new URL(""),
-        logger: sampleLogger,
-        ...configSetupOptions,
-      });
-    } catch {
-      // Something went wrong with our mock integration call, we'll just ignore the error
-    }
-  });
+  await Promise.allSettled(
+    integrations.map(async (integration) => {
+      try {
+        return await integration.hooks["astro:config:setup"]?.({
+          config: sampleConfig,
+          command: "dev",
+          isRestart: false,
+          updateConfig: () => sampleConfig,
+          addRenderer: () => {},
+          addClientDirective: () => {},
+          addMiddleware: () => {},
+          addDevToolbarApp: () => {},
+          addWatchFile: () => {},
+          injectScript: () => {},
+          injectRoute: () => {},
+          createCodegenDir: () => new URL(""),
+          logger: sampleLogger,
+          ...configSetupOptions,
+        });
+      } catch {
+        // Something went wrong with our mock integration call, we'll just ignore the error
+      }
+    }),
+  );
 }
