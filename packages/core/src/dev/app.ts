@@ -19,7 +19,7 @@ import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
 import type {
   MightyRenderFunction,
   MightyStartContainerFunction,
-} from "./render-dev";
+} from "./render";
 import { loadRenderersFromIntegrations } from "./renderers";
 import { getInjectedScriptsFromIntegrations } from "./scripts";
 
@@ -94,7 +94,7 @@ export async function createDevHonoApp(
     throw new Error("ssrEnv is not RunnableDevEnvironment");
   }
 
-  // We need to import the renderers here and not in the render-dev.ts file. Not sure why...
+  // We need to import the renderers here and not in the render.ts file. Not sure why...
   const loadedRenderers = await loadRenderersFromIntegrations(
     finalConfig.integrations,
     ssrEnv,
@@ -103,7 +103,7 @@ export async function createDevHonoApp(
   const { render, createContainer } = await ssrEnv.runner.import<{
     render: MightyRenderFunction;
     createContainer: MightyStartContainerFunction;
-  }>(path.join(__dirname, "./render-dev.ts"));
+  }>(path.join(__dirname, "./render.ts"));
 
   await createContainer(loadedRenderers, getHostAddress);
 
