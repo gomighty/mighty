@@ -51,28 +51,30 @@ export async function createDevHonoApp(
         },
       ],
     },
-    adapter: {
-      name: "mighty-adapter",
-      hooks: {
-        "astro:config:done": ({ config }) => {
-          finalConfig = config;
-        },
-        "astro:server:setup": async ({ server }) => {
-          server.listen = async () => {
-            return server;
-          };
-          // @ts-expect-error - This is a hack to make Astro work in middleware mode
-          server.httpServer = {
-            address() {
-              return null;
-            },
-          };
-          server.bindCLIShortcuts = () => {};
+    integrations: [
+      {
+        name: "mighty-integration",
+        hooks: {
+          "astro:config:done": ({ config }) => {
+            finalConfig = config;
+          },
+          "astro:server:setup": async ({ server }) => {
+            server.listen = async () => {
+              return server;
+            };
+            // @ts-expect-error - This is a hack to make Astro work in middleware mode
+            server.httpServer = {
+              address() {
+                return null;
+              },
+            };
+            server.bindCLIShortcuts = () => {};
 
-          viteServer = server;
+            viteServer = server;
+          },
         },
       },
-    },
+    ],
   };
 
   const userConfig = options?.config ?? {};
