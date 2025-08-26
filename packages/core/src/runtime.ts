@@ -1,8 +1,8 @@
 import type { AddressInfo } from "node:net";
 import { serve } from "@hono/node-server";
-import type { Hono } from "hono";
+import type { Context, Hono } from "hono";
 import type { ViteDevServer } from "vite";
-import type { MightyServer } from "@/types";
+import type { MightyStandaloneServer } from "@/types";
 
 type Runtime = "bun" | "node";
 
@@ -10,10 +10,7 @@ export function isRunningInBun() {
   return typeof Bun !== "undefined";
 }
 
-export function serveHonoAppWithBun(
-  app: Hono,
-  viteServer: ViteDevServer,
-): MightyServer {
+function serveHonoAppWithBun(app: Hono, viteServer: ViteDevServer) {
   const server = Bun.serve({ fetch: app.fetch });
   return {
     address: {
@@ -28,10 +25,7 @@ export function serveHonoAppWithBun(
   };
 }
 
-export function serveHonoAppWithNode(
-  app: Hono,
-  viteServer: ViteDevServer,
-): MightyServer {
+function serveHonoAppWithNode(app: Hono, viteServer: ViteDevServer) {
   const server = serve(app);
   return {
     address: server.address() as AddressInfo,
@@ -42,7 +36,7 @@ export function serveHonoAppWithNode(
   };
 }
 
-export function getCurrentRuntime(): Runtime {
+function getCurrentRuntime(): Runtime {
   if (isRunningInBun()) return "bun";
   return "node";
 }
@@ -50,11 +44,25 @@ export function getCurrentRuntime(): Runtime {
 export function serveHonoApp(
   app: Hono,
   viteServer: ViteDevServer,
-): MightyServer {
+): MightyStandaloneServer {
   switch (getCurrentRuntime()) {
     case "bun":
-      return serveHonoAppWithBun(app, viteServer);
+      return { ...serveHonoAppWithBun(app, viteServer), honoApp: app };
     case "node":
-      return serveHonoAppWithNode(app, viteServer);
+      return { ...serveHonoAppWithNode(app, viteServer), honoApp: app };
+  }
+}
+
+export async function getRuntimeConnInfo(c: Context) {
+  switch (getCurrentRuntime()) {
+    case "bun": {
+      const getConnInfo = (await import("hono/bun")).getConnInfo;
+      return getConnInfo(c);
+    }
+    case "node": {
+      const getConnInfo = (await import("@hono/node-server/conninfo"))
+        .getConnInfo;
+      return getConnInfo(c);
+    }
   }
 }

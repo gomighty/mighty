@@ -1,15 +1,18 @@
-import { getContentFromMatchingTags, getFixture } from "@tests/utils";
-import type { Hono } from "hono";
+import {
+  type AppRequestFunction,
+  getContentFromMatchingTags,
+  getFixture,
+} from "@tests/utils";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("dev hono app", () => {
-  let app: Hono;
+  let request: AppRequestFunction;
   let stop: () => Promise<void>;
 
   const fixture = getFixture("basic");
 
   beforeEach(async () => {
-    ({ app, stop } = await fixture.startDevServer());
+    ({ request, stop } = await fixture.startDevServer());
   });
 
   afterEach(async () => {
@@ -17,14 +20,14 @@ describe("dev hono app", () => {
   });
 
   it("starts a dev server", async () => {
-    const response = await app.request("/", {
+    const response = await request("/", {
       headers: { host: "localhost" },
     });
     expect(response.status).toBe(200);
   });
 
   it("can render a partial", async () => {
-    const response = await app.request("/render", {
+    const response = await request("/render", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,7 +47,7 @@ describe("dev hono app", () => {
   });
 
   it("can render a partial with dot notation", async () => {
-    const response = await app.request("/render", {
+    const response = await request("/render", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -64,7 +67,7 @@ describe("dev hono app", () => {
   });
 
   it("returns 404 for a non-existent component", async () => {
-    const response = await app.request("/render", {
+    const response = await request("/render", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -78,7 +81,7 @@ describe("dev hono app", () => {
   });
 
   it("can render a page", async () => {
-    const response = await app.request("/render", {
+    const response = await request("/render", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -101,7 +104,7 @@ describe("dev hono app", () => {
   });
 
   it("can render a page with styles", async () => {
-    const response = await app.request("/render", {
+    const response = await request("/render", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -129,7 +132,7 @@ describe("dev hono app", () => {
   });
 
   it("can render a page with styles from a child component", async () => {
-    const response = await app.request("/render", {
+    const response = await request("/render", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -160,13 +163,13 @@ describe("dev hono app", () => {
 });
 
 describe("dev react renderer", () => {
-  let app: Hono;
+  let request: AppRequestFunction;
   let stop: () => Promise<void>;
 
   const fixture = getFixture("react-renderer");
 
   beforeEach(async () => {
-    ({ app, stop } = await fixture.startDevServer());
+    ({ request, stop } = await fixture.startDevServer());
   });
 
   afterEach(async () => {
@@ -174,7 +177,7 @@ describe("dev react renderer", () => {
   });
 
   it("can render a react component", async () => {
-    const response = await app.request("/render", {
+    const response = await request("/render", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -195,7 +198,7 @@ describe("dev react renderer", () => {
   });
 
   it("can render a react component and hydrate it", async () => {
-    const response = await app.request("/render", {
+    const response = await request("/render", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -226,13 +229,13 @@ describe("dev react renderer", () => {
 });
 
 describe("dev alpinejs", () => {
-  let app: Hono;
+  let request: AppRequestFunction;
   let stop: () => Promise<void>;
 
   const fixture = getFixture("alpinejs");
 
   beforeEach(async () => {
-    ({ app, stop } = await fixture.startDevServer());
+    ({ request, stop } = await fixture.startDevServer());
   });
 
   afterEach(async () => {
@@ -240,7 +243,7 @@ describe("dev alpinejs", () => {
   });
 
   it("can render a page with alpinejs", async () => {
-    const response = await app.request("/render", {
+    const response = await request("/render", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -262,7 +265,7 @@ describe("dev alpinejs", () => {
       '<script type="module" src="http://host-placeholder.test/@id/astro:scripts/page.js"></script>',
     );
 
-    const scriptResponse = await app.request("/@id/astro:scripts/page.js", {
+    const scriptResponse = await request("/@id/astro:scripts/page.js", {
       headers: { host: "localhost" },
     });
     expect(scriptResponse.status).toBe(200);
@@ -272,13 +275,13 @@ describe("dev alpinejs", () => {
 });
 
 describe("dev partytown", () => {
-  let app: Hono;
+  let request: AppRequestFunction;
   let stop: () => Promise<void>;
 
   const fixture = getFixture("partytown");
 
   beforeEach(async () => {
-    ({ app, stop } = await fixture.startDevServer());
+    ({ request, stop } = await fixture.startDevServer());
   });
 
   afterEach(async () => {
@@ -286,7 +289,7 @@ describe("dev partytown", () => {
   });
 
   it("can render a page with partytown", async () => {
-    const response = await app.request("/render", {
+    const response = await request("/render", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -8,9 +8,11 @@ import {
 } from "astro";
 import type { Element } from "hast";
 import { Hono } from "hono";
+import type { ConnInfo } from "hono/conninfo";
 import { cors } from "hono/cors";
 import { isRunnableDevEnvironment, type ViteDevServer } from "vite";
 import { getStylesForURL } from "@/dev/css";
+import { getRuntimeConnInfo } from "@/runtime";
 import { MightyRenderRequestSchema } from "@/schemas";
 import type { MightyServerOptions } from "@/types";
 import { adaptConnectMiddleware } from "@/utils/adaptConnectMiddleware";
@@ -18,15 +20,13 @@ import { dotStringToPath } from "@/utils/dotStringToPath";
 import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
 import type {
   MightyRenderFunction,
+  MightySetHostAddressFunction,
   MightyStartContainerFunction,
 } from "./render";
 import { loadRenderersFromIntegrations } from "./renderers";
 import { getInjectedScriptsFromIntegrations } from "./scripts";
 
-export async function createDevHonoApp(
-  options: MightyServerOptions,
-  getHostAddress: () => string,
-): Promise<{
+export async function createDevHonoApp(options: MightyServerOptions): Promise<{
   app: Hono;
   viteServer: ViteDevServer;
 }> {
@@ -102,12 +102,14 @@ export async function createDevHonoApp(
     ssrEnv,
   );
 
-  const { render, createContainer } = await ssrEnv.runner.import<{
-    render: MightyRenderFunction;
-    createContainer: MightyStartContainerFunction;
-  }>(path.join(__dirname, "./render.ts"));
+  const { render, createContainer, setHostAddress } =
+    await ssrEnv.runner.import<{
+      render: MightyRenderFunction;
+      createContainer: MightyStartContainerFunction;
+      setHostAddress: MightySetHostAddressFunction;
+    }>(path.join(__dirname, "./render.ts"));
 
-  await createContainer(loadedRenderers, getHostAddress);
+  await createContainer(loadedRenderers);
 
   const injectedScripts = await getInjectedScriptsFromIntegrations(
     finalConfig.integrations,
@@ -122,29 +124,35 @@ export async function createDevHonoApp(
       children: [{ type: "text", value: script.content }],
     }));
 
-  const getPageScripts: () => Element[] = injectedScripts.some(
-    (script) => script.stage === "page",
-  )
-    ? () => [
-        {
-          type: "element",
-          tagName: "script",
-          properties: {
-            type: "module",
-            src: `${getHostAddress()}/@id/astro:scripts/page.js`,
+  const getPageScripts: (connInfo: ConnInfo) => Element[] =
+    injectedScripts.some((script) => script.stage === "page")
+      ? (connInfo) => [
+          {
+            type: "element",
+            tagName: "script",
+            properties: {
+              type: "module",
+              src: `${connInfo.remote.address}/@id/astro:scripts/page.js`,
+            },
+            children: [],
           },
-          children: [],
-        },
-      ]
-    : () => [];
+        ]
+      : () => [];
 
   const app = new Hono();
   app.use(cors());
+  app.use(async (c, next) => {
+    const connInfo = await getRuntimeConnInfo(c);
+    setHostAddress(connInfo.remote.address ?? "");
+    await next();
+  });
 
   app.post(
     "/render",
     zValidator("json", MightyRenderRequestSchema),
     async (c) => {
+      const connInfo = await getRuntimeConnInfo(c);
+
       const { component, props, partial } = c.req.valid("json");
 
       const componentPath: `${string}.astro` = `${path.join(
@@ -184,7 +192,7 @@ export async function createDevHonoApp(
         tagName: "script",
         properties: {
           type: "module",
-          src: `${getHostAddress()}/@vite/client`,
+          src: `${connInfo.remote.address}/@vite/client`,
         },
         children: [],
       };
@@ -195,7 +203,7 @@ export async function createDevHonoApp(
           [
             ...styleTags,
             viteClientScript,
-            ...getPageScripts(),
+            ...getPageScripts(connInfo),
             ...headInlineScriptTags,
           ],
           partial,

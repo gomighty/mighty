@@ -4,14 +4,15 @@ import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 
 let container: AstroContainer | undefined;
 
-export async function createContainer(
-  renderers: SSRLoadedRenderer[],
-  getHostAddress: () => string,
-) {
+let address: string | undefined;
+
+export async function createContainer(renderers: SSRLoadedRenderer[]) {
   container = await AstroContainer.create({
     renderers,
     async resolve(s) {
-      const address = getHostAddress();
+      if (!address) {
+        throw new Error("Host address not set");
+      }
       if (s.startsWith("astro:scripts")) {
         return `${address}/@id/${s}`;
       }
@@ -24,6 +25,12 @@ export async function createContainer(
 }
 
 export type MightyStartContainerFunction = typeof createContainer;
+
+export async function setHostAddress(hostAddress: string) {
+  address = hostAddress;
+}
+
+export type MightySetHostAddressFunction = typeof setHostAddress;
 
 export async function render({
   componentPath,
