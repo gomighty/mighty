@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     setupFiles: ["./tests/custom-matchers.ts"],
     retry: process.env.CI ? 2 : undefined,
+    fileParallelism: false,
   },
   resolve: {
     alias: {
