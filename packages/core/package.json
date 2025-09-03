@@ -7,7 +7,7 @@
     "url": "git+https://github.com/gomighty/mighty.git"
   },
   "exports": {
-    "dev": "src/dev/index.ts"
+    ".": "./dist/index.js"
   },
   "dependencies": {
     "@hono/node-server": "^1.18.1",
@@ -35,7 +35,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "vitest": "vitest"
+    "vitest": "vitest",
+    "build-pkg": "bun run build-pkg.ts"
   },
   "type": "module",
   "devDependencies": {
