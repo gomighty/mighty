@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     setupFiles: ["./tests/custom-matchers.ts"],
-    retry: process.env.CI ? 2 : undefined,
+    retry: 2,
     fileParallelism: false,
   },
   resolve: {
