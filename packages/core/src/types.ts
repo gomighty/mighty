@@ -22,3 +22,5 @@ export type MightyStandaloneServer = {
 };
 
 export type MightyServer = MightyMiddlewareServer | MightyStandaloneServer;
+
+export type MightyContext = Record<string, unknown>;

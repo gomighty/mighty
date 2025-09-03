@@ -153,7 +153,7 @@ export async function createDevHonoApp(options: MightyServerOptions): Promise<{
     async (c) => {
       const connInfo = await getRuntimeConnInfo(c);
 
-      const { component, props, partial } = c.req.valid("json");
+      const { component, props, context, partial } = c.req.valid("json");
 
       const componentPath: `${string}.astro` = `${path.join(
         finalConfig.srcDir.pathname,
@@ -172,6 +172,7 @@ export async function createDevHonoApp(options: MightyServerOptions): Promise<{
         render({
           componentPath,
           props,
+          context,
           partial,
         }),
         getStylesForURL(componentPath, viteServer).then((styles): Element[] =>

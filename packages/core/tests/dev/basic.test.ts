@@ -160,4 +160,29 @@ describe("dev basic fixture", () => {
       /p\[data-astro-cid-.+\]\{color:red\}/,
     ]);
   });
+
+  it("can render a component with context", async () => {
+    const response = await request("/render", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        component: "context",
+        context: {
+          notifications: ["Hello World"],
+          user: {
+            id: 1,
+          },
+        },
+      }),
+    });
+    expect(response.status).toBe(200);
+
+    const output = await response.text();
+
+    expect(output).toContain(
+      "<p>Context: {&quot;notifications&quot;:[&quot;Hello World&quot;],&quot;user&quot;:{&quot;id&quot;:1}}</p>",
+    );
+  });
 });
