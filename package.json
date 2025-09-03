@@ -9,6 +9,7 @@
   },
   "scripts": {
     "ci:biome": "biome ci",
+    "build-pkg": "bun run --filter '*' build-pkg",
     "ci:vitest": "bun run --filter '*' vitest --reporter=github-actions",
     "vitest": "bun run --filter '*' vitest --reporter=verbose"
   }
