@@ -1,5 +1,6 @@
 import { copyFile, mkdir, rm } from "node:fs/promises";
 import path from "node:path";
+import { $ } from "bun";
 
 const FILES_TO_COPY_AS_IS = ["src/dev/render.ts"];
 
@@ -31,3 +32,5 @@ await Bun.build({
 });
 
 await Promise.all(FILES_TO_COPY_AS_IS.map(copyFileWithMkdir));
+
+await $`bunx tsgo`;
