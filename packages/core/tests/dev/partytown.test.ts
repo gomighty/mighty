@@ -1,8 +1,6 @@
-import {
-  type AppRequestFunction,
-  getContentFromMatchingTags,
-  getFixture,
-} from "@tests/utils";
+import { type AppRequestFunction, getFixture } from "@tests/fixture";
+import { getContentFromMatchingTags } from "@tests/utils";
+
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("dev partytown fixture", () => {

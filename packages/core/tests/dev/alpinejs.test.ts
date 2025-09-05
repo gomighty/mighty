@@ -1,4 +1,4 @@
-import { type AppRequestFunction, getFixture } from "@tests/utils";
+import { type AppRequestFunction, getFixture } from "@tests/fixture";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("dev alpinejs fixture", () => {
