@@ -1,6 +1,7 @@
 import { copyFile, mkdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { $ } from "bun";
+import { replaceTscAliasPaths } from "tsc-alias";
 
 const FILES_TO_COPY_AS_IS = ["src/dev/render.ts"];
 
@@ -22,15 +23,17 @@ async function copyFileWithMkdir(source: string) {
 }
 
 await Bun.build({
-  entrypoints: ["src/dev/index.ts", "src/context/index.ts", "src/index.ts"],
+  entrypoints: ["src/index.ts", "src/dev/index.ts", "src/context/index.ts"],
   target: "node",
   outdir: "dist",
   root: "src",
   external: await getDependencies(),
   // @ts-expect-error splitting is a supported option
   splitting: true,
+  minify: { identifiers: true },
 });
 
 await Promise.all(FILES_TO_COPY_AS_IS.map(copyFileWithMkdir));
 
 await $`bunx tsgo`;
+await replaceTscAliasPaths();
