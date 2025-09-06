@@ -7,7 +7,7 @@ describe("dev partytown fixture", () => {
   let request: AppRequestFunction;
   let stop: () => Promise<void>;
 
-  const fixture = getFixture("partytown");
+  const fixture = getFixture("dev.partytown");
 
   beforeEach(async () => {
     ({ request, stop } = await fixture.startDevServer());

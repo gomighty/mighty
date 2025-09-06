@@ -5,7 +5,7 @@ describe("dev alpinejs fixture", () => {
   let request: AppRequestFunction;
   let stop: () => Promise<void>;
 
-  const fixture = getFixture("alpinejs");
+  const fixture = getFixture("dev.alpinejs");
 
   beforeEach(async () => {
     ({ request, stop } = await fixture.startDevServer());

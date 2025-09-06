@@ -6,7 +6,7 @@ describe("dev react fixture", () => {
   let request: AppRequestFunction;
   let stop: () => Promise<void>;
 
-  const fixture = getFixture("react-renderer");
+  const fixture = getFixture("dev.react-renderer");
 
   beforeEach(async () => {
     ({ request, stop } = await fixture.startDevServer());
