@@ -2,6 +2,7 @@ import { rm } from "node:fs/promises";
 import path from "node:path";
 import { createDevHonoApp } from "@/dev/app";
 import type { MightyServerOptions } from "@/types";
+import { dotStringToPath } from "@/utils/dotStringToPath";
 
 export type AppRequestFunction = (
   input: string | URL,
@@ -9,7 +10,7 @@ export type AppRequestFunction = (
 ) => Promise<Response>;
 
 export function getFixture(fixtureName: string) {
-  const fixtureRoot = path.join(__dirname, "..", "fixtures", fixtureName);
+  const fixtureRoot = path.join(__dirname, "..", "fixtures", ...dotStringToPath(fixtureName));
 
   return {
     startDevServer: async (params?: MightyServerOptions) => {
