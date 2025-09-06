@@ -25,6 +25,7 @@ import type {
 } from "./render";
 import { loadRenderersFromIntegrations } from "./renderers";
 import { getInjectedScriptsFromIntegrations } from "./scripts";
+import { getViteLogger } from "./viteLogger";
 
 export async function createDevHonoApp(options: MightyServerOptions): Promise<{
   app: Hono;
@@ -35,6 +36,7 @@ export async function createDevHonoApp(options: MightyServerOptions): Promise<{
 
   const mightyConfig: AstroInlineConfig = {
     vite: {
+      customLogger: getViteLogger(),
       server: {
         middlewareMode: true,
         cors: false,
