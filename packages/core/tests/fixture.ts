@@ -10,7 +10,12 @@ export type AppRequestFunction = (
 ) => Promise<Response>;
 
 export function getFixture(fixtureName: string) {
-  const fixtureRoot = path.join(__dirname, "..", "fixtures", ...dotStringToPath(fixtureName));
+  const fixtureRoot = path.join(
+    __dirname,
+    "..",
+    "fixtures",
+    ...dotStringToPath(fixtureName),
+  );
 
   return {
     startDevServer: async (params?: MightyServerOptions) => {
