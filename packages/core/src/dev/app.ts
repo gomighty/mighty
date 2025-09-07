@@ -6,6 +6,7 @@ import {
   type AstroInlineConfig,
   dev as astroDev,
 } from "astro";
+import { mergeConfig } from "astro/config";
 import type { Element } from "hast";
 import { Hono } from "hono";
 import type { ConnInfo } from "hono/conninfo";
@@ -79,9 +80,7 @@ export async function createDevHonoApp(options: MightyServerOptions): Promise<{
     ],
   };
 
-  const userConfig = options?.config ?? {};
-
-  await astroDev({ ...userConfig, ...mightyConfig });
+  await astroDev(mergeConfig(mightyConfig, options?.config ?? {}));
 
   // @ts-expect-error - finalConfig is defined at this point
   if (!finalConfig) {

@@ -1,5 +1,7 @@
 import { rm } from "node:fs/promises";
 import path from "node:path";
+import type { AstroInlineConfig } from "astro";
+import { mergeConfig } from "astro/config";
 import { createDevHonoApp } from "@/dev/app";
 import type { MightyServerOptions } from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
@@ -20,11 +22,13 @@ export function getFixture(fixtureName: string) {
   return {
     startDevServer: async (params?: MightyServerOptions) => {
       const { app, viteServer } = await createDevHonoApp({
-        config: {
-          root: fixtureRoot,
-          logLevel: "warn",
-          ...params,
-        },
+        config: mergeConfig<AstroInlineConfig>(
+          {
+            root: fixtureRoot,
+            logLevel: "warn",
+          },
+          params?.config ?? {},
+        ),
       });
 
       const request: AppRequestFunction = async (input, requestInit) => {
