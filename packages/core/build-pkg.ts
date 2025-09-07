@@ -35,5 +35,5 @@ await Bun.build({
 
 await Promise.all(FILES_TO_COPY_AS_IS.map(copyFileWithMkdir));
 
-await $`bunx tsgo`;
+await $`bunx tsc`;
 await replaceTscAliasPaths();

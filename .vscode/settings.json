@@ -1,4 +1,3 @@
 {
   "editor.defaultFormatter": "biomejs.biome",
-  "typescript.experimental.useTsgo": true
 }
