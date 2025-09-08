@@ -1,6 +1,10 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { MightyContext } from "@/types";
 
+export class MightyContextError extends Error {
+  name = "MightyContextError";
+}
+
 const asyncLocalStorage = new AsyncLocalStorage<MightyContext>();
 
 export async function runInContext<CallbackReturnType>(
@@ -13,7 +17,9 @@ export async function runInContext<CallbackReturnType>(
 export function getContext(): MightyContext {
   const store = asyncLocalStorage.getStore();
   if (!store) {
-    throw new Error("No context found");
+    throw new MightyContextError(
+      "No context found. Are you trying to access the context in a prerendered page?",
+    );
   }
   return store;
 }
