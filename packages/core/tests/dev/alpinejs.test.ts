@@ -1,5 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { type AppRequestFunction, getFixture } from "@tests/fixture";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("dev alpinejs fixture", () => {
   let request: AppRequestFunction;

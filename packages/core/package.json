@@ -35,7 +35,6 @@
   ],
   "license": "MIT",
   "scripts": {
-    "vitest": "vitest",
     "build-pkg": "bun run build-pkg.ts"
   },
   "type": "module",
@@ -44,7 +43,6 @@
     "@astrojs/partytown": "^2.1.4",
     "@astrojs/react": "4.3.1",
     "@types/body-parser": "^1.19.6",
-    "tsc-alias": "^1.8.16",
-    "vitest": "^3.2.4"
+    "tsc-alias": "^1.8.16"
   }
 }

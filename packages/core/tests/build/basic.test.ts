@@ -1,7 +1,7 @@
+import { afterEach, describe, expect, it } from "bun:test";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getFixture } from "@tests/fixture";
-import { afterEach, describe, expect, it } from "vitest";
 
 describe("build basic fixture", () => {
   const fixture = getFixture("build.basic");
@@ -11,7 +11,7 @@ describe("build basic fixture", () => {
   });
 
   it("can build a static output", async () => {
-    await expect(
+    expect(
       fixture.build({ config: { output: "static" } }),
     ).resolves.toBeUndefined();
 
@@ -24,7 +24,7 @@ describe("build basic fixture", () => {
   });
 
   it("can build a server output", async () => {
-    await expect(
+    expect(
       fixture.build({ config: { output: "server" } }),
     ).resolves.toBeUndefined();
 

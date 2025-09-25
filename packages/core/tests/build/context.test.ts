@@ -1,5 +1,5 @@
+import { afterEach, describe, expect, it } from "bun:test";
 import { getFixture } from "@tests/fixture";
-import { afterEach, describe, expect, it } from "vitest";
 
 describe("build context fixture", () => {
   const fixture = getFixture("build.context");
@@ -9,19 +9,16 @@ describe("build context fixture", () => {
   });
 
   it("can build a server output with context", async () => {
-    await expect(
+    expect(
       fixture.build({ config: { output: "server" } }),
     ).resolves.toBeUndefined();
   });
 
   it("cannot build a static output with context", async () => {
-    await expect(
-      fixture.build({ config: { output: "static" } }),
-    ).rejects.toThrowError(
-      expect.toSatisfy((error) => {
-        expect(error.name).toBe("MightyContextError");
-        expect(error.id).toBe("src/pages/index.astro");
-        return true;
+    expect(fixture.build({ config: { output: "static" } })).toEqual(
+      expect.rejectsTo.objectContaining({
+        name: "MightyContextError",
+        id: "src/pages/index.astro",
       }),
     );
   });

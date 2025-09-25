@@ -50,12 +50,12 @@ export function getFixture(fixtureName: string) {
 
       const request: AppRequestFunction = async (input, requestInit) => {
         return app.request(input, requestInit, {
-          incoming: {
-            socket: {
-              remoteAddress: "http://host-placeholder.test",
-              remoteFamily: "IPv4",
-              remotePort: 80,
-            },
+          requestIP() {
+            return {
+              address: "http://host-placeholder.test",
+              family: "IPv4",
+              port: 80,
+            };
           },
         });
       };

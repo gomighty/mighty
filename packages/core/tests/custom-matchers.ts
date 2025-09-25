@@ -1,9 +1,7 @@
-import { expect } from "vitest";
+import { expect } from "bun:test";
 
 expect.extend({
   arrayMatching(received, expected) {
-    const { equals } = this;
-
     if (!Array.isArray(received) || !Array.isArray(expected)) {
       return {
         pass: false,
@@ -11,7 +9,7 @@ expect.extend({
       };
     }
 
-    if (!equals(received.length, expected.length)) {
+    if (received.length !== expected.length) {
       return {
         pass: false,
         message: () =>
