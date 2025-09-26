@@ -35,7 +35,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build-pkg": "bun run build-pkg.ts"
+    "build-pkg": "bun run build-pkg.ts",
+    "typecheck": "tsc --noEmit"
   },
   "type": "module",
   "devDependencies": {

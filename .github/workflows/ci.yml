@@ -10,6 +10,16 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - run: bun install
       - run: bun run ci:biome
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun run ci:typecheck
+
   test:
     name: Test
     runs-on: ubuntu-latest

@@ -9,6 +9,7 @@
   },
   "scripts": {
     "ci:biome": "biome ci",
+    "ci:typecheck": "bun run --filter '*' typecheck",
     "build-pkg": "bun run --filter '*' build-pkg"
   }
 }
