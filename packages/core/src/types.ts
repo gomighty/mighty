@@ -6,21 +6,14 @@ export type MightyServerOptions = {
   config?: AstroInlineConfig;
 };
 
-export type MightyDevOptions = MightyServerOptions & {
+export type MightyDevAndStartOptions = MightyServerOptions & {
   middlewareMode?: boolean;
 };
 
-export type MightyMiddlewareServer = {
+export type MightyServer = {
   honoApp: Hono;
+  address?: AddressInfo;
   stop: () => Promise<void>;
 };
-
-export type MightyStandaloneServer = {
-  honoApp: Hono;
-  address: AddressInfo;
-  stop: () => Promise<void>;
-};
-
-export type MightyServer = MightyMiddlewareServer | MightyStandaloneServer;
 
 export type MightyContext = Record<string, unknown>;

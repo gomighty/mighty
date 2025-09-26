@@ -1,12 +1,14 @@
-import type {
-  MightyDevOptions,
-  MightyMiddlewareServer,
-  MightyServer,
-} from "@/types";
-import { serveHonoApp } from "../runtime";
+import { getCurrentRuntime, serveHonoApp } from "@/runtime";
+import type { MightyDevAndStartOptions, MightyServer } from "@/types";
 import { createDevHonoApp } from "./app";
 
-export async function dev(options?: MightyDevOptions): Promise<MightyServer> {
+export async function dev(
+  options?: MightyDevAndStartOptions,
+): Promise<MightyServer> {
+  if (getCurrentRuntime() === "workerd") {
+    throw new Error("Dev mode is not supported in Cloudflare Workers");
+  }
+
   const { middlewareMode, ...serverOptions } = options ?? {};
 
   const { app, viteServer } = await createDevHonoApp(serverOptions);
@@ -17,7 +19,7 @@ export async function dev(options?: MightyDevOptions): Promise<MightyServer> {
       stop: async () => {
         await viteServer.close();
       },
-    } satisfies MightyMiddlewareServer;
+    };
   }
 
   const mightyServer = serveHonoApp(app, viteServer);

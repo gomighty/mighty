@@ -1,4 +1,5 @@
 import path from "node:path";
+import type { Element } from "hast";
 import rehypeParse from "rehype-parse";
 import rehypeStringify from "rehype-stringify";
 import { unified } from "unified";
@@ -51,4 +52,27 @@ export function getContentFromMatchingTags({
   });
 
   return tagContent;
+}
+
+export function getMatchingTags({
+  html,
+  tag,
+  fragment,
+}: {
+  html: string;
+  tag: string;
+  fragment: boolean;
+}) {
+  const tree = fragment
+    ? fragmentProcessor.parse(html)
+    : pageProcessor.parse(html);
+  const matchingTags: Element[] = [];
+
+  visit(tree, "element", (node) => {
+    if (node.tagName === tag) {
+      matchingTags.push(node);
+    }
+  });
+
+  return matchingTags;
 }
