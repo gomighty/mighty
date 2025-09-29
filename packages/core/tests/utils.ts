@@ -1,4 +1,3 @@
-import path from "node:path";
 import type { Element } from "hast";
 import rehypeParse from "rehype-parse";
 import rehypeStringify from "rehype-stringify";
@@ -8,22 +7,6 @@ import { visit } from "unist-util-visit";
 const contentProcessor = unified().use(rehypeStringify);
 const fragmentProcessor = unified().use(rehypeParse, { fragment: true });
 const pageProcessor = unified().use(rehypeParse, { fragment: false });
-
-export function getTreeFromOutput({
-  output,
-  fragment,
-}: {
-  output: string;
-  fragment: boolean;
-}) {
-  // We replace the root path with a dummy path to have consistent snapshots
-  const root = path.join(__dirname, "..");
-  const outputWithRootReplaced = output.replaceAll(root, "/test_root");
-
-  const processor = unified().use(rehypeParse, { fragment });
-
-  return processor.parse(outputWithRootReplaced);
-}
 
 export function getContentFromMatchingTags({
   html,
