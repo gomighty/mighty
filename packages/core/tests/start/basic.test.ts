@@ -286,4 +286,145 @@ describe("start basic fixture", () => {
       /p\[data-astro-cid-.+\]\{color:red\}/,
     );
   });
+
+  it("can render a prerendered page with an inline script", async () => {
+    await fixture.build({
+      config: {
+        output: "static",
+        vite: { build: { assetsInlineLimit: 4096 } },
+      },
+    });
+    const { request } = await fixture.startProdServer();
+
+    const response = await request("/render", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        component: "scriptTag",
+      }),
+    });
+    expect(response.status).toBe(302);
+    expect(response.headers.get("Location")).toBe("scriptTag/index.html");
+
+    const redirectResponse = await request("scriptTag/index.html");
+    const output = await redirectResponse.text();
+
+    expect(output).toContain('<script type="module">');
+    expect(output).toContain("Hello World!");
+    expect(output).toContain("console.log");
+    expect(output).toContain("</script>");
+  });
+
+  it("can render a prerendered page with an external script", async () => {
+    await fixture.build({
+      config: { output: "static", vite: { build: { assetsInlineLimit: 0 } } },
+    });
+    const { request } = await fixture.startProdServer();
+
+    const response = await request("/render", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        component: "scriptTag",
+      }),
+    });
+    expect(response.status).toBe(302);
+    expect(response.headers.get("Location")).toBe("scriptTag/index.html");
+
+    const redirectResponse = await request("scriptTag/index.html");
+    const output = await redirectResponse.text();
+
+    const matchingTags = getMatchingTags({
+      html: output,
+      tag: "script",
+      fragment: false,
+    });
+    expect(matchingTags.length).toBe(1);
+
+    const scriptSrc = matchingTags[0]?.properties.src as string;
+    expect(scriptSrc).toMatch(/_astro\/.+\.js/);
+
+    const scriptResponse = await request(scriptSrc);
+    expect(scriptResponse.status).toBe(200);
+    expect(scriptResponse.headers.get("Content-Type")).toContain(
+      "text/javascript",
+    );
+
+    const scriptContent = await scriptResponse.text();
+    expect(scriptContent).toContain("Hello World!");
+    expect(scriptContent).toContain("console.log");
+  });
+
+  it("can render an on-demand page with an inline script", async () => {
+    await fixture.build({
+      config: {
+        output: "server",
+        vite: { build: { assetsInlineLimit: 4096 } },
+      },
+    });
+    const { request } = await fixture.startProdServer();
+
+    const response = await request("/render", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        component: "scriptTag",
+      }),
+    });
+    expect(response.status).toBe(200);
+
+    const output = await response.text();
+
+    expect(output).toContain('<script type="module">');
+    expect(output).toContain("Hello World!");
+    expect(output).toContain("console.log");
+    expect(output).toContain("</script>");
+  });
+
+  it("can render an on-demand page with an external script", async () => {
+    await fixture.build({
+      config: { output: "server", vite: { build: { assetsInlineLimit: 0 } } },
+    });
+    const { request } = await fixture.startProdServer();
+
+    const response = await request("/render", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        component: "scriptTag",
+      }),
+    });
+
+    expect(response.status).toBe(200);
+
+    const output = await response.text();
+
+    const matchingTags = getMatchingTags({
+      html: output,
+      tag: "script",
+      fragment: false,
+    });
+    expect(matchingTags.length).toBe(1);
+
+    const scriptSrc = matchingTags[0]?.properties.src as string;
+    expect(scriptSrc).toMatch(/_astro\/.+\.js/);
+
+    const scriptResponse = await request(scriptSrc);
+    expect(scriptResponse.status).toBe(200);
+    expect(scriptResponse.headers.get("Content-Type")).toContain(
+      "text/javascript",
+    );
+
+    const scriptContent = await scriptResponse.text();
+    expect(scriptContent).toContain("Hello World!");
+    expect(scriptContent).toContain("console.log");
+  });
 });

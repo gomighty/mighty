@@ -32,6 +32,9 @@ export async function createProdHonoApp(options: MightyServerOptions): Promise<{
   const container = await AstroContainer.create({
     manifest,
     renderers,
+    async resolve(s) {
+      return manifest.entryModules[s] ?? s;
+    },
   });
 
   const app = new Hono();
