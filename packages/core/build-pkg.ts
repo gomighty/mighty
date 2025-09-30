@@ -37,7 +37,6 @@ await Bun.build({
   outdir: "dist",
   root: "src",
   external: await getDependencies(),
-  // @ts-expect-error splitting is a supported option
   splitting: true,
   minify: { identifiers: true },
 });
