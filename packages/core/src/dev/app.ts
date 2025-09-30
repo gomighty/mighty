@@ -108,7 +108,7 @@ export async function createDevHonoApp(options: MightyServerOptions): Promise<{
       render: MightyRenderFunction;
       createContainer: MightyStartContainerFunction;
       setHostAddress: MightySetHostAddressFunction;
-    }>(path.join(__dirname, "./render.ts"));
+    }>(path.join(import.meta.dir, "./render.ts"));
 
   await createContainer(loadedRenderers);
 

@@ -11,7 +11,10 @@ export async function build(options?: MightyServerOptions): Promise<void> {
         "astro:config:done": ({ setAdapter }) => {
           setAdapter({
             name: "mighty-adapter",
-            serverEntrypoint: path.join(__dirname, "./server-entrypoint.mjs"),
+            serverEntrypoint: path.join(
+              import.meta.dir,
+              "./server-entrypoint.mjs",
+            ),
             supportedAstroFeatures: {
               serverOutput: "stable",
               sharpImageService: "stable",

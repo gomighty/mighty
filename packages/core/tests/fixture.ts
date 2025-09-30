@@ -44,7 +44,7 @@ export function getFixture(fixtureName: string): {
   clean: () => Promise<void>;
 } {
   const fixtureRoot = path.join(
-    __dirname,
+    import.meta.dir,
     "..",
     "fixtures",
     ...dotStringToPath(fixtureName),
