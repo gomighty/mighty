@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.18.1",
-    "@hono/zod-validator": "^0.7.2",
     "astro": "5.14.0",
     "fetch-to-node": "^2.1.0",
     "hono": "catalog:",

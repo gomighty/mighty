@@ -1,6 +1,5 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
-import { zValidator } from "@hono/zod-validator";
 import {
   type AstroConfig,
   type AstroInlineConfig,
@@ -11,6 +10,7 @@ import type { Element } from "hast";
 import { Hono } from "hono";
 import type { ConnInfo } from "hono/conninfo";
 import { cors } from "hono/cors";
+import { validator } from "hono/validator";
 import { isRunnableDevEnvironment, type ViteDevServer } from "vite";
 import { getStylesForURL } from "@/dev/css";
 import { getRuntimeConnInfo } from "@/runtime";
@@ -150,7 +150,13 @@ export async function createDevHonoApp(options: MightyServerOptions): Promise<{
 
   app.post(
     "/render",
-    zValidator("json", MightyRenderRequestSchema),
+    validator("json", (value, c) => {
+      const result = MightyRenderRequestSchema.safeParse(value);
+      if (!result.success) {
+        return c.json(result, 400);
+      }
+      return result.data;
+    }),
     async (c) => {
       const connInfo = await getRuntimeConnInfo(c);
 

@@ -1,9 +1,9 @@
 import path from "node:path";
-import { zValidator } from "@hono/zod-validator";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { Element } from "hast";
 import { Hono } from "hono";
+import { validator } from "hono/validator";
 import { runInContext } from "@/context";
 import { MightyRenderRequestSchema } from "@/schemas";
 import type { MightyServerOptions } from "@/types";
@@ -41,7 +41,13 @@ export async function createProdHonoApp(options: MightyServerOptions): Promise<{
 
   app.post(
     "/render",
-    zValidator("json", MightyRenderRequestSchema),
+    validator("json", (value, c) => {
+      const result = MightyRenderRequestSchema.safeParse(value);
+      if (!result.success) {
+        return c.json(result, 400);
+      }
+      return result.data;
+    }),
     async (c) => {
       const { component, props, context, partial } = c.req.valid("json");
 
