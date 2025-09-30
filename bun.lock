@@ -5,6 +5,8 @@
       "devDependencies": {
         "@biomejs/biome": "2.1.3",
         "@types/bun": "^1.2.23",
+        "oxc-transform": "^0.93.0",
+        "tsc-alias": "^1.8.16",
         "typescript": "^5.9.2",
       },
     },
@@ -13,23 +15,32 @@
       "version": "0.0.1",
       "dependencies": {
         "@hono/node-server": "^1.18.1",
-        "@hono/zod-validator": "^0.7.2",
+        "@hono/zod-validator": "0.7.3",
         "astro": "5.14.0",
         "fetch-to-node": "^2.1.0",
-        "hono": "^4.9.0",
+        "hono": "catalog:",
         "zod": "^4.0.15",
       },
       "devDependencies": {
         "@astrojs/alpinejs": "0.4.9",
         "@astrojs/partytown": "^2.1.4",
         "@astrojs/react": "4.4.0",
-        "oxc-transform": "^0.93.0",
-        "tsc-alias": "^1.8.16",
       },
       "peerDependencies": {
         "typescript": "^5",
       },
     },
+    "packages/hono": {
+      "name": "@gomighty/hono",
+      "version": "0.0.1",
+      "dependencies": {
+        "@gomighty/core": "workspace:*",
+        "hono": "catalog:",
+      },
+    },
+  },
+  "catalog": {
+    "hono": "^4.9.9",
   },
   "packages": {
     "@ampproject/remapping": ["@ampproject/remapping@2.3.0", "", { "dependencies": { "@jridgewell/gen-mapping": "^0.3.5", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw=="],
@@ -168,9 +179,11 @@
 
     "@gomighty/core": ["@gomighty/core@workspace:packages/core"],
 
+    "@gomighty/hono": ["@gomighty/hono@workspace:packages/hono"],
+
     "@hono/node-server": ["@hono/node-server@1.19.1", "", { "peerDependencies": { "hono": "^4" } }, "sha512-h44e5s+ByUriaRIbeS/C74O8v90m0A95luyYQGMF7KEn96KkYMXO7bZAwombzTpjQTU4e0TkU8U1WBIXlwuwtA=="],
 
-    "@hono/zod-validator": ["@hono/zod-validator@0.7.2", "", { "peerDependencies": { "hono": ">=3.9.0", "zod": "^3.25.0 || ^4.0.0" } }, "sha512-ub5eL/NeZ4eLZawu78JpW/J+dugDAYhwqUIdp9KYScI6PZECij4Hx4UsrthlEUutqDDhPwRI0MscUfNkvn/mqQ=="],
+    "@hono/zod-validator": ["@hono/zod-validator@0.7.3", "", { "peerDependencies": { "hono": ">=3.9.0", "zod": "^3.25.0 || ^4.0.0" } }, "sha512-uYGdgVib3RlGD698WR5dVM0zB3UuPY5vHKXffGUbUh7r4xY+mFIhF3/v4AcQVLrU5CQdBso8BJr4wuVoCrjTuQ=="],
 
     "@img/colour": ["@img/colour@1.0.0", "", {}, "sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw=="],
 
@@ -568,7 +581,7 @@
 
     "hastscript": ["hastscript@9.0.1", "", { "dependencies": { "@types/hast": "^3.0.0", "comma-separated-tokens": "^2.0.0", "hast-util-parse-selector": "^4.0.0", "property-information": "^7.0.0", "space-separated-tokens": "^2.0.0" } }, "sha512-g7df9rMFX/SPi34tyGCyUBREQoKkapwdY/T04Qn9TDWfHhAYt4/I0gMVirzK5wEzeUqIjEB+LXC/ypb7Aqno5w=="],
 
-    "hono": ["hono@4.9.5", "", {}, "sha512-aLAVl5/67ifNnoFVxnhR89dpmSLsgwBprw/PT671ASwUpJqmd7Ne8KPTQo37DbRZfgpHaHeZ4bPVUvbOkeedMw=="],
+    "hono": ["hono@4.9.9", "", {}, "sha512-Hxw4wT6zjJGZJdkJzAx9PyBdf7ZpxaTSA0NfxqjLghwMrLBX8p33hJBzoETRakF3UJu6OdNQBZAlNSkGqKFukw=="],
 
     "html-escaper": ["html-escaper@3.0.3", "", {}, "sha512-RuMffC89BOWQoY0WKGpIhn5gX3iI54O6nRA0yC124NYVtzjmFWBIiFd8M0x+ZdX0P9R4lADg1mgP8C7PxGOWuQ=="],
 

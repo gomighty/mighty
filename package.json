@@ -1,15 +1,22 @@
 {
-  "workspaces": [
-    "packages/*"
-  ],
   "devDependencies": {
     "@biomejs/biome": "2.1.3",
     "@types/bun": "^1.2.23",
+    "oxc-transform": "^0.93.0",
+    "tsc-alias": "^1.8.16",
     "typescript": "^5.9.2"
   },
   "scripts": {
     "ci:biome": "biome ci",
     "ci:typecheck": "bun run --filter '*' typecheck",
     "build-pkg": "bun run --filter '*' build-pkg"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "catalog": {
+      "hono": "^4.9.9"
+    }
   }
 }

@@ -1,0 +1,17 @@
+{
+  "name": "@gomighty/hono",
+  "version": "0.0.1",
+  "author": "Amine Ilidrissi",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gomighty/mighty.git"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "dependencies": {
+    "@gomighty/core": "workspace:*",
+    "hono": "catalog:"
+  }
+}
