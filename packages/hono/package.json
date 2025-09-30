@@ -13,5 +13,8 @@
   "dependencies": {
     "@gomighty/core": "workspace:*",
     "hono": "catalog:"
+  },
+  "scripts": {
+    "typecheck": "tsc"
   }
 }
