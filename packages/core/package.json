@@ -40,7 +40,7 @@
   "license": "MIT",
   "scripts": {
     "build-pkg": "bun run build-pkg.ts",
-    "typecheck": "tsc"
+    "typecheck": "tsgo"
   },
   "type": "module",
   "devDependencies": {
