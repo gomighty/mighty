@@ -6,7 +6,11 @@ import type { AstroInlineConfig } from "astro";
  *
  * This function is useful in environments where we cannot resolve the Astro config, e.g. in Cloudflare Workers.
  */
-export function getBuildPathsFromInlineConfig(config: AstroInlineConfig) {
+export function getBuildPathsFromInlineConfig(config: AstroInlineConfig): {
+  outDirPath: string;
+  buildServerPath: string;
+  buildClientPath: string;
+} {
   const outDirPath = config?.outDir ?? path.join(config?.root ?? ".", "dist");
 
   return {

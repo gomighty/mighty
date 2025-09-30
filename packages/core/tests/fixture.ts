@@ -28,7 +28,21 @@ function requestFnWithDummyConnInfo(app: Hono): AppRequestFunction {
   };
 }
 
-export function getFixture(fixtureName: string) {
+export function getFixture(fixtureName: string): {
+  fixtureRoot: string;
+  startDevServer: (params?: MightyServerOptions) => Promise<{
+    app: Hono;
+    request: AppRequestFunction;
+    stop: () => Promise<void>;
+  }>;
+  build: (params?: MightyServerOptions) => Promise<void>;
+  startProdServer: (params?: MightyServerOptions) => Promise<{
+    app: Hono;
+    request: AppRequestFunction;
+    stop: () => Promise<void>;
+  }>;
+  clean: () => Promise<void>;
+} {
   const fixtureRoot = path.join(
     __dirname,
     "..",

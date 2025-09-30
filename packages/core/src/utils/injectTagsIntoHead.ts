@@ -8,7 +8,7 @@ export function injectTagsIntoHead(
   result: string,
   children: Element[],
   fragment: boolean,
-) {
+): string {
   const processor = unified().use(rehypeParse, { fragment });
   const tree = processor.parse(result);
   let hasHead = false;

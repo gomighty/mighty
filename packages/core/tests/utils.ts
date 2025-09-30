@@ -16,7 +16,7 @@ export function getContentFromMatchingTags({
   html: string;
   tag: string;
   fragment: boolean;
-}) {
+}): string[] {
   const tree = fragment
     ? fragmentProcessor.parse(html)
     : pageProcessor.parse(html);
@@ -45,7 +45,7 @@ export function getMatchingTags({
   html: string;
   tag: string;
   fragment: boolean;
-}) {
+}): Element[] {
   const tree = fragment
     ? fragmentProcessor.parse(html)
     : pageProcessor.parse(html);

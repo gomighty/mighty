@@ -1,4 +1,4 @@
-import { runInContext } from "@gomighty/core";
+import { runInContext } from "@gomighty/core/context";
 import type { SSRLoadedRenderer } from "astro";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
@@ -8,7 +8,9 @@ let container: AstroContainer | undefined;
 
 let address: string | undefined;
 
-export async function createContainer(renderers: SSRLoadedRenderer[]) {
+export async function createContainer(
+  renderers: SSRLoadedRenderer[],
+): Promise<void> {
   container = await AstroContainer.create({
     renderers,
     async resolve(s) {
@@ -28,7 +30,7 @@ export async function createContainer(renderers: SSRLoadedRenderer[]) {
 
 export type MightyStartContainerFunction = typeof createContainer;
 
-export async function setHostAddress(hostAddress: string) {
+export async function setHostAddress(hostAddress: string): Promise<void> {
   address = hostAddress;
 }
 
@@ -44,7 +46,7 @@ export async function render({
   props: Record<string, unknown>;
   context: MightyContext;
   partial: boolean;
-}) {
+}): Promise<string> {
   const component: AstroComponentFactory = (
     await import(/* @vite-ignore */ componentPath)
   ).default;

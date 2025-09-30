@@ -1,9 +1,18 @@
 import { copyFile, mkdir, rm } from "node:fs/promises";
 import path from "node:path";
-import { $ } from "bun";
+import { isolatedDeclaration } from "oxc-transform";
 import { replaceTscAliasPaths } from "tsc-alias";
 
 const FILES_TO_COPY_AS_IS = ["src/dev/render.ts"];
+
+const ENTRYPOINTS = [
+  "src/index.ts",
+  "src/dev/index.ts",
+  "src/context/index.ts",
+  "src/start/index.ts",
+  "src/build/index.ts",
+  "src/types.ts",
+];
 
 await rm("dist", { recursive: true, force: true });
 
@@ -23,7 +32,7 @@ async function copyFileWithMkdir(source: string) {
 }
 
 await Bun.build({
-  entrypoints: ["src/index.ts", "src/dev/index.ts", "src/context/index.ts"],
+  entrypoints: ENTRYPOINTS,
   target: "node",
   outdir: "dist",
   root: "src",
@@ -35,5 +44,19 @@ await Bun.build({
 
 await Promise.all(FILES_TO_COPY_AS_IS.map(copyFileWithMkdir));
 
-await $`bunx tsc`;
+await Promise.all(
+  ENTRYPOINTS.map(async (entrypoint) => {
+    const declarationCode = isolatedDeclaration(
+      entrypoint,
+      await Bun.file(entrypoint).text(),
+    ).code;
+
+    const destination = entrypoint.startsWith("src")
+      ? path.join("dist", entrypoint.slice("src".length))
+      : path.join("dist", entrypoint);
+
+    return Bun.write(destination.replace(".ts", ".d.ts"), declarationCode);
+  }),
+);
+
 await replaceTscAliasPaths();

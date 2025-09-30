@@ -1,6 +1,6 @@
-import { createLogger } from "vite";
+import { createLogger, type Logger } from "vite";
 
-export function getViteLogger() {
+export function getViteLogger(): Logger {
   const logger = createLogger();
   const loggerWarn = logger.warn;
 

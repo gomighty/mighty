@@ -7,13 +7,17 @@
     "url": "git+https://github.com/gomighty/mighty.git"
   },
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./context": "./dist/context/index.js",
+    "./dev": "./dist/dev/index.js",
+    "./start": "./dist/start/index.js",
+    "./build": "./dist/build/index.js",
+    "./types": "./dist/types.js"
   },
   "dependencies": {
     "@hono/node-server": "^1.18.1",
     "@hono/zod-validator": "^0.7.2",
     "astro": "5.14.0",
-    "body-parser": "^2.2.0",
     "fetch-to-node": "^2.1.0",
     "hono": "^4.9.0",
     "zod": "^4.0.15"
@@ -36,14 +40,14 @@
   "license": "MIT",
   "scripts": {
     "build-pkg": "bun run build-pkg.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc"
   },
   "type": "module",
   "devDependencies": {
     "@astrojs/alpinejs": "0.4.9",
     "@astrojs/partytown": "^2.1.4",
     "@astrojs/react": "4.4.0",
-    "@types/body-parser": "^1.19.6",
+    "oxc-transform": "^0.93.0",
     "tsc-alias": "^1.8.16"
   }
 }
