@@ -3,7 +3,7 @@ import path from "node:path";
 import { isolatedDeclaration } from "oxc-transform";
 import { replaceTscAliasPaths } from "tsc-alias";
 
-const FILES_TO_COPY_AS_IS = ["src/dev/render.ts"];
+const FILES_TO_COPY_AS_IS = ["src/dev/render-vite.ts"];
 
 const ENTRYPOINTS = [
   "src/index.ts",
@@ -12,6 +12,7 @@ const ENTRYPOINTS = [
   "src/start/index.ts",
   "src/build/index.ts",
   "src/types.ts",
+  "src/schemas.ts",
 ];
 
 await rm("dist", { recursive: true, force: true });

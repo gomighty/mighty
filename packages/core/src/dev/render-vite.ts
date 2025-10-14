@@ -6,17 +6,16 @@ import type { MightyContext } from "@/types";
 
 let container: AstroContainer | undefined;
 
-let address: string | undefined;
+// let address: string | undefined;
 
 export async function createContainer(
   renderers: SSRLoadedRenderer[],
+  getAddress: () => string,
 ): Promise<void> {
   container = await AstroContainer.create({
     renderers,
     async resolve(s) {
-      if (!address) {
-        throw new Error("Host address not set");
-      }
+      const address = getAddress();
       if (s.startsWith("astro:scripts")) {
         return `${address}/@id/${s}`;
       }
@@ -30,11 +29,11 @@ export async function createContainer(
 
 export type MightyStartContainerFunction = typeof createContainer;
 
-export async function setHostAddress(hostAddress: string): Promise<void> {
-  address = hostAddress;
-}
+// export async function setHostAddress(hostAddress: string): Promise<void> {
+//   address = hostAddress;
+// }
 
-export type MightySetHostAddressFunction = typeof setHostAddress;
+// export type MightySetHostAddressFunction = typeof setHostAddress;
 
 export async function render({
   componentPath,

@@ -68,7 +68,7 @@ export function getFixture(fixtureName: string): {
   return {
     fixtureRoot,
     startDevServer: async (params?: MightyServerOptions) => {
-      const { app, viteServer } = await createDevHonoApp({
+      const { app, stop: stopDevServer } = await createDevHonoApp({
         config: mergeConfig<AstroInlineConfig>(
           {
             root: fixtureRoot,
@@ -82,7 +82,7 @@ export function getFixture(fixtureName: string): {
         app,
         request: requestFnWithDummyConnInfo(app),
         stop: async () => {
-          await viteServer.close();
+          await stopDevServer();
           await clean();
         },
       };

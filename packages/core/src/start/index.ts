@@ -1,20 +1,24 @@
 import { serveHonoApp } from "@/runtime";
-import type { MightyDevAndStartOptions, MightyServer } from "@/types";
+import type {
+  MightyServer,
+  MightyStartMiddleware,
+  MightyStartOptions,
+} from "@/types";
 import { createProdHonoApp } from "./app";
+import { setupStart } from "./setup";
 
 export async function start(
-  options?: MightyDevAndStartOptions,
-): Promise<MightyServer> {
+  options?: MightyStartOptions,
+): Promise<MightyServer | MightyStartMiddleware> {
   const { middlewareMode, ...serverOptions } = options ?? {};
 
-  const { app } = await createProdHonoApp(serverOptions);
-
   if (middlewareMode) {
-    return {
-      honoApp: app,
-      stop: async () => {},
-    };
+    return setupStart({
+      options: serverOptions,
+    });
   }
+
+  const { app } = await createProdHonoApp(serverOptions);
 
   return serveHonoApp(app);
 }

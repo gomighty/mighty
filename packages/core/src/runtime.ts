@@ -2,7 +2,6 @@ import type { AddressInfo } from "node:net";
 import { serve } from "@hono/node-server";
 import type { Context, Hono } from "hono";
 import type { ConnInfo } from "hono/conninfo";
-import type { ViteDevServer } from "vite";
 import type { MightyServer } from "@/types";
 
 /**
@@ -27,7 +26,7 @@ function isRunningInWorkerd() {
   );
 }
 
-function serveHonoAppWithBun(app: Hono, viteServer?: ViteDevServer) {
+function serveHonoAppWithBun(app: Hono, stopViteServer?: () => Promise<void>) {
   const server = Bun.serve({ fetch: app.fetch });
   return {
     address: {
@@ -37,18 +36,18 @@ function serveHonoAppWithBun(app: Hono, viteServer?: ViteDevServer) {
     },
     stop: async () => {
       await server.stop();
-      await viteServer?.close();
+      await stopViteServer?.();
     },
   };
 }
 
-function serveHonoAppWithNode(app: Hono, viteServer?: ViteDevServer) {
+function serveHonoAppWithNode(app: Hono, stopViteServer?: () => Promise<void>) {
   const server = serve(app);
   return {
     address: server.address() as AddressInfo,
     stop: async () => {
       await new Promise((resolve) => server.close(resolve));
-      await viteServer?.close();
+      await stopViteServer?.();
     },
   };
 }
@@ -61,13 +60,13 @@ export function getCurrentRuntime(): Runtime {
 
 export function serveHonoApp(
   app: Hono,
-  viteServer?: ViteDevServer,
+  stopViteServer?: () => Promise<void>,
 ): MightyServer {
   switch (getCurrentRuntime()) {
     case "bun":
-      return { ...serveHonoAppWithBun(app, viteServer), honoApp: app };
+      return { ...serveHonoAppWithBun(app, stopViteServer), honoApp: app };
     case "node":
-      return { ...serveHonoAppWithNode(app, viteServer), honoApp: app };
+      return { ...serveHonoAppWithNode(app, stopViteServer), honoApp: app };
     case "workerd":
       return { stop: async () => {}, honoApp: app };
   }
