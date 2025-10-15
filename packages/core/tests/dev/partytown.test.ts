@@ -1,16 +1,16 @@
-import { type AppRequestFunction, getFixture } from "@tests/fixture";
+import { type DevRenderFunction, getFixture } from "@tests/fixture";
 import { getContentFromMatchingTags } from "@tests/utils";
 import "@tests/custom-matchers";
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 
 describe("dev partytown fixture", () => {
-  let request: AppRequestFunction;
+  let render: DevRenderFunction;
   let stop: () => Promise<void>;
 
   const fixture = getFixture("dev.partytown");
 
   beforeEach(async () => {
-    ({ request, stop } = await fixture.startDevServer());
+    ({ render, stop } = await fixture.startDevServer());
   });
 
   afterEach(async () => {
@@ -18,23 +18,17 @@ describe("dev partytown fixture", () => {
   });
 
   it("can render a page with partytown", async () => {
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "basic",
-        partial: false,
-      }),
+    const response = await render({
+      component: "basic",
+      props: {},
+      context: {},
+      partial: false,
     });
 
     expect(response.status).toBe(200);
 
-    const output = await response.text();
-
     const scripts = getContentFromMatchingTags({
-      html: output,
+      html: response.content,
       tag: "script",
       fragment: false,
     });

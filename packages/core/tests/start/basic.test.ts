@@ -14,128 +14,95 @@ describe("start basic fixture", () => {
     expect(fixture.startProdServer()).rejects.toThrowError();
   });
 
-  it("can start a prod server", async () => {
-    await fixture.build();
-    const { request } = await fixture.startProdServer();
-    const response = await request("/thisRouteDoesNotExist");
-    expect(response.status).toBe(404);
-  });
-
   it("can render a prerendered page", async () => {
     await fixture.build();
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "index",
-      }),
+    const response = await render({
+      component: "index",
+      props: {},
+      context: {},
+      partial: true,
     });
-    expect(response.status).toBe(302);
-    expect(response.headers.get("Location")).toBe("index.html");
+    expect(response).toEqual({ redirectTo: "index.html" });
 
-    const redirectResponse = await request("index.html");
-    const output = await redirectResponse.text();
-
-    expect(output).toBe("<!DOCTYPE html><p>Hello World!</p>");
+    expect(
+      await Bun.file(
+        path.join(fixture.fixtureRoot, "dist", "client", "index.html"),
+      ).text(),
+    ).toBe("<!DOCTYPE html><p>Hello World!</p>");
   });
 
   it("can render an on-demand component", async () => {
     await fixture.build({ config: { output: "server" } });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "index",
-        partial: true,
-      }),
+    const response = await render({
+      component: "index",
+      props: {},
+      context: {},
+      partial: true,
     });
-    expect(response.status).toBe(200);
-
-    const output = await response.text();
-
-    expect(output).toBe("<p>Hello World!</p>");
+    expect(response).toEqual({ status: 200, content: "<p>Hello World!</p>" });
   });
 
   it("can render an on-demand page", async () => {
     await fixture.build({ config: { output: "server" } });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "page",
-        partial: false,
-      }),
+    const response = await render({
+      component: "page",
+      props: {},
+      context: {},
+      partial: false,
     });
-    expect(response.status).toBe(200);
-
-    const output = await response.text();
-
-    expect(output).toBe(
-      "<!DOCTYPE html><html><head></head> <body> <p>Hello World!</p> </body></html>",
-    );
+    expect(response).toEqual({
+      status: 200,
+      content:
+        "<!DOCTYPE html><html><head></head> <body> <p>Hello World!</p> </body></html>",
+    });
   });
 
   it("can render a component with props", async () => {
     await fixture.build({ config: { output: "server" } });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await render({
+      component: "props",
+      props: {
+        title: "This is a prop!",
       },
-      body: JSON.stringify({
-        component: "props",
-        props: {
-          title: "This is a prop!",
-        },
-      }),
+      context: {},
+      partial: true,
     });
-    expect(response.status).toBe(200);
-
-    const output = await response.text();
-
-    expect(output).toBe("<p>This is a prop!</p>");
+    expect(response).toEqual({
+      status: 200,
+      content: "<p>This is a prop!</p>",
+    });
   });
 
   it("can render an img tag and serve images", async () => {
     await fixture.build({ config: { output: "server" } });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "imgTag",
-      }),
-    });
+    const response = (await render({
+      component: "imgTag",
+      props: {},
+      context: {},
+      partial: true,
+    })) as { status: number; content: string };
     expect(response.status).toBe(200);
 
-    const output = await response.text();
-
-    const imageSrc = output.match(
+    const imageSrc = response.content.match(
       /<img src="([^"]+)" width="96" height="96">/,
     )?.[1] as string;
     expect(imageSrc).toStartWith("/_astro/");
 
-    const imageResponse = await request(imageSrc);
-    expect(imageResponse.status).toBe(200);
-    expect(imageResponse.headers.get("Content-Type")).toBe("image/png");
-    expect(imageResponse.text()).resolves.toBe(
+    expect(
+      Bun.file(
+        path.join(fixture.fixtureRoot, "dist", "client", imageSrc),
+      ).text(),
+    ).resolves.toBe(
       await Bun.file(
         path.join(fixture.fixtureRoot, "src", "assets", "sample.png"),
       ).text(),
@@ -149,23 +116,19 @@ describe("start basic fixture", () => {
         vite: { build: { assetsInlineLimit: 4096 } },
       },
     });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "styles",
-        partial: false,
-      }),
+    const response = await render({
+      component: "styles",
+      props: {},
+      context: {},
+      partial: false,
     });
-    expect(response.status).toBe(302);
-    expect(response.headers.get("Location")).toBe("styles/index.html");
+    expect(response).toEqual({ redirectTo: "styles/index.html" });
 
-    const redirectResponse = await request("styles/index.html");
-    const output = await redirectResponse.text();
+    const output = await Bun.file(
+      path.join(fixture.fixtureRoot, "dist", "client", "styles", "index.html"),
+    ).text();
 
     const styleContent = getContentFromMatchingTags({
       html: output,
@@ -180,24 +143,19 @@ describe("start basic fixture", () => {
     await fixture.build({
       config: { output: "static", vite: { build: { assetsInlineLimit: 0 } } },
     });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "styles",
-        partial: false,
-      }),
+    const response = await render({
+      component: "styles",
+      props: {},
+      context: {},
+      partial: false,
     });
+    expect(response).toEqual({ redirectTo: "styles/index.html" });
 
-    expect(response.status).toBe(302);
-    expect(response.headers.get("Location")).toBe("styles/index.html");
-
-    const redirectResponse = await request("styles/index.html");
-    const output = await redirectResponse.text();
+    const output = await Bun.file(
+      path.join(fixture.fixtureRoot, "dist", "client", "styles", "index.html"),
+    ).text();
 
     const matchingTags = getMatchingTags({
       html: output,
@@ -209,12 +167,11 @@ describe("start basic fixture", () => {
     const linkHref = matchingTags[0]?.properties.href as string;
     expect(linkHref).toMatch(/_astro\/.+\.css/);
 
-    const styleResponse = await request(linkHref);
-    expect(styleResponse.status).toBe(200);
-    expect(styleResponse.headers.get("Content-Type")).toContain("text/css");
-    expect(await styleResponse.text()).toMatch(
-      /p\[data-astro-cid-.+\]\{color:red\}/,
-    );
+    expect(
+      Bun.file(
+        path.join(fixture.fixtureRoot, "dist", "client", linkHref),
+      ).text(),
+    ).resolves.toMatch(/p\[data-astro-cid-.+\]\{color:red\}/);
   });
 
   it("can render an on-demand page with inline styles", async () => {
@@ -224,24 +181,18 @@ describe("start basic fixture", () => {
         vite: { build: { assetsInlineLimit: 4096 } },
       },
     });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "styles",
-        partial: false,
-      }),
-    });
+    const response = (await render({
+      component: "styles",
+      props: {},
+      context: {},
+      partial: false,
+    })) as { status: number; content: string };
     expect(response.status).toBe(200);
 
-    const output = await response.text();
-
     const styleContent = getContentFromMatchingTags({
-      html: output,
+      html: response.content,
       tag: "style",
       fragment: false,
     });
@@ -253,24 +204,18 @@ describe("start basic fixture", () => {
     await fixture.build({
       config: { output: "server", vite: { build: { assetsInlineLimit: 0 } } },
     });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "styles",
-        partial: false,
-      }),
-    });
+    const response = (await render({
+      component: "styles",
+      props: {},
+      context: {},
+      partial: false,
+    })) as { status: number; content: string };
     expect(response.status).toBe(200);
 
-    const output = await response.text();
-
     const matchingTags = getMatchingTags({
-      html: output,
+      html: response.content,
       tag: "link",
       fragment: false,
     });
@@ -279,12 +224,11 @@ describe("start basic fixture", () => {
     const linkHref = matchingTags[0]?.properties.href as string;
     expect(linkHref).toMatch(/_astro\/.+\.css/);
 
-    const styleResponse = await request(linkHref);
-    expect(styleResponse.status).toBe(200);
-    expect(styleResponse.headers.get("Content-Type")).toContain("text/css");
-    expect(await styleResponse.text()).toMatch(
-      /p\[data-astro-cid-.+\]\{color:red\}/,
-    );
+    expect(
+      Bun.file(
+        path.join(fixture.fixtureRoot, "dist", "client", linkHref),
+      ).text(),
+    ).resolves.toMatch(/p\[data-astro-cid-.+\]\{color:red\}/);
   });
 
   it("can render a prerendered page with an inline script", async () => {
@@ -294,22 +238,25 @@ describe("start basic fixture", () => {
         vite: { build: { assetsInlineLimit: 4096 } },
       },
     });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "scriptTag",
-      }),
+    const response = await render({
+      component: "scriptTag",
+      props: {},
+      context: {},
+      partial: false,
     });
-    expect(response.status).toBe(302);
-    expect(response.headers.get("Location")).toBe("scriptTag/index.html");
+    expect(response).toEqual({ redirectTo: "scriptTag/index.html" });
 
-    const redirectResponse = await request("scriptTag/index.html");
-    const output = await redirectResponse.text();
+    const output = await Bun.file(
+      path.join(
+        fixture.fixtureRoot,
+        "dist",
+        "client",
+        "scriptTag",
+        "index.html",
+      ),
+    ).text();
 
     expect(output).toContain('<script type="module">');
     expect(output).toContain("Hello World!");
@@ -321,22 +268,25 @@ describe("start basic fixture", () => {
     await fixture.build({
       config: { output: "static", vite: { build: { assetsInlineLimit: 0 } } },
     });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "scriptTag",
-      }),
+    const response = await render({
+      component: "scriptTag",
+      props: {},
+      context: {},
+      partial: false,
     });
-    expect(response.status).toBe(302);
-    expect(response.headers.get("Location")).toBe("scriptTag/index.html");
+    expect(response).toEqual({ redirectTo: "scriptTag/index.html" });
 
-    const redirectResponse = await request("scriptTag/index.html");
-    const output = await redirectResponse.text();
+    const output = await Bun.file(
+      path.join(
+        fixture.fixtureRoot,
+        "dist",
+        "client",
+        "scriptTag",
+        "index.html",
+      ),
+    ).text();
 
     const matchingTags = getMatchingTags({
       html: output,
@@ -348,13 +298,9 @@ describe("start basic fixture", () => {
     const scriptSrc = matchingTags[0]?.properties.src as string;
     expect(scriptSrc).toMatch(/_astro\/.+\.js/);
 
-    const scriptResponse = await request(scriptSrc);
-    expect(scriptResponse.status).toBe(200);
-    expect(scriptResponse.headers.get("Content-Type")).toContain(
-      "text/javascript",
-    );
-
-    const scriptContent = await scriptResponse.text();
+    const scriptContent = await Bun.file(
+      path.join(fixture.fixtureRoot, "dist", "client", scriptSrc),
+    ).text();
     expect(scriptContent).toContain("Hello World!");
     expect(scriptContent).toContain("console.log");
   });
@@ -366,49 +312,38 @@ describe("start basic fixture", () => {
         vite: { build: { assetsInlineLimit: 4096 } },
       },
     });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "scriptTag",
-      }),
-    });
+    const response = (await render({
+      component: "scriptTag",
+      props: {},
+      context: {},
+      partial: false,
+    })) as { status: number; content: string };
     expect(response.status).toBe(200);
 
-    const output = await response.text();
-
-    expect(output).toContain('<script type="module">');
-    expect(output).toContain("Hello World!");
-    expect(output).toContain("console.log");
-    expect(output).toContain("</script>");
+    expect(response.content).toContain('<script type="module">');
+    expect(response.content).toContain("Hello World!");
+    expect(response.content).toContain("console.log");
+    expect(response.content).toContain("</script>");
   });
 
   it("can render an on-demand page with an external script", async () => {
     await fixture.build({
       config: { output: "server", vite: { build: { assetsInlineLimit: 0 } } },
     });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "scriptTag",
-      }),
-    });
-
+    const response = (await render({
+      component: "scriptTag",
+      props: {},
+      context: {},
+      partial: false,
+    })) as { status: number; content: string };
     expect(response.status).toBe(200);
 
-    const output = await response.text();
-
     const matchingTags = getMatchingTags({
-      html: output,
+      html: response.content,
       tag: "script",
       fragment: false,
     });
@@ -417,13 +352,9 @@ describe("start basic fixture", () => {
     const scriptSrc = matchingTags[0]?.properties.src as string;
     expect(scriptSrc).toMatch(/_astro\/.+\.js/);
 
-    const scriptResponse = await request(scriptSrc);
-    expect(scriptResponse.status).toBe(200);
-    expect(scriptResponse.headers.get("Content-Type")).toContain(
-      "text/javascript",
-    );
-
-    const scriptContent = await scriptResponse.text();
+    const scriptContent = await Bun.file(
+      path.join(fixture.fixtureRoot, "dist", "client", scriptSrc),
+    ).text();
     expect(scriptContent).toContain("Hello World!");
     expect(scriptContent).toContain("console.log");
   });

@@ -2,43 +2,32 @@ import { rm } from "node:fs/promises";
 import path from "node:path";
 import type { AstroInlineConfig } from "astro";
 import { mergeConfig } from "astro/config";
-import type { Hono } from "hono";
+import { toFetchResponse, toReqRes } from "fetch-to-node";
 import { build } from "@/build";
-import { createDevHonoApp } from "@/dev/app";
-import { createProdHonoApp } from "@/start/app";
+import { setupDev } from "@/dev/setup";
+import { setupStart } from "@/start/setup";
 import type { MightyServerOptions } from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 
-export type AppRequestFunction = (
-  input: string | URL,
-  requestInit?: RequestInit,
-) => Promise<Response>;
+export type DevRenderFunction = Awaited<ReturnType<typeof setupDev>>["render"];
+export type StartRenderFunction = Awaited<
+  ReturnType<typeof setupStart>
+>["render"];
 
-function requestFnWithDummyConnInfo(app: Hono): AppRequestFunction {
-  return async (input, requestInit) => {
-    return app.request(input, requestInit, {
-      requestIP() {
-        return {
-          address: "http://host-placeholder.test",
-          family: "IPv4",
-          port: 80,
-        };
-      },
-    });
-  };
-}
+export type GetFromViteMiddlewareFunction = (
+  path: string,
+) => Promise<Response | undefined>;
 
 export function getFixture(fixtureName: string): {
   fixtureRoot: string;
   startDevServer: (params?: MightyServerOptions) => Promise<{
-    app: Hono;
-    request: AppRequestFunction;
+    render: DevRenderFunction;
+    getFromViteMiddleware: GetFromViteMiddlewareFunction;
     stop: () => Promise<void>;
   }>;
   build: (params?: MightyServerOptions) => Promise<void>;
   startProdServer: (params?: MightyServerOptions) => Promise<{
-    app: Hono;
-    request: AppRequestFunction;
+    render: StartRenderFunction;
     stop: () => Promise<void>;
   }>;
   clean: () => Promise<void>;
@@ -68,19 +57,41 @@ export function getFixture(fixtureName: string): {
   return {
     fixtureRoot,
     startDevServer: async (params?: MightyServerOptions) => {
-      const { app, stop: stopDevServer } = await createDevHonoApp({
-        config: mergeConfig<AstroInlineConfig>(
-          {
-            root: fixtureRoot,
-            logLevel: "warn",
-          },
-          params?.config ?? {},
-        ),
+      const {
+        render,
+        stop: stopDevServer,
+        viteMiddleware,
+      } = await setupDev({
+        options: {
+          config: mergeConfig<AstroInlineConfig>(
+            {
+              root: fixtureRoot,
+              logLevel: "warn",
+            },
+            params?.config ?? {},
+          ),
+        },
+        getAddress: () => "http://host-placeholder.test",
       });
 
       return {
-        app,
-        request: requestFnWithDummyConnInfo(app),
+        render,
+        getFromViteMiddleware: async (path: string) => {
+          const { req, res } = toReqRes(
+            new Request(
+              new URL(path, "http://host-placeholder.test").toString(),
+              { headers: { host: "localhost" } },
+            ),
+          );
+
+          return new Promise<Response | undefined>((resolve, reject) => {
+            viteMiddleware(req, res, (err: unknown) => {
+              if (err) reject(err);
+              else resolve(undefined);
+            });
+            toFetchResponse(res).then(resolve);
+          });
+        },
         stop: async () => {
           await stopDevServer();
           await clean();
@@ -104,19 +115,20 @@ export function getFixture(fixtureName: string): {
       });
     },
     startProdServer: async (params?: MightyServerOptions) => {
-      const { app } = await createProdHonoApp({
-        config: mergeConfig<AstroInlineConfig>(
-          {
-            root: fixtureRoot,
-            logLevel: "warn",
-          },
-          params?.config ?? {},
-        ),
+      const { render } = await setupStart({
+        options: {
+          config: mergeConfig<AstroInlineConfig>(
+            {
+              root: fixtureRoot,
+              logLevel: "warn",
+            },
+            params?.config ?? {},
+          ),
+        },
       });
 
       return {
-        app,
-        request: requestFnWithDummyConnInfo(app),
+        render,
         stop: async () => {
           await clean();
         },

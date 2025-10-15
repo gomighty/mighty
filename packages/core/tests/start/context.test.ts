@@ -10,29 +10,23 @@ describe("start context fixture", () => {
 
   it("can render an on-demand component with context", async () => {
     await fixture.build({ config: { output: "server" } });
-    const { request } = await fixture.startProdServer();
+    const { render } = await fixture.startProdServer();
 
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        component: "index",
-        context: {
-          notifications: ["Hello World"],
-          user: {
-            id: 1,
-          },
+    const response = await render({
+      component: "index",
+      props: {},
+      context: {
+        notifications: ["Hello World"],
+        user: {
+          id: 1,
         },
-      }),
+      },
+      partial: true,
     });
-    expect(response.status).toBe(200);
-
-    const output = await response.text();
-
-    expect(output).toBe(
-      "<p>Context: {&quot;notifications&quot;:[&quot;Hello World&quot;],&quot;user&quot;:{&quot;id&quot;:1}}</p>",
-    );
+    expect(response).toEqual({
+      status: 200,
+      content:
+        "<p>Context: {&quot;notifications&quot;:[&quot;Hello World&quot;],&quot;user&quot;:{&quot;id&quot;:1}}</p>",
+    });
   });
 });

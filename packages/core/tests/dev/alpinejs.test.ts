@@ -1,14 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { type AppRequestFunction, getFixture } from "@tests/fixture";
+import {
+  type DevRenderFunction,
+  type GetFromViteMiddlewareFunction,
+  getFixture,
+} from "@tests/fixture";
 
 describe("dev alpinejs fixture", () => {
-  let request: AppRequestFunction;
+  let render: DevRenderFunction;
+  let getFromViteMiddleware: GetFromViteMiddlewareFunction;
   let stop: () => Promise<void>;
 
   const fixture = getFixture("dev.alpinejs");
 
   beforeEach(async () => {
-    ({ request, stop } = await fixture.startDevServer());
+    ({ render, getFromViteMiddleware, stop } = await fixture.startDevServer());
   });
 
   afterEach(async () => {
@@ -16,33 +21,24 @@ describe("dev alpinejs fixture", () => {
   });
 
   it("can render a page with alpinejs", async () => {
-    const response = await request("/render", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await render({
+      component: "basic",
+      props: {
+        initialCount: 0,
       },
-      body: JSON.stringify({
-        component: "basic",
-        props: {
-          initialCount: 0,
-        },
-        partial: false,
-      }),
+      context: {},
+      partial: false,
     });
-
     expect(response.status).toBe(200);
-
-    const output = await response.text();
-
-    expect(output).toContain(
+    expect(response.content).toContain(
       '<script type="module" src="http://host-placeholder.test/@id/astro:scripts/page.js"></script>',
     );
 
-    const scriptResponse = await request("/@id/astro:scripts/page.js", {
-      headers: { host: "localhost" },
-    });
-    expect(scriptResponse.status).toBe(200);
-    const scriptContent = await scriptResponse.text();
+    const scriptResponse = await getFromViteMiddleware(
+      "/@id/astro:scripts/page.js",
+    );
+    expect(scriptResponse?.status).toBe(200);
+    const scriptContent = await scriptResponse?.text();
     expect(scriptContent).toContain("Alpine.start()");
   });
 });
