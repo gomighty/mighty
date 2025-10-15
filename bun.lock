@@ -14,11 +14,7 @@
       "name": "@gomighty/core",
       "version": "0.0.1",
       "dependencies": {
-        "@hono/node-server": "^1.18.1",
         "astro": "5.14.5",
-        "fetch-to-node": "^2.1.0",
-        "hono": "catalog:",
-        "zod": "^4.0.15",
       },
       "devDependencies": {
         "@astrojs/alpinejs": "0.4.9",
@@ -34,11 +30,15 @@
       "version": "0.0.1",
       "dependencies": {
         "@gomighty/core": "workspace:*",
+        "@hono/node-server": "catalog:",
+        "fetch-to-node": "^2.1.0",
         "hono": "catalog:",
+        "zod": "^4.0.15",
       },
     },
   },
   "catalog": {
+    "@hono/node-server": "^1.19.5",
     "hono": "^4.9.9",
   },
   "packages": {
@@ -180,7 +180,7 @@
 
     "@gomighty/hono": ["@gomighty/hono@workspace:packages/hono"],
 
-    "@hono/node-server": ["@hono/node-server@1.19.1", "", { "peerDependencies": { "hono": "^4" } }, "sha512-h44e5s+ByUriaRIbeS/C74O8v90m0A95luyYQGMF7KEn96KkYMXO7bZAwombzTpjQTU4e0TkU8U1WBIXlwuwtA=="],
+    "@hono/node-server": ["@hono/node-server@1.19.5", "", { "peerDependencies": { "hono": "^4" } }, "sha512-iBuhh+uaaggeAuf+TftcjZyWh2GEgZcVGXkNtskLVoWaXhnJtC5HLHrU8W1KHDoucqO1MswwglmkWLFyiDn4WQ=="],
 
     "@img/colour": ["@img/colour@1.0.0", "", {}, "sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw=="],
 

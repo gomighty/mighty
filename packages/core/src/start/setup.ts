@@ -10,11 +10,7 @@ import { getBuildPathsFromInlineConfig } from "@/utils/getBuildPathsFromInlineCo
 import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
 import { importManifestAndRenderers } from "./importManifestAndRenderers";
 
-export async function setupStart({
-  options,
-}: {
-  options: MightyServerOptions;
-}): Promise<{
+export async function setupStart(options: MightyServerOptions): Promise<{
   render: (
     request: MightyRenderRequest,
   ) => Promise<{ redirectTo: string } | { status: number; content: string }>;

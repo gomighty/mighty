@@ -12,7 +12,10 @@
   },
   "dependencies": {
     "@gomighty/core": "workspace:*",
-    "hono": "catalog:"
+    "@hono/node-server": "catalog:",
+    "hono": "catalog:",
+    "fetch-to-node": "^2.1.0",
+    "zod": "^4.0.15"
   },
   "scripts": {
     "typecheck": "tsc"

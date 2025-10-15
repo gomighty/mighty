@@ -62,15 +62,13 @@ export function getFixture(fixtureName: string): {
         stop: stopDevServer,
         viteMiddleware,
       } = await setupDev({
-        options: {
-          config: mergeConfig<AstroInlineConfig>(
-            {
-              root: fixtureRoot,
-              logLevel: "warn",
-            },
-            params?.config ?? {},
-          ),
-        },
+        config: mergeConfig<AstroInlineConfig>(
+          {
+            root: fixtureRoot,
+            logLevel: "warn",
+          },
+          params?.config ?? {},
+        ),
         getAddress: () => "http://host-placeholder.test",
       });
 
@@ -116,15 +114,13 @@ export function getFixture(fixtureName: string): {
     },
     startProdServer: async (params?: MightyServerOptions) => {
       const { render } = await setupStart({
-        options: {
-          config: mergeConfig<AstroInlineConfig>(
-            {
-              root: fixtureRoot,
-              logLevel: "warn",
-            },
-            params?.config ?? {},
-          ),
-        },
+        config: mergeConfig<AstroInlineConfig>(
+          {
+            root: fixtureRoot,
+            logLevel: "warn",
+          },
+          params?.config ?? {},
+        ),
       });
 
       return {

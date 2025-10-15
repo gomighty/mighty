@@ -15,11 +15,7 @@
     "./types": "./dist/types.js"
   },
   "dependencies": {
-    "@hono/node-server": "^1.18.1",
-    "astro": "5.14.5",
-    "fetch-to-node": "^2.1.0",
-    "hono": "catalog:",
-    "zod": "^4.0.15"
+    "astro": "5.14.5"
   },
   "peerDependencies": {
     "typescript": "^5"

@@ -1,6 +1,4 @@
-import type { AddressInfo } from "node:net";
 import type { AstroInlineConfig } from "astro";
-import type { Hono } from "hono";
 import type { Connect } from "vite";
 import type { MightyRenderRequest } from "@/schemas";
 
@@ -9,20 +7,10 @@ export type MightyServerOptions = {
 };
 
 export type MightyDevOptions = MightyServerOptions & {
-  middlewareMode?: {
-    getAddress: () => string;
-  };
+  getAddress: () => string;
 };
 
-export type MightyStartOptions = MightyServerOptions & {
-  middlewareMode?: boolean;
-};
-
-export type MightyServer = {
-  honoApp: Hono;
-  address?: AddressInfo;
-  stop: () => Promise<void>;
-};
+export type MightyStartOptions = MightyServerOptions;
 
 export type MightyDevMiddleware = {
   render: (

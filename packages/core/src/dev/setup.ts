@@ -14,7 +14,7 @@ import {
 } from "vite";
 import { getStylesForURL } from "@/dev/css";
 import type { MightyRenderRequest } from "@/schemas";
-import type { MightyServerOptions } from "@/types";
+import type { MightyDevOptions } from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
 import type {
@@ -25,13 +25,7 @@ import { loadRenderersFromIntegrations } from "./renderers";
 import { getInjectedScriptsFromIntegrations } from "./scripts";
 import { getViteLogger } from "./viteLogger";
 
-export async function setupDev({
-  options,
-  getAddress,
-}: {
-  options: MightyServerOptions;
-  getAddress: () => string;
-}): Promise<{
+export async function setupDev(options: MightyDevOptions): Promise<{
   render: (
     request: MightyRenderRequest,
   ) => Promise<{ status: number; content: string }>;
@@ -86,7 +80,7 @@ export async function setupDev({
     ],
   };
 
-  await astroDev(mergeConfig(mightyConfig, options?.config ?? {}));
+  await astroDev(mergeConfig(mightyConfig, options.config ?? {}));
 
   // @ts-expect-error - finalConfig is defined at this point
   if (!finalConfig) {
@@ -115,7 +109,7 @@ export async function setupDev({
       createContainer: MightyStartContainerFunction;
     }>(path.join(import.meta.dir, "./render-vite.ts"));
 
-  await createContainer(loadedRenderers, getAddress);
+  await createContainer(loadedRenderers, options.getAddress);
 
   const injectedScripts = await getInjectedScriptsFromIntegrations(
     finalConfig.integrations,
@@ -139,7 +133,7 @@ export async function setupDev({
           tagName: "script",
           properties: {
             type: "module",
-            src: `${getAddress()}/@id/astro:scripts/page.js`,
+            src: `${options.getAddress()}/@id/astro:scripts/page.js`,
           },
           children: [],
         },
@@ -190,7 +184,7 @@ export async function setupDev({
         tagName: "script",
         properties: {
           type: "module",
-          src: `${getAddress()}/@vite/client`,
+          src: `${options.getAddress()}/@vite/client`,
         },
         children: [],
       };
