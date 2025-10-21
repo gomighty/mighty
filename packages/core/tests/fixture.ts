@@ -6,7 +6,7 @@ import { toFetchResponse, toReqRes } from "fetch-to-node";
 import { build } from "@/build";
 import { setupDev } from "@/dev/setup";
 import { setupStart } from "@/start/setup";
-import type { MightyServerOptions } from "@/types";
+import type { MightyDevOptions, MightyServerOptions } from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 
 export type DevRenderFunction = Awaited<ReturnType<typeof setupDev>>["render"];
@@ -20,7 +20,7 @@ export type GetFromViteMiddlewareFunction = (
 
 export function getFixture(fixtureName: string): {
   fixtureRoot: string;
-  startDevServer: (params?: MightyServerOptions) => Promise<{
+  startDevServer: (params?: Omit<MightyDevOptions, "getAddress">) => Promise<{
     render: DevRenderFunction;
     getFromViteMiddleware: GetFromViteMiddlewareFunction;
     stop: () => Promise<void>;
@@ -56,12 +56,13 @@ export function getFixture(fixtureName: string): {
 
   return {
     fixtureRoot,
-    startDevServer: async (params?: MightyServerOptions) => {
+    startDevServer: async (params) => {
       const {
         render,
         stop: stopDevServer,
         viteMiddleware,
       } = await setupDev({
+        ...params,
         config: mergeConfig<AstroInlineConfig>(
           {
             root: fixtureRoot,

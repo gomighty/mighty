@@ -6,7 +6,11 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!packages/core/fixtures/dev/basic/src/pages/error.astro"
+    ]
   },
   "formatter": {
     "enabled": true,

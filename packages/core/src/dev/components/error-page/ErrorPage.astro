@@ -1,0 +1,94 @@
+---
+import ErrorDisplay from "./ErrorDisplay.astro";
+import Header from "./Header.astro";
+import type { ErrorWithMetadata } from "./types";
+
+interface Props {
+  error: ErrorWithMetadata;
+}
+
+const { error } = Astro.props;
+---
+
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Error</title>
+    <script is:inline>
+      if (
+        localStorage.getItem("mightyErrorPageTheme") === "dark" ||
+        (!("mightyErrorPageTheme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        localStorage.setItem("mightyErrorPageTheme", "dark");
+        document.documentElement.dataset.theme = "dark";
+      } else {
+        document.documentElement.dataset.theme = "light";
+      }
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", (e) => {
+          document.documentElement.dataset.theme = e.matches ? "dark" : "light";
+          localStorage.setItem(
+            "mightyErrorPageTheme",
+            e.matches ? "dark" : "light"
+          );
+        });
+    </script>
+  </head>
+  <body>
+    <div class="page">
+      <Header />
+      <ErrorDisplay error={error} />
+    </div>
+  </body>
+</html>
+
+<style>
+  :root {
+    --background-color: #ffffff;
+    --foreground-color: #000000;
+    --link-hover-color: #37446b;
+    --accent-color: 335, 72%, 54%;
+    --overlay-color: hsla(var(--accent-color), 0.2);
+
+    --font-monospace: ui-monospace, Menlo, Monaco, "Cascadia Mono",
+      "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace",
+      "Source Code Pro", "Fira Mono", "Droid Sans Mono", "Courier New",
+      monospace;
+
+    --dark-mode-icon-display: none;
+    --light-mode-icon-display: inherit;
+  }
+
+  :root[data-theme="dark"] {
+    --overlay-color: hsla(var(--accent-color), 0.5);
+    --background-color: #17181c;
+    --foreground-color: #ffffff;
+    --link-hover-color: #bdc6e2;
+
+    --dark-mode-icon-display: inherit;
+    --light-mode-icon-display: none;
+  }
+
+  body {
+    margin: 0;
+    box-sizing: border-box;
+    background-color: var(--background-color);
+    color: var(--foreground-color);
+  }
+
+  .page {
+    min-height: 100vh;
+    padding: 0 1rem;
+    @media screen and (min-width: 1024px) {
+      padding: 0 10rem;
+    }
+    background:
+      linear-gradient(215deg, var(--overlay-color), transparent 40%),
+      radial-gradient(var(--overlay-color), transparent 40%) no-repeat -60vw -40vh /
+        105vw 200vh,
+      radial-gradient(var(--overlay-color), transparent 65%) no-repeat 50%
+        calc(100% + 20rem) / 60rem 30rem;
+  }
+</style>

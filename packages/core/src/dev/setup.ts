@@ -41,6 +41,9 @@ export async function setupDev(options: MightyDevOptions): Promise<{
       server: {
         middlewareMode: true,
         cors: false,
+        hmr: {
+          overlay: false,
+        },
       },
       plugins: [
         {
@@ -140,68 +143,108 @@ export async function setupDev(options: MightyDevOptions): Promise<{
       ]
     : () => [];
 
+  const renderComponentByPath = async (
+    data: Omit<MightyRenderRequest, "component"> & {
+      componentPath: `${string}.astro`;
+    },
+  ) => {
+    const { componentPath, props, context, partial } = data;
+
+    const [renderedComponent, styleTags] = await Promise.all([
+      renderComponent({
+        componentPath,
+        props,
+        context,
+        partial,
+      }),
+      getStylesForURL(componentPath, viteServer).then((styles): Element[] =>
+        styles.styles.map((style) => ({
+          type: "element",
+          tagName: "style",
+          properties: {
+            type: "text/css",
+            "data-vite-dev-id": style.id,
+          },
+          children: [{ type: "text", value: style.content }],
+        })),
+      ),
+    ]);
+
+    const viteClientScript: Element = {
+      type: "element",
+      tagName: "script",
+      properties: {
+        type: "module",
+        src: `${options.getAddress()}/@vite/client`,
+      },
+      children: [],
+    };
+
+    return injectTagsIntoHead(
+      renderedComponent,
+      [
+        ...styleTags,
+        viteClientScript,
+        ...getPageScripts(),
+        ...headInlineScriptTags,
+      ],
+      partial,
+    );
+  };
+
   return {
     viteMiddleware: viteServer.middlewares,
     stop: () => viteServer.close(),
     render: async (request: MightyRenderRequest) => {
-      const { component, props, context, partial } = request;
+      try {
+        const { component, props, context, partial } = request;
 
-      const componentPath: `${string}.astro` = `${path.join(
-        finalConfig.srcDir.pathname,
-        "pages",
-        ...dotStringToPath(component),
-      )}.astro`;
+        const componentPath: `${string}.astro` = `${path.join(
+          finalConfig.srcDir.pathname,
+          "pages",
+          ...dotStringToPath(component),
+        )}.astro`;
 
-      const doesComponentExist = await access(componentPath)
-        .then(() => true)
-        .catch(() => false);
-      if (!doesComponentExist) {
-        return { status: 404, content: `Component ${component} not found` };
-      }
+        const doesComponentExist = await access(componentPath)
+          .then(() => true)
+          .catch(() => false);
+        if (!doesComponentExist) {
+          return { status: 404, content: `Component ${component} not found` };
+        }
 
-      const [renderedComponent, styleTags] = await Promise.all([
-        renderComponent({
-          componentPath,
-          props,
-          context,
-          partial,
-        }),
-        getStylesForURL(componentPath, viteServer).then((styles): Element[] =>
-          styles.styles.map((style) => ({
-            type: "element",
-            tagName: "style",
-            properties: {
-              type: "text/css",
-              "data-vite-dev-id": style.id,
+        return {
+          status: 200,
+          content: await renderComponentByPath({
+            componentPath,
+            props,
+            context,
+            partial,
+          }),
+        };
+      } catch (error) {
+        viteServer.ssrFixStacktrace(error as Error);
+
+        if (!(options.showErrorPage ?? true)) {
+          throw error;
+        }
+
+        return {
+          status: 500,
+          content: await renderComponentByPath({
+            componentPath: path.join(
+              import.meta.dir,
+              "components",
+              "error-page",
+              "ErrorPage.astro",
+            ) as `${string}.astro`,
+            props: {
+              error: error as Error,
             },
-            children: [{ type: "text", value: style.content }],
-          })),
-        ),
-      ]);
-
-      const viteClientScript: Element = {
-        type: "element",
-        tagName: "script",
-        properties: {
-          type: "module",
-          src: `${options.getAddress()}/@vite/client`,
-        },
-        children: [],
-      };
-
-      return {
-        status: 200,
-        content: injectTagsIntoHead(
-          renderedComponent,
-          [
-            ...styleTags,
-            viteClientScript,
-            ...getPageScripts(),
-            ...headInlineScriptTags,
-          ],
-          partial,
-        ),
-      };
+            context: {},
+            partial: false,
+          }),
+        };
+      }
     },
   };
 }

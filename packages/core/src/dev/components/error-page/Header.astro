@@ -1,0 +1,87 @@
+---
+import DarkModeIcon from "./DarkModeIcon.astro";
+import LightModeIcon from "./LightModeIcon.astro";
+import MightyLogo from "./MightyLogo.astro";
+---
+
+<header class="header">
+  <div class="header-title">
+    <MightyLogo class="mighty-logo" />
+    <p class="error-page-label">Error Page</p>
+  </div>
+  <button type="button" id="dark-mode-toggle">
+    <DarkModeIcon class="dark-mode-icon" />
+    <LightModeIcon class="light-mode-icon" />
+  </button>
+</header>
+
+<script>
+  document.getElementById("dark-mode-toggle")?.addEventListener("click", () => {
+    document.documentElement.dataset.theme =
+      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    localStorage.setItem(
+      "mightyErrorPageTheme",
+      document.documentElement.dataset.theme === "dark" ? "dark" : "light"
+    );
+  });
+</script>
+
+<style>
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px dotted #333;
+  }
+
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header-title svg path {
+    transition: transform 0.5s ease;
+    transform-origin: center;
+  }
+
+  .header-title:hover svg path {
+    transform: rotateY(540deg);
+  }
+
+  .error-page-label {
+    font-family: var(--font-monospace);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--foreground-color);
+  }
+
+  .header-title {
+    cursor: default;
+  }
+
+  .header-title :global(svg path) {
+    transition: transform 0.5s ease;
+    transform-origin: center;
+  }
+
+  .header-title:hover :global(svg path) {
+    transform: rotateY(540deg);
+  }
+
+  #dark-mode-toggle {
+    cursor: pointer;
+  }
+
+  button {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+    border: 0 solid;
+  }
+</style>

@@ -8,6 +8,8 @@ export type MightyServerOptions = {
 
 export type MightyDevOptions = MightyServerOptions & {
   getAddress: () => string;
+  /** @default true */
+  showErrorPage?: boolean;
 };
 
 export type MightyStartOptions = MightyServerOptions;

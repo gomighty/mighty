@@ -1,0 +1,71 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg
+  class={className}
+  width="32"
+  height="32"
+  viewBox="0 0 512 512"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+  <rect
+    id="«r3a»"
+    width="512"
+    height="512"
+    x="0"
+    y="0"
+    rx="200"
+    fill="url(#«r3b»)"
+    stroke="#FFFFFF"
+    stroke-width="0"
+    stroke-opacity="100%"
+    paint-order="stroke"></rect>
+  <clipPath id="clip">
+    <use xlink:href="#«r3a»"></use>
+  </clipPath>
+  <defs>
+    <linearGradient
+      id="«r3b»"
+      gradientUnits="userSpaceOnUse"
+      gradientTransform="rotate(180)"
+      style="transform-origin: center center;"
+    >
+      <stop stop-color="#DE367B"></stop>
+      <stop offset="1" stop-color="#3F5EFB"></stop>
+    </linearGradient>
+    <radialGradient
+      id="«r3c»"
+      cx="0"
+      cy="0"
+      r="1"
+      gradientUnits="userSpaceOnUse"
+      gradientTransform="translate(256) rotate(90) scale(512)"
+    >
+      <stop stop-color="white"></stop>
+      <stop offset="1" stop-color="white" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  <!-- Icon from OOUI by OOUI Team - https://github.com/wikimedia/oojs-ui/blob/master/LICENSE-MIT -->
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="400"
+    height="400"
+    viewBox="0 0 20 20"
+    x="56"
+    y="56"
+    alignment-baseline="middle"
+    style="color: rgb(255, 255, 255);"
+  >
+    <path
+      fill="currentColor"
+      d="M6.29 19a54 54 0 0 1-.73-2.88a31 31 0 0 1-.42-2.47A15 15 0 0 1 5 11.79q0-1.455.54-2.43a4.2 4.2 0 0 1 1.43-1.57a6 6 0 0 1 1.99-.84a9.3 9.3 0 0 1 2.2-.22c.74.01 1.45.08 2.1.22a4 4 0 0 0-.12-1.3a2.8 2.8 0 0 0-.46-1.07a2.1 2.1 0 0 0-.75-.7a1.9 1.9 0 0 0-.99-.27a2.2 2.2 0 0 0-.96.22a3 3 0 0 0-.89.66c-.28.3-.54.67-.79 1.1L6.17 4.48c.42-.85.9-1.53 1.43-2.03c.54-.5 1.11-.86 1.7-1.09A4.9 4.9 0 0 1 11.1 1c.89 0 1.64.18 2.27.53a4.2 4.2 0 0 1 1.52 1.4c.39.55.67 1.16.84 1.8A6.5 6.5 0 0 1 16 6.58a6.8 6.8 0 0 1-.89 3.23a20 20 0 0 0-2.41-.48a9.8 9.8 0 0 0-2.04-.1a4.2 4.2 0 0 0-1.54.36a2.16 2.16 0 0 0-1 .86c-.24.39-.36.87-.36 1.46c0 .55.05 1.18.14 1.9c.1.73.23 1.48.4 2.26s.37 1.55.58 2.32l-2.6.62Z"
+    ></path>
+  </svg>
+</svg>

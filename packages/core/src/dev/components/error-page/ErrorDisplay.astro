@@ -1,0 +1,193 @@
+---
+import { Code } from "astro:components";
+import { readFile } from "node:fs/promises";
+import { transformerMetaHighlight } from "@shikijs/transformers";
+import { escapeHTML } from "astro/runtime/server/escape.js";
+import { createCssVariablesTheme } from "shiki";
+import type { ErrorWithMetadata } from "./types";
+
+interface Props {
+  error: ErrorWithMetadata;
+}
+
+const { error } = Astro.props;
+
+const fullCode = error.loc?.file
+  ? await readFile(error.loc.file, "utf-8")
+  : undefined;
+
+const separator = error.loc?.file?.includes("/") ? "/" : "\\";
+const fileLocation = [
+  error.loc?.file?.split(separator).slice(-2).join("/"),
+  error.loc?.line,
+  error.loc?.column,
+]
+  .filter(Boolean)
+  .join(":");
+
+const theme = createCssVariablesTheme({
+  variablePrefix: "--astro-code-",
+});
+
+const errorHintText = escapeHTML(error.hint ?? "")
+  .split(" ")
+  .map((v) => {
+    if (!v.startsWith("https://")) return v;
+    if (v.endsWith("."))
+      return `<a target="_blank" href="${v.slice(0, -1)}">${v.slice(0, -1)}</a>.`;
+    return `<a target="_blank" href="${v}">${v}</a>`;
+  })
+  .join(" ");
+---
+
+<main class="error-top">
+  <h1 class="error-name">{error.name}</h1>
+  <p class="error-description">
+    {error.message}
+  </p>
+  {
+    errorHintText && (
+      <div class="error-hint">
+        <span class="error-hint-icon">🚀</span>
+        <p class="error-hint-text" set:html={errorHintText}></p>
+      </div>
+    )
+  }
+  {fileLocation && <p class="error-file-location">{fileLocation}</p>}
+  {
+    fullCode && (
+      <Code
+        code={fullCode}
+        lang="astro"
+        transformers={[transformerMetaHighlight()]}
+        meta={error.loc?.line ? `{${error.loc.line}}` : undefined}
+        theme={theme}
+      />
+    )
+  }
+</main>
+
+<script is:inline define:vars={{ column: error.loc?.column }}>
+  if (column) {
+    document
+      .querySelector(".highlighted")
+      ?.insertAdjacentHTML(
+        "afterend",
+        `\n<span class="line error-caret"><span style="padding-left:${
+          column - 1
+        }ch;">^</span></span>`
+      );
+  }
+</script>
+
+<style>
+  :root {
+    --link-hover-color: #37446b;
+
+    --astro-code-foreground: #000000;
+    --astro-code-background: #f3f4f7;
+    --astro-code-token-constant: #4ca48f;
+    --astro-code-token-string: #9f722a;
+    --astro-code-token-comment: #8490b5;
+    --astro-code-token-keyword: #5f11a6;
+    --astro-code-token-parameter: #aa0000;
+    --astro-code-token-function: #4ca48f;
+    --astro-code-token-string-expression: #9f722a;
+    --astro-code-token-punctuation: #000000;
+    --astro-code-token-link: #9f722a;
+  }
+
+  :root[data-theme="dark"] {
+    --link-hover-color: #bdc6e2;
+
+    --astro-code-foreground: #ffffff;
+    --astro-code-background: #141925;
+    --astro-code-token-constant: #90f4e3;
+    --astro-code-token-string: #f4cf90;
+    --astro-code-token-comment: #8490b5;
+    --astro-code-token-keyword: #c490f4;
+    --astro-code-token-parameter: #aa0000;
+    --astro-code-token-function: #90f4e3;
+    --astro-code-token-string-expression: #f4cf90;
+    --astro-code-token-punctuation: #ffffff;
+    --astro-code-token-link: #f4cf90;
+  }
+
+  .error-top {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2rem;
+  }
+
+  .error-name {
+    margin: 0;
+    font-family: var(--font-monospace);
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--foreground-color);
+    overflow-wrap: break-word;
+  }
+
+  .error-description {
+    font-family: var(--font-monospace);
+    font-size: 1rem;
+    overflow-wrap: break-word;
+    color: var(--foreground-color);
+  }
+
+  .error-file-location {
+    font-family: var(--font-monospace);
+    font-size: 0.8rem;
+    overflow-wrap: break-word;
+    color: var(--foreground-color);
+  }
+
+  .error-hint {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    @media screen and (min-width: 1024px) {
+      padding: 1rem 0;
+    }
+    border-radius: 1rem;
+    background-color: var(--overlay-color);
+    width: 100%;
+  }
+
+  .error-hint-icon {
+    font-size: 1.5rem;
+    padding-left: 1rem;
+    color: var(--foreground-color);
+  }
+
+  .error-hint-text {
+    font-family: var(--font-monospace);
+    font-size: 1rem;
+    overflow: auto;
+    overflow-wrap: break-word;
+    color: var(--foreground-color);
+  }
+</style>
+
+<style is:global>
+  .astro-code .highlighted {
+    background-color: #f4909026;
+    display: inline-block;
+    min-width: 100%;
+  }
+
+  .astro-code {
+    border-radius: 1rem;
+    padding: 1rem;
+    margin: 0;
+    overflow: auto;
+  }
+
+  .error-hint-text a {
+    color: var(--foreground-color);
+  }
+
+  .error-hint-text a:hover {
+    color: var(--link-hover-color);
+  }
+</style>

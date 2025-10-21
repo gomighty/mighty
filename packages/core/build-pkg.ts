@@ -3,7 +3,16 @@ import path from "node:path";
 import { isolatedDeclaration } from "oxc-transform";
 import { replaceTscAliasPaths } from "tsc-alias";
 
-const FILES_TO_COPY_AS_IS = ["src/dev/render-vite.ts"];
+const FILES_TO_COPY_AS_IS = [
+  "src/dev/render-vite.ts",
+  "src/dev/components/error-page/ErrorPage.astro",
+  "src/dev/components/error-page/ErrorDisplay.astro",
+  "src/dev/components/error-page/Header.astro",
+  "src/dev/components/error-page/DarkModeIcon.astro",
+  "src/dev/components/error-page/LightModeIcon.astro",
+  "src/dev/components/error-page/MightyLogo.astro",
+  "src/dev/components/error-page/types.ts",
+];
 
 const ENTRYPOINTS = [
   "src/index.ts",

@@ -15,6 +15,7 @@
     "./types": "./dist/types.js"
   },
   "dependencies": {
+    "@shikijs/transformers": "^3.13.0",
     "astro": "5.14.5"
   },
   "peerDependencies": {
