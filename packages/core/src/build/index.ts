@@ -12,7 +12,7 @@ export async function build(options?: MightyServerOptions): Promise<void> {
           setAdapter({
             name: "mighty-adapter",
             serverEntrypoint: path.join(
-              import.meta.dir,
+              import.meta.dirname,
               "./server-entrypoint.mjs",
             ),
             supportedAstroFeatures: {

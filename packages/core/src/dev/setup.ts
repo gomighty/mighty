@@ -110,7 +110,7 @@ export async function setupDev(options: MightyDevOptions): Promise<{
     await ssrEnv.runner.import<{
       render: MightyRenderFunction;
       createContainer: MightyStartContainerFunction;
-    }>(path.join(import.meta.dir, "./render-vite.ts"));
+    }>(path.join(import.meta.dirname, "./render-vite.ts"));
 
   await createContainer(loadedRenderers, options.getAddress);
 
@@ -232,7 +232,7 @@ export async function setupDev(options: MightyDevOptions): Promise<{
           status: 500,
           content: await renderComponentByPath({
             componentPath: path.join(
-              import.meta.dir,
+              import.meta.dirname,
               "components",
               "error-page",
               "ErrorPage.astro",

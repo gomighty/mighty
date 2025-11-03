@@ -33,7 +33,7 @@ export function getFixture(fixtureName: string): {
   clean: () => Promise<void>;
 } {
   const fixtureRoot = path.join(
-    import.meta.dir,
+    import.meta.dirname,
     "..",
     "fixtures",
     ...dotStringToPath(fixtureName),
