@@ -7,11 +7,7 @@ import {
 } from "astro";
 import { mergeConfig } from "astro/config";
 import type { Element } from "hast";
-import {
-  type Connect,
-  isRunnableDevEnvironment,
-  type ViteDevServer,
-} from "vite";
+import type { Connect, ViteDevServer } from "vite";
 import { getStylesForURL } from "@/dev/css";
 import type { MightyRenderRequest } from "@/schemas";
 import type { MightyDevOptions } from "@/types";
@@ -95,22 +91,19 @@ export async function setupDev(options: MightyDevOptions): Promise<{
     throw new Error("viteServer is not defined");
   }
 
-  const ssrEnv = viteServer.environments.ssr;
-  if (!isRunnableDevEnvironment(ssrEnv)) {
-    throw new Error("ssrEnv is not RunnableDevEnvironment");
-  }
-
   // We need to import the renderers here and not in the render-vite.ts file. Not sure why...
   const loadedRenderers = await loadRenderersFromIntegrations(
     finalConfig.integrations,
-    ssrEnv,
+    viteServer,
   );
 
   const { render: renderComponent, createContainer } =
-    await ssrEnv.runner.import<{
+    (await viteServer.ssrLoadModule(
+      path.join(import.meta.dirname, "./render-vite.ts"),
+    )) as {
       render: MightyRenderFunction;
       createContainer: MightyStartContainerFunction;
-    }>(path.join(import.meta.dirname, "./render-vite.ts"));
+    };
 
   await createContainer(loadedRenderers, options.getAddress);
 

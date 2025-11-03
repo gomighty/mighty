@@ -1,14 +1,14 @@
 import type { AstroIntegration, AstroRenderer, SSRLoadedRenderer } from "astro";
-import type { RunnableDevEnvironment } from "vite";
+import type { ViteDevServer } from "vite";
 import { executeIntegrationsConfigSetup } from "@/utils/integrations";
 
 async function loadRenderers(
   renderers: AstroRenderer[],
-  viteDevEnv: RunnableDevEnvironment,
+  viteServer: ViteDevServer,
 ): Promise<SSRLoadedRenderer[]> {
   const loadedRenderers = await Promise.all(
     renderers.map(async (renderer) => {
-      const mod = await viteDevEnv.runner.import(
+      const mod = await viteServer.ssrLoadModule(
         renderer.serverEntrypoint.toString(),
       );
       if (typeof mod.default !== "undefined") {
@@ -30,7 +30,7 @@ async function loadRenderers(
 
 export async function loadRenderersFromIntegrations(
   integrations: AstroIntegration[],
-  viteDevEnv: RunnableDevEnvironment,
+  viteServer: ViteDevServer,
 ): Promise<SSRLoadedRenderer[]> {
   const renderers: AstroRenderer[] = [];
   await executeIntegrationsConfigSetup(integrations, {
@@ -39,5 +39,5 @@ export async function loadRenderersFromIntegrations(
     },
   });
 
-  return loadRenderers(renderers, viteDevEnv);
+  return loadRenderers(renderers, viteServer);
 }
