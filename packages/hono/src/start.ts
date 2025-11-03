@@ -1,7 +1,4 @@
-import {
-  type MightyStartOptions,
-  start,
-} from "@gomighty/core";
+import { type MightyStartOptions, start } from "@gomighty/core";
 import { createMiddleware } from "hono/factory";
 import type { UnofficialStatusCode } from "hono/utils/http-status";
 import type { StartMightyServerMiddlewareHandler } from "./types";
@@ -26,7 +23,7 @@ export function startMiddleware(): StartMightyServerMiddlewareHandler {
         return c.redirect(response.redirectTo);
       }
       return c.html(response.content, response.status as UnofficialStatusCode);
-    })
+    });
 
     c.set("shareWithAstroComponent", (dataToShare: Record<string, unknown>) => {
       Object.assign(sharedData, dataToShare);
