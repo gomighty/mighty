@@ -10,10 +10,6 @@ describe("start basic fixture", () => {
     await fixture.clean();
   });
 
-  it("cannot start a prod server without building", async () => {
-    expect(fixture.startProdServer()).rejects.toThrowError();
-  });
-
   it("can render a prerendered page", async () => {
     await fixture.build();
     const { render } = await fixture.startProdServer();
@@ -357,5 +353,9 @@ describe("start basic fixture", () => {
     ).text();
     expect(scriptContent).toContain("Hello World!");
     expect(scriptContent).toContain("console.log");
+  });
+
+  it("cannot start a prod server without building", async () => {
+    expect(fixture.startProdServer()).rejects.toThrowError();
   });
 });
