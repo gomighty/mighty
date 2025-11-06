@@ -18,6 +18,7 @@
     "zod": "^4.0.15"
   },
   "scripts": {
+    "build-pkg": "bun run build-pkg.ts",
     "typecheck": "tsc"
   }
 }
