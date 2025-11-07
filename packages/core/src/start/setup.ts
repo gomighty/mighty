@@ -3,18 +3,19 @@ import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { Element } from "hast";
 import { runInContext } from "@/context";
-import type { MightyRenderRequest } from "@/schemas";
-import type { MightyServerOptions } from "@/types";
+import type {
+  MightyRenderRequest,
+  MightyServerOptions,
+  MightyStartMiddleware,
+} from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 import { getBuildPathsFromInlineConfig } from "@/utils/getBuildPathsFromInlineConfig";
 import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
 import { importManifestAndRenderers } from "./importManifestAndRenderers";
 
-export async function setupStart(options: MightyServerOptions): Promise<{
-  render: (
-    request: MightyRenderRequest,
-  ) => Promise<{ redirectTo: string } | { status: number; content: string }>;
-}> {
+export async function setupStart(
+  options: MightyServerOptions,
+): Promise<MightyStartMiddleware> {
   const { buildServerPath } = getBuildPathsFromInlineConfig(
     options.config ?? {},
   );

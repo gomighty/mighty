@@ -7,10 +7,13 @@ import {
 } from "astro";
 import { mergeConfig } from "astro/config";
 import type { Element } from "hast";
-import type { Connect, ViteDevServer } from "vite";
+import type { ViteDevServer } from "vite";
 import { getStylesForURL } from "@/dev/css";
-import type { MightyRenderRequest } from "@/schemas";
-import type { MightyDevOptions } from "@/types";
+import type {
+  MightyDevMiddleware,
+  MightyDevOptions,
+  MightyRenderRequest,
+} from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
 import type {
@@ -21,13 +24,9 @@ import { loadRenderersFromIntegrations } from "./renderers";
 import { getInjectedScriptsFromIntegrations } from "./scripts";
 import { getViteLogger } from "./viteLogger";
 
-export async function setupDev(options: MightyDevOptions): Promise<{
-  render: (
-    request: MightyRenderRequest,
-  ) => Promise<{ status: number; content: string }>;
-  viteMiddleware: Connect.Server;
-  stop: () => Promise<void>;
-}> {
+export async function setupDev(
+  options: MightyDevOptions,
+): Promise<MightyDevMiddleware> {
   let finalConfig: AstroConfig;
   let viteServer: ViteDevServer;
 

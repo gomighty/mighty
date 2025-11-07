@@ -21,7 +21,6 @@ const ENTRYPOINTS = [
   "src/start/index.ts",
   "src/build/index.ts",
   "src/types.ts",
-  "src/schemas.ts",
 ];
 
 await rm("dist", { recursive: true, force: true });

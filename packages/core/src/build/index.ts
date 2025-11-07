@@ -3,6 +3,9 @@ import { type AstroInlineConfig, build as astroBuild } from "astro";
 import { mergeConfig } from "astro/config";
 import type { MightyServerOptions } from "@/types";
 
+/**
+ * Builds the Astro project.
+ */
 export async function build(options?: MightyServerOptions): Promise<void> {
   const mightyConfig: AstroInlineConfig = {
     adapter: {

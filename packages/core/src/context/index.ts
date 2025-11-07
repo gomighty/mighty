@@ -14,6 +14,9 @@ export async function runInContext<CallbackReturnType>(
   return asyncLocalStorage.run(context, callback);
 }
 
+/**
+ * Gets the Mighty context for the current request.
+ */
 export function getContext(): MightyContext {
   const store = asyncLocalStorage.getStore();
   if (!store) {
