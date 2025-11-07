@@ -18,7 +18,6 @@ describe("start basic fixture", () => {
       component: "index",
       props: {},
       context: {},
-      partial: true,
     });
     expect(response).toEqual({ redirectTo: "index.html" });
 
@@ -38,6 +37,18 @@ describe("start basic fixture", () => {
       props: {},
       context: {},
       partial: true,
+    });
+    expect(response).toEqual({ status: 200, content: "<p>Hello World!</p>" });
+  });
+
+  it("renders a partial by default", async () => {
+    await fixture.build({ config: { output: "server" } });
+    const { render } = await fixture.startProdServer();
+
+    const response = await render({
+      component: "index",
+      props: {},
+      context: {},
     });
     expect(response).toEqual({ status: 200, content: "<p>Hello World!</p>" });
   });

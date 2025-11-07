@@ -30,6 +30,18 @@ describe("dev basic fixture", () => {
     expect(response.content).toBe("<p>Hello World</p>");
   });
 
+  it("renders a partial by default", async () => {
+    const response = await render({
+      component: "index",
+      props: {
+        title: "Hello World",
+      },
+      context: {},
+    });
+    expect(response.status).toBe(200);
+    expect(response.content).toBe("<p>Hello World</p>");
+  });
+
   it("can render a partial with dot notation", async () => {
     const response = await render({
       component: "nested.index",

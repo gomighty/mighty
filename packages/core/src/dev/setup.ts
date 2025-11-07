@@ -141,7 +141,7 @@ export async function setupDev(options: MightyDevOptions): Promise<{
       componentPath: `${string}.astro`;
     },
   ) => {
-    const { componentPath, props, context, partial } = data;
+    const { componentPath, props, context, partial = true } = data;
 
     const [renderedComponent, styleTags] = await Promise.all([
       renderComponent({
