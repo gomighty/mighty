@@ -20,14 +20,9 @@ export async function setupStart(
     options.config ?? {},
   );
 
-  const { data: manifestAndRenderers, error: manifestAndRenderersError } =
-    await importManifestAndRenderers(options.config ?? {});
-  if (manifestAndRenderersError) {
-    throw new Error(
-      "Failed to load manifest file and/or renderers. Did you build your project?",
-    );
-  }
-  const { manifest, renderers } = manifestAndRenderers;
+  const { manifest, renderers } = await importManifestAndRenderers(
+    options.config ?? {},
+  );
 
   const container = await AstroContainer.create({
     manifest,

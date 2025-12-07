@@ -1,7 +1,6 @@
 import path from "node:path";
 import type { AstroInlineConfig, SSRLoadedRenderer, SSRManifest } from "astro";
 import { getBuildPathsFromInlineConfig } from "@/utils/getBuildPathsFromInlineConfig";
-import { type Result, resultFromAsync } from "@/utils/result";
 
 /**
  * Import the manifest and renderers from the Astro build.
@@ -11,34 +10,25 @@ import { type Result, resultFromAsync } from "@/utils/result";
  */
 export async function importManifestAndRenderers(
   config: AstroInlineConfig,
-): Promise<
-  Result<{
-    manifest: SSRManifest;
-    renderers: SSRLoadedRenderer[];
-  }>
-> {
+): Promise<{ manifest: SSRManifest; renderers: SSRLoadedRenderer[] }> {
   const { buildServerPath } = getBuildPathsFromInlineConfig(config);
 
-  const { data: manifest, error: manifestError } = await resultFromAsync(
-    import(
-      path.join(buildServerPath, `entry.mjs?invalidateCache=${Math.random()}`)
-    ).then((module) => module.manifest),
-  );
-  if (manifestError) {
-    return { data: null, error: manifestError };
+  try {
+    const [manifest, renderers] = await Promise.all([
+      import(
+        path.join(buildServerPath, `entry.mjs?invalidateCache=${Math.random()}`)
+      ).then((module) => module.manifest),
+      import(
+        path.join(
+          buildServerPath,
+          `renderers.mjs?invalidateCache=${Math.random()}`,
+        )
+      ).then((module) => module.renderers),
+    ]);
+    return { manifest, renderers };
+  } catch (_) {
+    throw new Error(
+      "Failed to load manifest file and/or renderers. Did you build your project?",
+    );
   }
-
-  const { data: renderers, error: renderersError } = await resultFromAsync(
-    import(
-      path.join(
-        buildServerPath,
-        `renderers.mjs?invalidateCache=${Math.random()}`,
-      )
-    ).then((module) => module.renderers),
-  );
-  if (renderersError) {
-    return { data: null, error: renderersError };
-  }
-
-  return { data: { manifest, renderers }, error: null };
 }
