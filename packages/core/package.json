@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@shikijs/transformers": "^3.13.0",
-    "astro": "5.15.3"
+    "astro": "5.16.4"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -42,6 +42,6 @@
   "devDependencies": {
     "@astrojs/alpinejs": "0.4.9",
     "@astrojs/partytown": "^2.1.4",
-    "@astrojs/react": "4.4.1"
+    "@astrojs/react": "4.4.2"
   }
 }
