@@ -50,12 +50,12 @@ export async function setupStart(
       }
 
       if (routeInfo.routeData.prerender) {
-        const pathname = routeInfo.routeData.pathname ?? "/";
-        const redirectTo =
-          pathname === "/"
-            ? "index.html"
-            : `${pathname.replace(/^\//, "")}/index.html`;
-        return { redirectTo };
+        return {
+          redirectTo: path.join(
+            routeInfo.routeData.pathname ?? "/",
+            "index.html",
+          ),
+        };
       }
 
       const entryModule =

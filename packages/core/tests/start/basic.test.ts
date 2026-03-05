@@ -23,7 +23,7 @@ describe("start basic fixture", () => {
       props: {},
       context: {},
     });
-    expect(response).toEqual({ redirectTo: "index.html" });
+    expect(response).toEqual({ redirectTo: "/index.html" });
 
     expect(
       await Bun.file(path.join(fixture.outDir, "client", "index.html")).text(),
@@ -131,7 +131,7 @@ describe("start basic fixture", () => {
       context: {},
       partial: false,
     });
-    expect(response).toEqual({ redirectTo: "styles/index.html" });
+    expect(response).toEqual({ redirectTo: "/styles/index.html" });
 
     const output = await Bun.file(
       path.join(fixture.outDir, "client", "styles", "index.html"),
@@ -158,7 +158,7 @@ describe("start basic fixture", () => {
       context: {},
       partial: false,
     });
-    expect(response).toEqual({ redirectTo: "styles/index.html" });
+    expect(response).toEqual({ redirectTo: "/styles/index.html" });
 
     const output = await Bun.file(
       path.join(fixture.outDir, "client", "styles", "index.html"),
@@ -249,7 +249,7 @@ describe("start basic fixture", () => {
       context: {},
       partial: false,
     });
-    expect(response).toEqual({ redirectTo: "scriptTag/index.html" });
+    expect(response).toEqual({ redirectTo: "/scriptTag/index.html" });
 
     const output = await Bun.file(
       path.join(fixture.outDir, "client", "scriptTag", "index.html"),
@@ -273,7 +273,7 @@ describe("start basic fixture", () => {
       context: {},
       partial: false,
     });
-    expect(response).toEqual({ redirectTo: "scriptTag/index.html" });
+    expect(response).toEqual({ redirectTo: "/scriptTag/index.html" });
 
     const output = await Bun.file(
       path.join(fixture.outDir, "client", "scriptTag", "index.html"),
