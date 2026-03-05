@@ -14,17 +14,11 @@ export async function importManifestAndRenderers(
   const { buildServerPath } = getBuildPathsFromInlineConfig(config);
 
   try {
-    const [manifest, renderers] = await Promise.all([
-      import(
-        path.join(buildServerPath, `entry.mjs?invalidateCache=${Math.random()}`)
-      ).then((module) => module.manifest),
-      import(
-        path.join(
-          buildServerPath,
-          `renderers.mjs?invalidateCache=${Math.random()}`,
-        )
-      ).then((module) => module.renderers),
-    ]);
+    const entryModule = await import(
+      path.join(buildServerPath, `entry.mjs?invalidateCache=${Math.random()}`)
+    );
+    const manifest: SSRManifest = entryModule.manifest;
+    const renderers: SSRLoadedRenderer[] = manifest.renderers ?? [];
     return { manifest, renderers };
   } catch (_) {
     throw new Error(

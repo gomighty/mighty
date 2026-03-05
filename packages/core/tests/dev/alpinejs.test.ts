@@ -10,9 +10,10 @@ describe("dev alpinejs fixture", () => {
   let getFromViteMiddleware: GetFromViteMiddlewareFunction;
   let stop: () => Promise<void>;
 
-  const fixture = getFixture("dev.alpinejs");
+  let fixture: ReturnType<typeof getFixture>;
 
   beforeEach(async () => {
+    fixture = getFixture("dev.alpinejs");
     ({ render, getFromViteMiddleware, stop } = await fixture.startDevServer());
   });
 

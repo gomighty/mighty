@@ -2,9 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, jest } from "bun:test";
 import { getFixture } from "@tests/fixture";
 
 describe("dev error fixture", () => {
-  const fixture = getFixture("dev.basic");
+  let fixture: ReturnType<typeof getFixture>;
 
   beforeEach(() => {
+    fixture = getFixture("dev.basic");
     jest.spyOn(console, "error").mockImplementation(() => {});
   });
 

@@ -27,7 +27,7 @@ export async function setupStart(
   const container = await AstroContainer.create({
     manifest,
     renderers,
-    async resolve(s) {
+    async resolve(s: string) {
       return manifest.entryModules[s] ?? s;
     },
   });
@@ -50,11 +50,18 @@ export async function setupStart(
       }
 
       if (routeInfo.routeData.prerender) {
-        return { redirectTo: routeInfo.file };
+        const pathname = routeInfo.routeData.pathname ?? "/";
+        const redirectTo =
+          pathname === "/"
+            ? "index.html"
+            : `${pathname.replace(/^\//, "")}/index.html`;
+        return { redirectTo };
       }
 
       const entryModule =
-        manifest.entryModules[`\u0000@astro-page:${componentPath}@_@astro`];
+        manifest.entryModules[
+          `\u0000virtual:astro:page:${componentPath}@_@astro`
+        ];
       if (!entryModule) {
         return { status: 404, content: `Component ${component} not found` };
       }

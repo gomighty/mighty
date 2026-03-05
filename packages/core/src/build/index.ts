@@ -14,16 +14,16 @@ export async function build(options?: MightyServerOptions): Promise<void> {
         "astro:config:done": ({ setAdapter }) => {
           setAdapter({
             name: "mighty-adapter",
+            entrypointResolution: "auto",
             serverEntrypoint: path.join(
               import.meta.dirname,
               "./server-entrypoint.mjs",
             ),
             supportedAstroFeatures: {
               serverOutput: "stable",
-              sharpImageService: "stable",
               hybridOutput: "stable",
+              sharpImageService: "stable",
             },
-            exports: ["manifest"],
           });
         },
       },

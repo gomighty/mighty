@@ -7,9 +7,10 @@ describe("dev basic fixture", () => {
   let render: DevRenderFunction;
   let stop: () => Promise<void>;
 
-  const fixture = getFixture("dev.basic");
+  let fixture: ReturnType<typeof getFixture>;
 
   beforeEach(async () => {
+    fixture = getFixture("dev.basic");
     ({ render, stop } = await fixture.startDevServer());
   });
 
