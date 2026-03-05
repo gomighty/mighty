@@ -113,7 +113,7 @@ export function getFixture(fixtureName: string): {
             logLevel: "warn",
             vite: {
               build: {
-                rollupOptions: { external: ["@gomighty/core", "@/context"] },
+                rollupOptions: { external: ["@gomighty/core/context"] },
               },
             },
           },
