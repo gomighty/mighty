@@ -1,4 +1,4 @@
-import { fileURLToPath } from "node:url";
+import path from "node:path";
 import { type AstroInlineConfig, build as astroBuild } from "astro";
 import { mergeConfig } from "astro/config";
 import type { MightyServerOptions } from "@/types";
@@ -15,8 +15,9 @@ export async function build(options?: MightyServerOptions): Promise<void> {
           setAdapter({
             name: "mighty-adapter",
             entrypointResolution: "auto",
-            serverEntrypoint: fileURLToPath(
-              new URL("./server-entrypoint.mjs", import.meta.url),
+            serverEntrypoint: path.join(
+              import.meta.dirname,
+              "./server-entrypoint.mjs",
             ),
             supportedAstroFeatures: {
               serverOutput: "stable",
