@@ -3,7 +3,7 @@ import path from "node:path";
 import { isolatedDeclaration } from "oxc-transform";
 import { replaceTscAliasPaths } from "tsc-alias";
 
-const ENTRYPOINTS = ["src/index.ts", "src/server.ts"];
+const ENTRYPOINTS = ["src/index.ts", "src/server.ts", "src/shared.ts"];
 
 await rm("dist", { recursive: true, force: true });
 
