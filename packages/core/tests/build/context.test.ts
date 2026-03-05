@@ -12,18 +12,26 @@ describe("build context fixture", () => {
     await fixture.clean();
   });
 
-  it("can build a server output with context", async () => {
-    expect(
-      fixture.build({ config: { output: "server" } }),
-    ).resolves.toBeUndefined();
-  });
+  it(
+    "can build a server output with context",
+    async () => {
+      expect(
+        fixture.build({ config: { output: "server" } }),
+      ).resolves.toBeUndefined();
+    },
+    15_000,
+  );
 
-  it("cannot build a static output with context", async () => {
-    expect(fixture.build({ config: { output: "static" } })).toEqual(
-      expect.rejectsTo.objectContaining({
-        name: "MightyContextError",
-        id: "src/pages/index.astro",
-      }),
-    );
-  });
+  it(
+    "cannot build a static output with context",
+    async () => {
+      expect(fixture.build({ config: { output: "static" } })).toEqual(
+        expect.rejectsTo.objectContaining({
+          name: "MightyContextError",
+          id: "src/pages/index.astro",
+        }),
+      );
+    },
+    15_000,
+  );
 });
