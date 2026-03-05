@@ -1,5 +1,6 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   type AstroConfig,
   type AstroInlineConfig,
@@ -98,7 +99,7 @@ export async function setupDev(
 
   const { render: renderComponent, createContainer } =
     (await viteServer.ssrLoadModule(
-      path.join(import.meta.dirname, "./render-vite.ts"),
+      fileURLToPath(new URL("./render-vite.ts", import.meta.url)),
     )) as {
       render: MightyRenderFunction;
       createContainer: MightyStartContainerFunction;
@@ -223,11 +224,11 @@ export async function setupDev(
         return {
           status: 500,
           content: await renderComponentByPath({
-            componentPath: path.join(
-              import.meta.dirname,
-              "components",
-              "error-page",
-              "ErrorPage.astro",
+            componentPath: fileURLToPath(
+              new URL(
+                "./components/error-page/ErrorPage.astro",
+                import.meta.url,
+              ),
             ) as `${string}.astro`,
             props: {
               error: error as Error,
