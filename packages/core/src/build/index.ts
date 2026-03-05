@@ -14,6 +14,7 @@ export async function build(options?: MightyServerOptions): Promise<void> {
         "astro:config:done": ({ setAdapter }) => {
           setAdapter({
             name: "mighty-adapter",
+            entrypointResolution: "auto",
             serverEntrypoint: path.join(
               import.meta.dirname,
               "./server-entrypoint.mjs",
@@ -23,7 +24,6 @@ export async function build(options?: MightyServerOptions): Promise<void> {
               sharpImageService: "stable",
               hybridOutput: "stable",
             },
-            exports: ["manifest"],
           });
         },
       },

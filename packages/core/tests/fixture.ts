@@ -20,6 +20,7 @@ export type GetFromViteMiddlewareFunction = (
 
 export function getFixture(fixtureName: string): {
   fixtureRoot: string;
+  outDir: string;
   startDevServer: (params?: Omit<MightyDevOptions, "getAddress">) => Promise<{
     render: DevRenderFunction;
     getFromViteMiddleware: GetFromViteMiddlewareFunction;
@@ -39,8 +40,13 @@ export function getFixture(fixtureName: string): {
     ...dotStringToPath(fixtureName),
   );
 
+  const outDir = path.join(
+    fixtureRoot,
+    `dist-${Math.random().toString(36).substring(2, 15)}`,
+  );
+
   const clean = async () => {
-    await rm(path.join(fixtureRoot, "dist"), {
+    await rm(outDir, {
       recursive: true,
       force: true,
     });
@@ -56,6 +62,7 @@ export function getFixture(fixtureName: string): {
 
   return {
     fixtureRoot,
+    outDir,
     startDevServer: async (params) => {
       const {
         render,
@@ -102,6 +109,7 @@ export function getFixture(fixtureName: string): {
         config: mergeConfig<AstroInlineConfig>(
           {
             root: fixtureRoot,
+            outDir,
             logLevel: "warn",
             vite: {
               build: {
@@ -118,6 +126,7 @@ export function getFixture(fixtureName: string): {
         config: mergeConfig<AstroInlineConfig>(
           {
             root: fixtureRoot,
+            outDir,
             logLevel: "warn",
           },
           params?.config ?? {},

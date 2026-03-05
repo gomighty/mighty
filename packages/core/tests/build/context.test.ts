@@ -1,8 +1,12 @@
-import { afterEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { getFixture } from "@tests/fixture";
 
 describe("build context fixture", () => {
-  const fixture = getFixture("build.context");
+  let fixture: ReturnType<typeof getFixture>;
+
+  beforeEach(() => {
+    fixture = getFixture("build.context");
+  });
 
   afterEach(async () => {
     await fixture.clean();

@@ -50,11 +50,18 @@ export async function setupStart(
       }
 
       if (routeInfo.routeData.prerender) {
-        return { redirectTo: routeInfo.file };
+        return {
+          redirectTo: path.join(
+            routeInfo.routeData.pathname ?? "/",
+            "index.html",
+          ),
+        };
       }
 
       const entryModule =
-        manifest.entryModules[`\u0000@astro-page:${componentPath}@_@astro`];
+        manifest.entryModules[
+          `\u0000virtual:astro:page:${componentPath}@_@astro`
+        ];
       if (!entryModule) {
         return { status: 404, content: `Component ${component} not found` };
       }

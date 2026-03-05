@@ -1,10 +1,14 @@
-import { afterEach, describe, expect, it } from "bun:test";
-import { readFile } from "node:fs/promises";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { getFixture } from "@tests/fixture";
 
 describe("build basic fixture", () => {
-  const fixture = getFixture("build.basic");
+  let fixture: ReturnType<typeof getFixture>;
+
+  beforeEach(() => {
+    fixture = getFixture("build.basic");
+  });
 
   afterEach(async () => {
     await fixture.clean();
@@ -16,7 +20,7 @@ describe("build basic fixture", () => {
     ).resolves.toBeUndefined();
 
     const output = await readFile(
-      path.join(fixture.fixtureRoot, "dist", "client", "index.html"),
+      path.join(fixture.outDir, "client", "index.html"),
       { encoding: "utf-8" },
     );
 
@@ -28,17 +32,21 @@ describe("build basic fixture", () => {
       fixture.build({ config: { output: "server" } }),
     ).resolves.toBeUndefined();
 
-    const output = await readFile(
-      path.join(
-        fixture.fixtureRoot,
-        "dist",
-        "server",
-        "pages",
-        "index.astro.mjs",
-      ),
-      { encoding: "utf-8" },
-    );
+    const serverDir = path.join(fixture.outDir, "server");
+    const entryExists = await readFile(path.join(serverDir, "entry.mjs"), {
+      encoding: "utf-8",
+    });
+    expect(entryExists).toBeDefined();
 
+    const chunks = await readdir(path.join(serverDir, "chunks"));
+    const pageChunk = chunks.find(
+      (f) => f.startsWith("index_") && f.endsWith(".mjs"),
+    ) as string;
+    expect(pageChunk).toBeString();
+
+    const output = await readFile(path.join(serverDir, "chunks", pageChunk), {
+      encoding: "utf-8",
+    });
     expect(output).toContain("<p>Hello World!</p>");
   });
 });

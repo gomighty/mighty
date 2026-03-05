@@ -4,6 +4,7 @@ import { isolatedDeclaration } from "oxc-transform";
 import { replaceTscAliasPaths } from "tsc-alias";
 
 const FILES_TO_COPY_AS_IS = [
+  "src/build/server-entrypoint.mjs",
   "src/dev/render-vite.ts",
   "src/dev/components/error-page/ErrorPage.astro",
   "src/dev/components/error-page/ErrorDisplay.astro",

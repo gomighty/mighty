@@ -15,8 +15,8 @@
     "./types": "./dist/types.js"
   },
   "dependencies": {
-    "@shikijs/transformers": "^3.13.0",
-    "astro": "5.16.4"
+    "@shikijs/transformers": "^4.0.0",
+    "astro": "6.0.0-beta.17"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -40,8 +40,8 @@
   },
   "type": "module",
   "devDependencies": {
-    "@astrojs/alpinejs": "0.4.9",
+    "@astrojs/alpinejs": "0.5.0-beta.1",
     "@astrojs/partytown": "^2.1.4",
-    "@astrojs/react": "4.4.2"
+    "@astrojs/react": "5.0.0-beta.3"
   }
 }
