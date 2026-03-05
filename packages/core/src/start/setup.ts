@@ -1,8 +1,8 @@
 import path from "node:path";
+import { runInContext } from "@gomighty/core/context";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { Element } from "hast";
-import { runInContext } from "@gomighty/core/context";
 import type {
   MightyRenderRequest,
   MightyServerOptions,
