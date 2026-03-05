@@ -17,12 +17,12 @@ export async function runInContext<CallbackReturnType>(
 /**
  * Gets the Mighty context for the current request.
  */
-export function getContext(): MightyContext {
+export function getContext<T extends MightyContext = MightyContext>(): T {
   const store = asyncLocalStorage.getStore();
   if (!store) {
     throw new MightyContextError(
       "No context found. Are you trying to access the context in a prerendered page?",
     );
   }
-  return store;
+  return store as T;
 }

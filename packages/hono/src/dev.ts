@@ -1,4 +1,5 @@
 import { dev, type MightyDevOptions } from "@gomighty/core";
+import { mergeConfig } from "astro/config";
 import { createMiddleware } from "hono/factory";
 import type { UnofficialStatusCode } from "hono/utils/http-status";
 import type { StartMightyServerMiddlewareHandler } from "./types";
@@ -6,15 +7,16 @@ import { runConnectMiddleware } from "./utils/runConnectMiddleware.ts";
 
 const MIGHTY_DEV_ROOT = "/__MIGHTY_DEV_ADDRESS__";
 
-export function devMiddleware(): StartMightyServerMiddlewareHandler {
+export function devMiddleware(
+  options?: Omit<MightyDevOptions, "getAddress">,
+): StartMightyServerMiddlewareHandler {
   let rootAddress: string = "";
   const mightyConfig: MightyDevOptions = {
-    config: {
-      root: "./astro",
-      vite: {
-        base: MIGHTY_DEV_ROOT,
-      },
-    },
+    ...options,
+    config: mergeConfig(
+      { root: "./astro", vite: { base: MIGHTY_DEV_ROOT } },
+      options?.config ?? {},
+    ),
     getAddress: () => new URL(MIGHTY_DEV_ROOT, rootAddress).toString(),
   };
 
@@ -31,9 +33,19 @@ export function devMiddleware(): StartMightyServerMiddlewareHandler {
       return runConnectMiddleware(viteMiddleware, c);
     }
 
+    const sharedData: Record<string, unknown> = {};
+
     c.setRenderer(async (req) => {
-      const response = await render(req);
+      const mergedReq = {
+        ...req,
+        context: { ...sharedData, ...req.context },
+      };
+      const response = await render(mergedReq);
       return c.html(response.content, response.status as UnofficialStatusCode);
+    });
+
+    c.set("shareWithAstroComponent", (dataToShare: Record<string, unknown>) => {
+      Object.assign(sharedData, dataToShare);
     });
 
     await next();

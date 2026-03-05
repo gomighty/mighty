@@ -46,8 +46,15 @@ await Bun.build({
   target: "node",
   outdir: "dist",
   root: "src",
-  external: await getDependencies(),
-  splitting: true,
+  external: [
+    ...(await getDependencies()),
+    "@gomighty/core/build",
+    "@gomighty/core/context",
+    "@gomighty/core/dev",
+    "@gomighty/core/start",
+    "@gomighty/core/types",
+  ],
+  splitting: false,
   minify: { identifiers: true },
 });
 

@@ -1,24 +1,28 @@
 import { type MightyStartOptions, start } from "@gomighty/core";
+import { mergeConfig } from "astro/config";
 import { createMiddleware } from "hono/factory";
 import type { UnofficialStatusCode } from "hono/utils/http-status";
 import type { StartMightyServerMiddlewareHandler } from "./types";
 
-export function startMiddleware(): StartMightyServerMiddlewareHandler {
+export function startMiddleware(
+  options?: MightyStartOptions,
+): StartMightyServerMiddlewareHandler {
   const mightyConfig: MightyStartOptions = {
-    config: {
-      root: "./astro",
-    },
+    config: mergeConfig({ root: "./astro" }, options?.config ?? {}),
   };
 
   const setupStartPromise = start(mightyConfig);
 
-  const sharedData: Record<string, unknown> = {};
-
   return createMiddleware(async (c, next) => {
     const { render } = await setupStartPromise;
+    const sharedData: Record<string, unknown> = {};
 
     c.setRenderer(async (req) => {
-      const response = await render(req);
+      const mergedReq = {
+        ...req,
+        context: { ...sharedData, ...req.context },
+      };
+      const response = await render(mergedReq);
       if ("redirectTo" in response) {
         return c.redirect(response.redirectTo);
       }

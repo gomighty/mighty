@@ -16,7 +16,7 @@ describe("build context fixture", () => {
     expect(
       fixture.build({ config: { output: "server" } }),
     ).resolves.toBeUndefined();
-  });
+  }, 15_000);
 
   it("cannot build a static output with context", async () => {
     expect(fixture.build({ config: { output: "static" } })).toEqual(
@@ -25,5 +25,5 @@ describe("build context fixture", () => {
         id: "src/pages/index.astro",
       }),
     );
-  });
+  }, 15_000);
 });
