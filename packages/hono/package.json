@@ -9,7 +9,8 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.mjs",
-    "./server": "./dist/server.mjs"
+    "./server": "./dist/server.mjs",
+    "./shared": "./dist/shared.mjs"
   },
   "dependencies": {
     "@gomighty/core": "workspace:*",
