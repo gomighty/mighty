@@ -27,7 +27,7 @@ export async function setupStart(
   const container = await AstroContainer.create({
     manifest,
     renderers,
-    async resolve(s: string) {
+    async resolve(s) {
       return manifest.entryModules[s] ?? s;
     },
   });

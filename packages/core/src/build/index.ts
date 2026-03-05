@@ -21,8 +21,8 @@ export async function build(options?: MightyServerOptions): Promise<void> {
             ),
             supportedAstroFeatures: {
               serverOutput: "stable",
-              hybridOutput: "stable",
               sharpImageService: "stable",
+              hybridOutput: "stable",
             },
           });
         },

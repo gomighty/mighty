@@ -12,7 +12,7 @@ export async function createContainer(
 ): Promise<void> {
   container = await AstroContainer.create({
     renderers,
-    async resolve(s: string) {
+    async resolve(s) {
       const address = getAddress();
       if (s.startsWith("astro:scripts")) {
         return `${address}/@id/${s}`;
