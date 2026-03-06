@@ -1,12 +1,17 @@
 {
+  "name": "gomighty/laravel",
+  "description": "Build apps with Astro and Laravel.",
+  "keywords": ["mighty", "laravel", "astro"],
+  "homepage": "https://go-mighty.vercel.app/",
+  "license": "MIT",
   "authors": [
     {
       "name": "Amine Ilidrissi"
     }
   ],
   "require": {
-    "laravel/framework": "^12",
-    "php": "^8.4"
+    "php": "^8.4",
+    "laravel/framework": "^12"
   },
   "require-dev": {
     "larastan/larastan": "^3.0",
@@ -14,23 +19,30 @@
     "orchestra/testbench": "^10.9",
     "pestphp/pest": "^4.0",
     "phpstan/extension-installer": "^1.4",
-    "spatie/ray": "^1.28",
-    "symplify/monorepo-builder": "^12.3"
+    "spatie/ray": "^1.28"
   },
-  "replace": {
-    "gomighty/laravel": "self.version"
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true,
   "autoload": {
+    "files": ["php/src/helpers.php"],
     "psr-4": {
-      "Mighty\\Laravel\\": "php/laravel/src"
-    },
-    "files": ["php/laravel/src/helpers.php"]
+      "Mighty\\Laravel\\": "php/src"
+    }
   },
   "autoload-dev": {
     "psr-4": {
-      "Mighty\\Laravel\\Tests\\": "php/laravel/tests"
+      "Mighty\\Laravel\\Tests\\": "php/tests"
+    }
+  },
+  "scripts": {
+    "analyse": "vendor/bin/phpstan analyse",
+    "test": "vendor/bin/pest",
+    "test-coverage": "vendor/bin/pest --coverage",
+    "format": "vendor/bin/pint"
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true,
+      "phpstan/extension-installer": true
     }
   },
   "extra": {
@@ -38,10 +50,6 @@
       "providers": ["Mighty\\Laravel\\MightyServiceProvider"]
     }
   },
-  "config": {
-    "allow-plugins": {
-      "pestphp/pest-plugin": true,
-      "phpstan/extension-installer": true
-    }
-  }
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

@@ -9,7 +9,7 @@
   "scripts": {
     "ci:biome": "biome ci",
     "ci:typecheck": "bun run --filter '*' typecheck",
-    "ci:phpstan": "cd packages/laravel/php/laravel && vendor/bin/phpstan analyse --memory-limit=512M",
+    "ci:phpstan": "cd packages/laravel && vendor/bin/phpstan analyse --memory-limit=512M",
     "build-pkg": "bun run build-pkg.ts"
   },
   "workspaces": {
