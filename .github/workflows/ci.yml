@@ -29,8 +29,8 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-      - run: composer install --working-dir=packages/laravel/php/laravel
-      - run: packages/laravel/php/laravel/vendor/bin/phpstan analyse --memory-limit=512M -c packages/laravel/php/laravel/phpstan.neon
+      - run: composer install --working-dir=packages/laravel
+      - run: packages/laravel/vendor/bin/phpstan analyse --memory-limit=512M -c packages/laravel/phpstan.neon
 
   test:
     name: Test
