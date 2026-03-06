@@ -8,7 +8,7 @@
   "repositories": [
     {
       "type": "path",
-      "url": "../../packages/laravel/php/laravel"
+      "url": "../../packages/laravel"
     }
   ],
   "autoload": {
