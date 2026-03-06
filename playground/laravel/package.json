@@ -1,0 +1,7 @@
+{
+  "name": "playground-laravel",
+  "private": true,
+  "dependencies": {
+    "@gomighty/laravel": "workspace:*"
+  }
+}

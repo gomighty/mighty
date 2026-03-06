@@ -1,7 +1,10 @@
 import { styleText } from "node:util";
 import { $ } from "bun";
 
-const packagesToBuildConcurrently = [["@gomighty/core"], ["@gomighty/hono"]];
+const packagesToBuildConcurrently = [
+  ["@gomighty/core"],
+  ["@gomighty/hono", "@gomighty/laravel"],
+];
 
 for (const packages of packagesToBuildConcurrently) {
   await Promise.allSettled(

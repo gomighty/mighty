@@ -1,0 +1,55 @@
+{
+  "name": "gomighty/laravel",
+  "description": "Build apps with Astro and Laravel.",
+  "keywords": ["mighty", "laravel", "astro"],
+  "homepage": "https://go-mighty.vercel.app/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Amine Ilidrissi"
+    }
+  ],
+  "require": {
+    "php": "^8.4",
+    "laravel/framework": "^12"
+  },
+  "require-dev": {
+    "larastan/larastan": "^3.0",
+    "laravel/pint": "^1.0",
+    "orchestra/testbench": "^10.9",
+    "pestphp/pest": "^4.0",
+    "phpstan/extension-installer": "^1.4",
+    "spatie/ray": "^1.28"
+  },
+  "autoload": {
+    "files": ["src/helpers.php"],
+    "psr-4": {
+      "Mighty\\Laravel\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Mighty\\Laravel\\Tests\\": "tests"
+    }
+  },
+  "scripts": {
+    "analyse": "vendor/bin/phpstan analyse",
+    "test": "vendor/bin/pest",
+    "test-coverage": "vendor/bin/pest --coverage",
+    "format": "vendor/bin/pint"
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true,
+      "phpstan/extension-installer": true
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": ["Mighty\\Laravel\\MightyServiceProvider"]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
