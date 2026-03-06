@@ -29,6 +29,17 @@ jobs:
       - run: pnpm run build
       - run: pnpm run typecheck
 
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+      - run: composer install --working-dir=packages/laravel/php/laravel
+      - run: packages/laravel/php/laravel/vendor/bin/phpstan analyse --memory-limit=512M -c packages/laravel/php/laravel/phpstan.neon
+
   test:
     name: Test
     runs-on: ubuntu-latest

@@ -1,0 +1,26 @@
+{
+  "name": "@gomighty/laravel",
+  "version": "0.0.1",
+  "author": "Amine Ilidrissi",
+  "description": "Build apps with Astro and Laravel.",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./context": "./dist/context.mjs",
+    "./components/*": "./dist/components/*"
+  },
+  "bin": {
+    "mighty-sidecar": "./dist/cli.mjs"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@gomighty/core": "workspace:*",
+    "@gomighty/hono": "workspace:*",
+    "@hono/node-server": "catalog:",
+    "hono": "catalog:"
+  },
+  "license": "MIT"
+}
