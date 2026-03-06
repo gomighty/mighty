@@ -38,6 +38,25 @@
         "zod": "^4.0.15",
       },
     },
+    "packages/laravel/js": {
+      "name": "@gomighty/laravel",
+      "version": "0.0.1",
+      "bin": {
+        "mighty-sidecar": "./dist/cli.js",
+      },
+      "dependencies": {
+        "@gomighty/core": "workspace:*",
+        "@gomighty/hono": "workspace:*",
+        "@hono/node-server": "catalog:",
+        "hono": "catalog:",
+      },
+    },
+    "playground/laravel": {
+      "name": "playground-laravel",
+      "dependencies": {
+        "@gomighty/laravel": "workspace:*",
+      },
+    },
   },
   "catalog": {
     "@hono/node-server": "^1.19.5",
@@ -183,6 +202,8 @@
     "@gomighty/core": ["@gomighty/core@workspace:packages/core"],
 
     "@gomighty/hono": ["@gomighty/hono@workspace:packages/hono"],
+
+    "@gomighty/laravel": ["@gomighty/laravel@workspace:packages/laravel/js"],
 
     "@hono/node-server": ["@hono/node-server@1.19.5", "", { "peerDependencies": { "hono": "^4" } }, "sha512-iBuhh+uaaggeAuf+TftcjZyWh2GEgZcVGXkNtskLVoWaXhnJtC5HLHrU8W1KHDoucqO1MswwglmkWLFyiDn4WQ=="],
 
@@ -747,6 +768,8 @@
     "picocolors": ["picocolors@1.1.1", "", {}, "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA=="],
 
     "picomatch": ["picomatch@4.0.3", "", {}, "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q=="],
+
+    "playground-laravel": ["playground-laravel@workspace:playground/laravel"],
 
     "plimit-lit": ["plimit-lit@1.6.1", "", { "dependencies": { "queue-lit": "^1.5.1" } }, "sha512-B7+VDyb8Tl6oMJT9oSO2CW8XC/T4UcJGrwOVoNGwOQsQYhlpfajmrMj5xeejqaASq3V/EqThyOeATEOMuSEXiA=="],
 

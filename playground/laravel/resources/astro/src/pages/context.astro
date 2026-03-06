@@ -1,0 +1,7 @@
+---
+import { csrfToken, shared } from "@gomighty/laravel/context";
+
+const data = shared();
+---
+<p>CSRF: {csrfToken()}</p>
+<p>Shared: {JSON.stringify(data)}</p>
