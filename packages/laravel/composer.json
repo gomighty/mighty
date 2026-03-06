@@ -6,20 +6,27 @@
   ],
   "require": {
     "laravel/framework": "^12",
-    "php": "^8.4",
-    "symfony/dependency-injection": "^5.0",
-    "symfony/http-kernel": "^5.0"
+    "php": "^8.4"
   },
   "require-dev": {
+    "larastan/larastan": "^3.0",
     "laravel/pint": "^1.0",
+    "orchestra/testbench": "^10.9",
     "pestphp/pest": "^4.0",
+    "phpstan/extension-installer": "^1.4",
     "spatie/ray": "^1.28",
     "symplify/monorepo-builder": "^12.3"
   },
+  "replace": {
+    "gomighty/laravel": "self.version"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "autoload": {
     "psr-4": {
       "Mighty\\Laravel\\": "php/laravel/src"
-    }
+    },
+    "files": ["php/laravel/src/helpers.php"]
   },
   "autoload-dev": {
     "psr-4": {
@@ -31,9 +38,10 @@
       "providers": ["Mighty\\Laravel\\MightyServiceProvider"]
     }
   },
-  "replace": {
-    "gomighty/laravel": "self.version"
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true,
+      "phpstan/extension-installer": true
+    }
+  }
 }
