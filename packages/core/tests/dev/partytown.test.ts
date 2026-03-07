@@ -1,7 +1,7 @@
 import { type DevRenderFunction, getFixture } from "@tests/fixture";
 import { getContentFromMatchingTags } from "@tests/utils";
 import "@tests/custom-matchers";
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("dev partytown fixture", () => {
   let render: DevRenderFunction;

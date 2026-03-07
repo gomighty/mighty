@@ -1,16 +1,16 @@
-import { afterEach, beforeEach, describe, expect, it, jest } from "bun:test";
 import { getFixture } from "@tests/fixture";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("dev error fixture", () => {
   let fixture: ReturnType<typeof getFixture>;
 
   beforeEach(() => {
     fixture = getFixture("dev.basic");
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(async () => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
     await fixture.clean();
   });
 
@@ -59,7 +59,7 @@ describe("dev error fixture", () => {
       config: { logLevel: "silent" },
     });
 
-    expect(
+    await expect(
       render({
         component: "error",
         props: {},

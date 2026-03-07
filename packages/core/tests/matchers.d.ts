@@ -2,8 +2,9 @@ interface CustomMatchers<R = unknown> {
   arrayMatching: (expected: RegExp[]) => R;
 }
 
-declare module "bun:test" {
-  interface Matchers<T> extends CustomMatchers<T> {}
+declare module "vitest" {
+  interface Assertion<T> extends CustomMatchers<T> {}
+  interface AsymmetricMatchersContaining extends CustomMatchers {}
 }
 
 export {};

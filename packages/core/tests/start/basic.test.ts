@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getFixture } from "@tests/fixture";
 import { getContentFromMatchingTags, getMatchingTags } from "@tests/utils";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("start basic fixture", () => {
   let fixture: ReturnType<typeof getFixture>;
@@ -26,7 +27,10 @@ describe("start basic fixture", () => {
     expect(response).toEqual({ redirectTo: "/index.html" });
 
     expect(
-      await Bun.file(path.join(fixture.outDir, "client", "index.html")).text(),
+      await readFile(
+        path.join(fixture.outDir, "client", "index.html"),
+        "utf-8",
+      ),
     ).toBe("<!DOCTYPE html><p>Hello World!</p>");
   });
 
@@ -105,14 +109,15 @@ describe("start basic fixture", () => {
     const imageSrc = response.content.match(
       /<img src="([^"]+)" width="96" height="96">/,
     )?.[1] as string;
-    expect(imageSrc).toStartWith("/_astro/");
+    expect(imageSrc).toMatch(/^\/_astro\//);
 
-    expect(
-      Bun.file(path.join(fixture.outDir, "client", imageSrc)).text(),
+    await expect(
+      readFile(path.join(fixture.outDir, "client", imageSrc), "utf-8"),
     ).resolves.toBe(
-      await Bun.file(
+      await readFile(
         path.join(fixture.fixtureRoot, "src", "assets", "sample.png"),
-      ).text(),
+        "utf-8",
+      ),
     );
   });
 
@@ -133,9 +138,10 @@ describe("start basic fixture", () => {
     });
     expect(response).toEqual({ redirectTo: "/styles/index.html" });
 
-    const output = await Bun.file(
+    const output = await readFile(
       path.join(fixture.outDir, "client", "styles", "index.html"),
-    ).text();
+      "utf-8",
+    );
 
     const styleContent = getContentFromMatchingTags({
       html: output,
@@ -160,9 +166,10 @@ describe("start basic fixture", () => {
     });
     expect(response).toEqual({ redirectTo: "/styles/index.html" });
 
-    const output = await Bun.file(
+    const output = await readFile(
       path.join(fixture.outDir, "client", "styles", "index.html"),
-    ).text();
+      "utf-8",
+    );
 
     const matchingTags = getMatchingTags({
       html: output,
@@ -174,8 +181,8 @@ describe("start basic fixture", () => {
     const linkHref = matchingTags[0]?.properties.href as string;
     expect(linkHref).toMatch(/_astro\/.+\.css/);
 
-    expect(
-      Bun.file(path.join(fixture.outDir, "client", linkHref)).text(),
+    await expect(
+      readFile(path.join(fixture.outDir, "client", linkHref), "utf-8"),
     ).resolves.toMatch(/p\[data-astro-cid-.+\]\{color:red\}/);
   });
 
@@ -229,8 +236,8 @@ describe("start basic fixture", () => {
     const linkHref = matchingTags[0]?.properties.href as string;
     expect(linkHref).toMatch(/_astro\/.+\.css/);
 
-    expect(
-      Bun.file(path.join(fixture.outDir, "client", linkHref)).text(),
+    await expect(
+      readFile(path.join(fixture.outDir, "client", linkHref), "utf-8"),
     ).resolves.toMatch(/p\[data-astro-cid-.+\]\{color:red\}/);
   });
 
@@ -251,9 +258,10 @@ describe("start basic fixture", () => {
     });
     expect(response).toEqual({ redirectTo: "/scriptTag/index.html" });
 
-    const output = await Bun.file(
+    const output = await readFile(
       path.join(fixture.outDir, "client", "scriptTag", "index.html"),
-    ).text();
+      "utf-8",
+    );
 
     expect(output).toContain('<script type="module">');
     expect(output).toContain("Hello World!");
@@ -275,9 +283,10 @@ describe("start basic fixture", () => {
     });
     expect(response).toEqual({ redirectTo: "/scriptTag/index.html" });
 
-    const output = await Bun.file(
+    const output = await readFile(
       path.join(fixture.outDir, "client", "scriptTag", "index.html"),
-    ).text();
+      "utf-8",
+    );
 
     const matchingTags = getMatchingTags({
       html: output,
@@ -289,9 +298,10 @@ describe("start basic fixture", () => {
     const scriptSrc = matchingTags[0]?.properties.src as string;
     expect(scriptSrc).toMatch(/_astro\/.+\.js/);
 
-    const scriptContent = await Bun.file(
+    const scriptContent = await readFile(
       path.join(fixture.outDir, "client", scriptSrc),
-    ).text();
+      "utf-8",
+    );
     expect(scriptContent).toContain("Hello World!");
     expect(scriptContent).toContain("console.log");
   });
@@ -343,14 +353,15 @@ describe("start basic fixture", () => {
     const scriptSrc = matchingTags[0]?.properties.src as string;
     expect(scriptSrc).toMatch(/_astro\/.+\.js/);
 
-    const scriptContent = await Bun.file(
+    const scriptContent = await readFile(
       path.join(fixture.outDir, "client", scriptSrc),
-    ).text();
+      "utf-8",
+    );
     expect(scriptContent).toContain("Hello World!");
     expect(scriptContent).toContain("console.log");
   });
 
   it("cannot start a prod server without building", async () => {
-    expect(fixture.startProdServer()).rejects.toThrowError();
+    await expect(fixture.startProdServer()).rejects.toThrowError();
   });
 });
