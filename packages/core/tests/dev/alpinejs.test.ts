@@ -1,9 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import {
   type DevRenderFunction,
   type GetFromViteMiddlewareFunction,
   getFixture,
 } from "@tests/fixture";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("dev alpinejs fixture", () => {
   let render: DevRenderFunction;

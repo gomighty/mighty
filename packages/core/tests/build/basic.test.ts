@@ -1,7 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { getFixture } from "@tests/fixture";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("build basic fixture", () => {
   let fixture: ReturnType<typeof getFixture>;
@@ -15,7 +15,7 @@ describe("build basic fixture", () => {
   });
 
   it("can build a static output", async () => {
-    expect(
+    await expect(
       fixture.build({ config: { output: "static" } }),
     ).resolves.toBeUndefined();
 
@@ -28,7 +28,7 @@ describe("build basic fixture", () => {
   });
 
   it("can build a server output", async () => {
-    expect(
+    await expect(
       fixture.build({ config: { output: "server" } }),
     ).resolves.toBeUndefined();
 
@@ -42,7 +42,7 @@ describe("build basic fixture", () => {
     const pageChunk = chunks.find(
       (f) => f.startsWith("index_") && f.endsWith(".mjs"),
     ) as string;
-    expect(pageChunk).toBeString();
+    expect(pageChunk).toBeTypeOf("string");
 
     const output = await readFile(path.join(serverDir, "chunks", pageChunk), {
       encoding: "utf-8",

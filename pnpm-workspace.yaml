@@ -1,0 +1,5 @@
+packages:
+  - "packages/*"
+catalog:
+  hono: "^4.9.9"
+  "@hono/node-server": "^1.19.5"

@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { type DevRenderFunction, getFixture } from "@tests/fixture";
 import { getContentFromMatchingTags } from "@tests/utils";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import "@tests/custom-matchers";
 
 describe("dev basic fixture", () => {

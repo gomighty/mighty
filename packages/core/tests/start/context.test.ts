@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { getFixture } from "@tests/fixture";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("start context fixture", () => {
   let fixture: ReturnType<typeof getFixture>;
