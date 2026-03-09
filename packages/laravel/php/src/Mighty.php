@@ -97,13 +97,13 @@ class Mighty
 
         if ($request->hasSession()) {
             $context['_session'] = $request->session()->all();
-        }
 
-        $errors = $request->session()->get('errors');
-        if ($errors instanceof \Illuminate\Support\ViewErrorBag) {
-            $context['_errors'] = [];
-            foreach ($errors->getBags() as $bag => $messageBag) {
-                $context['_errors'][$bag] = $messageBag->toArray();
+            $errors = $request->session()->get('errors');
+            if ($errors instanceof \Illuminate\Support\ViewErrorBag) {
+                $context['_errors'] = [];
+                foreach ($errors->getBags() as $bag => $messageBag) {
+                    $context['_errors'][$bag] = $messageBag->toArray();
+                }
             }
         }
 

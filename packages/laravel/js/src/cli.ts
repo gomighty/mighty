@@ -24,6 +24,7 @@ switch (command) {
     await build({ config: { root } });
     break;
   case "start":
+    process.env.NODE_ENV = "production";
     await startSidecar({ port, config: { root } });
     break;
   default:
