@@ -1,5 +1,5 @@
-export * from "./build/index";
-export * from "./context/index";
-export * from "./dev/index";
-export * from "./start/index";
+export * from "./build";
+export * from "./context";
+export * from "./dev";
+export * from "./start";
 export type * from "./types";

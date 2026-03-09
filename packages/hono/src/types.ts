@@ -1,10 +1,22 @@
-import type { MightyRenderRequest } from "@gomighty/core";
 import type { MiddlewareHandler } from "hono";
+
+export type MightyHonoRenderRequest = {
+  /**
+   * The path of the Astro component to render, in dot notation.
+   *
+   * @example "posts.index"
+   */
+  component: string;
+  /**
+   * An object containing the props to pass to the Astro component.
+   */
+  props: Record<string, unknown>;
+};
 
 declare module "hono" {
   interface ContextRenderer {
     // biome-ignore lint/style/useShorthandFunctionType: ContextRenderer is an interface that has to be extended
-    (req: MightyRenderRequest): Promise<Response>;
+    (req: MightyHonoRenderRequest): Promise<Response>;
   }
 }
 

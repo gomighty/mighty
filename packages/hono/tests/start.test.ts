@@ -17,7 +17,7 @@ describe("start middleware", () => {
     it("can render an on-demand component", async () => {
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) =>
-        c.render({ component: "index", props: {}, context: {} }),
+        c.render({ component: "index", props: {} }),
       );
       const res = await app.request("/");
       expect(res.status).toBe(200);
@@ -27,7 +27,7 @@ describe("start middleware", () => {
     it("returns 404 for a non-existent component", async () => {
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) =>
-        c.render({ component: "non-existent", props: {}, context: {} }),
+        c.render({ component: "non-existent", props: {} }),
       );
 
       const res = await app.request("/");
@@ -48,7 +48,7 @@ describe("start middleware", () => {
     it("redirects for a prerendered page", async () => {
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) =>
-        c.render({ component: "index", props: {}, context: {} }),
+        c.render({ component: "index", props: {} }),
       );
 
       const res = await app.request("/", { redirect: "manual" });
@@ -57,7 +57,7 @@ describe("start middleware", () => {
     });
   });
 
-  describe("context fixture", () => {
+  describe("shared data", () => {
     beforeEach(async () => {
       fixture = getFixture("context");
       await fixture.build({ config: { output: "server" } });
@@ -67,28 +67,11 @@ describe("start middleware", () => {
       await fixture.clean();
     });
 
-    it("passes context to the rendered component", async () => {
-      const startApp = fixture.createStartApp();
-      const app = startApp.app.get("/", (c) =>
-        c.render({
-          component: "index",
-          props: {},
-          context: { user: "alice" },
-        }),
-      );
-
-      const res = await app.request("/");
-      expect(res.status).toBe(200);
-      expect(await res.text()).toBe(
-        "<p>Context: {&quot;user&quot;:&quot;alice&quot;}</p>",
-      );
-    });
-
-    it("merges sharedData into context", async () => {
+    it("passes shared data to the rendered component", async () => {
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) => {
         c.var.shareWithAstroComponent({ user: "alice" });
-        return c.render({ component: "index", props: {}, context: {} });
+        return c.render({ component: "index", props: {} });
       });
 
       const res = await app.request("/");
@@ -96,25 +79,6 @@ describe("start middleware", () => {
       expect(await res.text()).toBe(
         "<p>Context: {&quot;user&quot;:&quot;alice&quot;}</p>",
       );
-    });
-
-    it("explicit context overrides sharedData", async () => {
-      const startApp = fixture.createStartApp();
-      const app = startApp.app.get("/", (c) => {
-        c.var.shareWithAstroComponent({ user: "shared", role: "viewer" });
-        return c.render({
-          component: "index",
-          props: {},
-          context: { user: "explicit" },
-        });
-      });
-
-      const res = await app.request("/");
-      expect(res.status).toBe(200);
-
-      const text = await res.text();
-      expect(text).toContain("&quot;user&quot;:&quot;explicit&quot;");
-      expect(text).toContain("&quot;role&quot;:&quot;viewer&quot;");
     });
 
     it("sharedData does not bleed across requests", async () => {
@@ -122,11 +86,11 @@ describe("start middleware", () => {
       const app = startApp.app
         .get("/a", (c) => {
           c.var.shareWithAstroComponent({ reqId: "a" });
-          return c.render({ component: "index", props: {}, context: {} });
+          return c.render({ component: "index", props: {} });
         })
         .get("/b", (c) => {
           c.var.shareWithAstroComponent({ reqId: "b" });
-          return c.render({ component: "index", props: {}, context: {} });
+          return c.render({ component: "index", props: {} });
         });
 
       const [resA, resB] = await Promise.all([
@@ -147,7 +111,7 @@ describe("start middleware", () => {
       const app = startApp.app.get("/", (c) => {
         c.var.shareWithAstroComponent({ user: "alice" });
         c.var.shareWithAstroComponent({ theme: "dark" });
-        return c.render({ component: "index", props: {}, context: {} });
+        return c.render({ component: "index", props: {} });
       });
 
       const res = await app.request("/");
@@ -164,7 +128,7 @@ describe("start middleware", () => {
       fixture = getFixture("basic");
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) =>
-        c.render({ component: "index", props: {}, context: {} }),
+        c.render({ component: "index", props: {} }),
       );
 
       const res = await app.request("/");

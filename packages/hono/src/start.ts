@@ -20,7 +20,7 @@ export function startMiddleware(
     c.setRenderer(async (req) => {
       const mergedReq = {
         ...req,
-        context: { ...sharedData, ...req.context },
+        context: { ...sharedData },
       };
       const response = await render(mergedReq);
       if ("redirectTo" in response) {

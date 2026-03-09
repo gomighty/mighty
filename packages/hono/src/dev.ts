@@ -38,7 +38,7 @@ export function devMiddleware(
     c.setRenderer(async (req) => {
       const mergedReq = {
         ...req,
-        context: { ...sharedData, ...req.context },
+        context: { ...sharedData },
       };
       const response = await render(mergedReq);
       return c.html(response.content, response.status as UnofficialStatusCode);

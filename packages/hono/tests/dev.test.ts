@@ -19,7 +19,7 @@ describe("dev middleware", () => {
       const devApp = fixture.createDevApp();
       stop = devApp.stop;
       const app = devApp.app.get("/", (c) =>
-        c.render({ component: "index", props: {}, context: {} }),
+        c.render({ component: "index", props: {} }),
       );
 
       const res = await app.request("/");
@@ -31,7 +31,7 @@ describe("dev middleware", () => {
       const devApp = fixture.createDevApp();
       stop = devApp.stop;
       const app = devApp.app.get("/", (c) =>
-        c.render({ component: "non-existent", props: {}, context: {} }),
+        c.render({ component: "non-existent", props: {} }),
       );
 
       const res = await app.request("/");
@@ -39,7 +39,7 @@ describe("dev middleware", () => {
     });
   });
 
-  describe("context fixture", () => {
+  describe("shared data", () => {
     let stop: () => Promise<void>;
 
     beforeEach(() => {
@@ -50,30 +50,12 @@ describe("dev middleware", () => {
       await stop();
     });
 
-    it("passes context to the rendered component", async () => {
-      const devApp = fixture.createDevApp();
-      stop = devApp.stop;
-      const app = devApp.app.get("/", (c) =>
-        c.render({
-          component: "index",
-          props: {},
-          context: { user: "alice" },
-        }),
-      );
-
-      const res = await app.request("/");
-      expect(res.status).toBe(200);
-      expect(await res.text()).toContain(
-        "<p>Context: {&quot;user&quot;:&quot;alice&quot;}</p>",
-      );
-    });
-
-    it("merges sharedData into context", async () => {
+    it("passes shared data to the rendered component", async () => {
       const devApp = fixture.createDevApp();
       stop = devApp.stop;
       const app = devApp.app.get("/", (c) => {
         c.var.shareWithAstroComponent({ user: "alice" });
-        return c.render({ component: "index", props: {}, context: {} });
+        return c.render({ component: "index", props: {} });
       });
 
       const res = await app.request("/");
@@ -81,26 +63,6 @@ describe("dev middleware", () => {
       expect(await res.text()).toContain(
         "<p>Context: {&quot;user&quot;:&quot;alice&quot;}</p>",
       );
-    });
-
-    it("explicit context overrides sharedData", async () => {
-      const devApp = fixture.createDevApp();
-      stop = devApp.stop;
-      const app = devApp.app.get("/", (c) => {
-        c.var.shareWithAstroComponent({ user: "shared", role: "viewer" });
-        return c.render({
-          component: "index",
-          props: {},
-          context: { user: "explicit" },
-        });
-      });
-
-      const res = await app.request("/");
-      expect(res.status).toBe(200);
-
-      const text = await res.text();
-      expect(text).toContain("&quot;user&quot;:&quot;explicit&quot;");
-      expect(text).toContain("&quot;role&quot;:&quot;viewer&quot;");
     });
 
     it("sharedData does not bleed across requests", async () => {
@@ -109,11 +71,11 @@ describe("dev middleware", () => {
       const app = devApp.app
         .get("/a", (c) => {
           c.var.shareWithAstroComponent({ reqId: "a" });
-          return c.render({ component: "index", props: {}, context: {} });
+          return c.render({ component: "index", props: {} });
         })
         .get("/b", (c) => {
           c.var.shareWithAstroComponent({ reqId: "b" });
-          return c.render({ component: "index", props: {}, context: {} });
+          return c.render({ component: "index", props: {} });
         });
 
       const [resA, resB] = await Promise.all([
