@@ -125,6 +125,27 @@ importers:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@25.3.5)(jiti@2.6.1)
 
+  packages/laravel/js:
+    dependencies:
+      '@gomighty/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@gomighty/hono':
+        specifier: workspace:*
+        version: link:../../hono
+      '@hono/node-server':
+        specifier: 'catalog:'
+        version: 1.19.11(hono@4.12.5)
+      hono:
+        specifier: 'catalog:'
+        version: 4.12.5
+
+  playground/laravel:
+    dependencies:
+      '@gomighty/laravel':
+        specifier: workspace:*
+        version: link:../../packages/laravel/js
+
 packages:
 
   '@astrojs/alpinejs@0.5.0-beta.1':

@@ -10,7 +10,5 @@ export default defineConfig({
   platform: "node",
   dts: true,
   clean: true,
-  copy: [
-    { from: "src/components/*", to: "dist/components" },
-  ],
+  copy: [{ from: "src/components/*", to: "dist/components" }],
 });
