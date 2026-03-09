@@ -36,7 +36,7 @@ export function devMiddleware(
     const sharedData: Record<string, unknown> = {};
 
     c.setRenderer(async (req) => {
-      const response = await render({ ...req, context: { ...sharedData } });
+      const response = await render({ ...req, context: sharedData });
       return c.html(response.content, response.status as UnofficialStatusCode);
     });
 

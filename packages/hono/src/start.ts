@@ -18,7 +18,7 @@ export function startMiddleware(
     const sharedData: Record<string, unknown> = {};
 
     c.setRenderer(async (req) => {
-      const response = await render({ ...req, context: { ...sharedData } });
+      const response = await render({ ...req, context: sharedData });
       if ("redirectTo" in response) {
         return c.redirect(response.redirectTo);
       }
