@@ -15,7 +15,6 @@
   "dependencies": {
     "@gomighty/core": "workspace:*",
     "@hono/node-server": "catalog:",
-    "astro": "6.0.0-beta.17",
     "fetch-to-node": "^2.1.0",
     "hono": "catalog:",
     "zod": "^4.0.15"
@@ -25,6 +24,7 @@
     "typecheck": "tsc"
   },
   "devDependencies": {
+    "astro": "6.0.0-beta.17",
     "vite": "^7.3.1"
   }
 }
