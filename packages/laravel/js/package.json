@@ -22,5 +22,8 @@
     "@hono/node-server": "catalog:",
     "hono": "catalog:"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bun": "^1.3.10"
+  }
 }
