@@ -8,17 +8,21 @@
   },
   "type": "module",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.mjs",
+    "./server": "./dist/server.mjs"
   },
   "dependencies": {
     "@gomighty/core": "workspace:*",
     "@hono/node-server": "catalog:",
-    "hono": "catalog:",
     "fetch-to-node": "^2.1.0",
+    "hono": "catalog:",
     "zod": "^4.0.15"
   },
   "scripts": {
-    "build-pkg": "bun run build-pkg.ts",
+    "build": "tsdown",
     "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1"
   }
 }
