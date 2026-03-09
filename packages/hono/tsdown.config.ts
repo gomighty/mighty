@@ -4,6 +4,7 @@ export default defineConfig({
   entry: {
     index: "src/index.ts",
     server: "src/server.ts",
+    shared: "src/shared.ts",
   },
   format: "esm",
   platform: "node",

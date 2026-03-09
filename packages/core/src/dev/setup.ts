@@ -1,4 +1,5 @@
 import { access } from "node:fs/promises";
+import { createRequire } from "node:module";
 import path from "node:path";
 import {
   type AstroConfig,
@@ -23,6 +24,9 @@ import type {
 import { loadRenderersFromIntegrations } from "./renderers";
 import { getInjectedScriptsFromIntegrations } from "./scripts";
 import { getViteLogger } from "./viteLogger";
+
+const require = createRequire(import.meta.url);
+const devDir = path.join(path.dirname(require.resolve("@gomighty/core/dev")));
 
 export async function setupDev(
   options: MightyDevOptions,
@@ -97,9 +101,7 @@ export async function setupDev(
   );
 
   const { render: renderComponent, createContainer } =
-    (await viteServer.ssrLoadModule(
-      path.join(import.meta.dirname, "./render-vite.ts"),
-    )) as {
+    (await viteServer.ssrLoadModule(path.join(devDir, "./render-vite.ts"))) as {
       render: MightyRenderFunction;
       createContainer: MightyStartContainerFunction;
     };
@@ -224,7 +226,7 @@ export async function setupDev(
           status: 500,
           content: await renderComponentByPath({
             componentPath: path.join(
-              import.meta.dirname,
+              devDir,
               "components",
               "error-page",
               "ErrorPage.astro",

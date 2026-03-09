@@ -9,11 +9,13 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.mjs",
-    "./server": "./dist/server.mjs"
+    "./server": "./dist/server.mjs",
+    "./shared": "./dist/shared.mjs"
   },
   "dependencies": {
     "@gomighty/core": "workspace:*",
     "@hono/node-server": "catalog:",
+    "astro": "6.0.0-beta.17",
     "fetch-to-node": "^2.1.0",
     "hono": "catalog:",
     "zod": "^4.0.15"
