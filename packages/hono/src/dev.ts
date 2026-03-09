@@ -36,11 +36,7 @@ export function devMiddleware(
     const sharedData: Record<string, unknown> = {};
 
     c.setRenderer(async (req) => {
-      const mergedReq = {
-        ...req,
-        context: { ...sharedData },
-      };
-      const response = await render(mergedReq);
+      const response = await render({ ...req, context: { ...sharedData } });
       return c.html(response.content, response.status as UnofficialStatusCode);
     });
 
