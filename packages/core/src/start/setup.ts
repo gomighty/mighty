@@ -1,5 +1,4 @@
 import path from "node:path";
-import { runInContext } from "@gomighty/core/context";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { Element } from "hast";
@@ -11,6 +10,7 @@ import type {
 import { dotStringToPath } from "@/utils/dotStringToPath";
 import { getBuildPathsFromInlineConfig } from "@/utils/getBuildPathsFromInlineConfig";
 import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
+import { runInContext } from "../context/index";
 import { importManifestAndRenderers } from "./importManifestAndRenderers";
 
 export async function setupStart(

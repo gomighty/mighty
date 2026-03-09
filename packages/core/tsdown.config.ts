@@ -13,14 +13,6 @@ export default defineConfig({
   platform: "node",
   dts: true,
   clean: true,
-  splitting: false,
-  external: [
-    "@gomighty/core/build",
-    "@gomighty/core/context",
-    "@gomighty/core/dev",
-    "@gomighty/core/start",
-    "@gomighty/core/types",
-  ],
   copy: [
     { from: "src/build/server-entrypoint.mjs", to: "dist/build" },
     { from: "src/dev/render-vite.ts", to: "dist/dev" },

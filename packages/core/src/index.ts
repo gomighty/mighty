@@ -1,5 +1,5 @@
-export * from "@gomighty/core/build";
-export * from "@gomighty/core/context";
-export * from "@gomighty/core/dev";
-export * from "@gomighty/core/start";
-export type * from "@gomighty/core/types";
+export * from "./build/index";
+export * from "./context/index";
+export * from "./dev/index";
+export * from "./start/index";
+export type * from "./types";
