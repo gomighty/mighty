@@ -1,6 +1,7 @@
 import type { MightyRenderRequest, MightyServerOptions } from "@gomighty/core";
 import { startMightyServer } from "@gomighty/hono";
-import { Hono, type Hono as HonoType } from "hono";
+import { mergeConfig } from "astro/config";
+import { Hono } from "hono";
 
 declare module "hono" {
   interface ContextRenderer {
@@ -9,9 +10,28 @@ declare module "hono" {
   }
 }
 
-export function createSidecarApp(options?: MightyServerOptions): HonoType {
-  const app = new Hono();
-  app.use(startMightyServer(options));
+export function createSidecarApp(
+  options?: MightyServerOptions,
+): Hono<{
+  Variables: {
+    shareWithAstroComponent: (data: Record<string, unknown>) => void;
+  };
+}> {
+  const app = new Hono().use(startMightyServer({
+    ...options,
+    config: mergeConfig(options?.config ?? {}, {
+      vite: {
+        server: {
+          cors: {
+            origin: [
+              /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/,
+              /^https?:\/\/.*\.test(:\d+)?$/,
+            ],
+          },
+        },
+      },
+    }),
+  }));
 
   app.post("/render", async (c) => {
     const { component, props, context } = await c.req.json<{
@@ -19,11 +39,16 @@ export function createSidecarApp(options?: MightyServerOptions): HonoType {
       props?: Record<string, unknown>;
       context?: Record<string, unknown>;
     }>();
-    return c.render({
+
+    const response = await c.render({
       component,
       props: props ?? {},
       context: context ?? {},
     });
+
+    // Return JSON envelope for the PHP client
+    const content = await response.text();
+    return c.json({ status: response.status, content });
   });
 
   return app;

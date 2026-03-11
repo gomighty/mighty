@@ -10,5 +10,6 @@ export default defineConfig({
   platform: "node",
   dts: true,
   clean: true,
+  splitting: false,
   copy: [{ from: "src/components/*", to: "dist/components" }],
 });
