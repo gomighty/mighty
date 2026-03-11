@@ -2,25 +2,32 @@ import { runInContext } from "@gomighty/core/context";
 import type { SSRLoadedRenderer } from "astro";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
+import type { DevEnvironment } from "vite";
 import type { MightyContext } from "@/types";
+import { resolveIdToUrl } from "../utils/resolveIdToUrl";
 
 let container: AstroContainer | undefined;
 
 export async function createContainer(
   renderers: SSRLoadedRenderer[],
   getAddress: () => string,
+  ssrEnvironment: DevEnvironment,
+  root: URL,
 ): Promise<void> {
   container = await AstroContainer.create({
     renderers,
     async resolve(s) {
       const address = getAddress();
+
       if (s.startsWith("astro:scripts")) {
         return `${address}/@id/${s}`;
       }
       if (s.startsWith("/@id")) {
         return `${address}${s}`;
       }
-      return `${address}/${s}`;
+
+      const resolved = await resolveIdToUrl(ssrEnvironment, s, root);
+      return `${address}${resolved}`;
     },
   });
 }
