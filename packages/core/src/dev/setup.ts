@@ -106,7 +106,7 @@ export async function setupDev(
       createContainer: MightyStartContainerFunction;
     };
 
-  await createContainer(loadedRenderers, options.getAddress);
+  await createContainer(loadedRenderers, options.getAddress, viteServer.environments.ssr, finalConfig.root);
 
   const injectedScripts = await getInjectedScriptsFromIntegrations(
     finalConfig.integrations,
