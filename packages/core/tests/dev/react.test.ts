@@ -67,12 +67,12 @@ describe("dev react fixture", () => {
       tag: "astro-island",
       fragment: true,
     });
-    const componentUrl = astroIslands[0]?.properties?.["component-url"] as
-      | string
-      | undefined;
+    const componentUrl = astroIslands[0]?.properties?.[
+      "component-url"
+    ] as string;
     expect(componentUrl).toBeDefined();
 
-    const urlPath = componentUrl!.replace("http://host-placeholder.test", "");
+    const urlPath = componentUrl.replace("http://host-placeholder.test", "");
     const scriptResponse = await getFromViteMiddleware(urlPath);
     expect(scriptResponse?.status).toBe(200);
   });

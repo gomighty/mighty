@@ -11,9 +11,7 @@ export async function resolveIdToUrl(
 
   // If unresolved and ends with .jsx, retry without extension (matching Astro's behavior)
   if (!resolved && id.endsWith(".jsx")) {
-    resolved = await environment.pluginContainer.resolveId(
-      id.slice(0, -4),
-    );
+    resolved = await environment.pluginContainer.resolveId(id.slice(0, -4));
   }
 
   if (!resolved) {
