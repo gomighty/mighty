@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@shikijs/transformers": "^4.0.0",
-    "astro": "6.0.0-beta.17",
+    "astro": "catalog:",
     "hast-util-to-html": "^9.0.0",
     "rehype-parse": "^9.0.0",
     "unified": "^11.0.0",
@@ -45,9 +45,9 @@
   },
   "type": "module",
   "devDependencies": {
-    "@astrojs/alpinejs": "0.5.0-beta.1",
-    "@astrojs/partytown": "^2.1.4",
-    "@astrojs/react": "5.0.0-beta.3",
+    "@astrojs/alpinejs": "0.5.0",
+    "@astrojs/partytown": "^2.1.5",
+    "@astrojs/react": "5.0.0",
     "@types/alpinejs": "^3.13.11",
     "@types/hast": "^3.0.4",
     "@types/react": "^19.2.14",

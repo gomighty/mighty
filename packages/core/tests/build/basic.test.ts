@@ -39,14 +39,13 @@ describe("build basic fixture", () => {
     expect(entryExists).toBeDefined();
 
     const chunks = await readdir(path.join(serverDir, "chunks"));
-    const pageChunk = chunks.find(
-      (f) => f.startsWith("index_") && f.endsWith(".mjs"),
-    ) as string;
-    expect(pageChunk).toBeTypeOf("string");
-
-    const output = await readFile(path.join(serverDir, "chunks", pageChunk), {
-      encoding: "utf-8",
-    });
-    expect(output).toContain("<p>Hello World!</p>");
+    const output = await Promise.all(
+      chunks
+        .filter((f) => f.startsWith("index_") && f.endsWith(".mjs"))
+        .map((f) =>
+          readFile(path.join(serverDir, "chunks", f), { encoding: "utf-8" }),
+        ),
+    );
+    expect(output.some((c) => c.includes("<p>Hello World!</p>"))).toBe(true);
   });
 });
