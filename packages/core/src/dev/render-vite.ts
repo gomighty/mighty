@@ -8,20 +8,11 @@ let container: AstroContainer | undefined;
 
 export async function createContainer(
   renderers: SSRLoadedRenderer[],
-  getAddress: () => string,
+  resolve: (s: string) => Promise<string>,
 ): Promise<void> {
   container = await AstroContainer.create({
     renderers,
-    async resolve(s) {
-      const address = getAddress();
-      if (s.startsWith("astro:scripts")) {
-        return `${address}/@id/${s}`;
-      }
-      if (s.startsWith("/@id")) {
-        return `${address}${s}`;
-      }
-      return `${address}/${s}`;
-    },
+    resolve,
   });
 }
 

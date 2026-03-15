@@ -128,6 +128,26 @@ describe("dev basic fixture", () => {
     ]);
   });
 
+  it("rewrites image /@fs/ URLs to include the dev address", async () => {
+    const response = await render({
+      component: "imgTag",
+      props: {},
+      context: {},
+      partial: true,
+    });
+    expect(response.status).toBe(200);
+
+    const imageSrc = response.content.match(/<img src="([^"]+)"/)?.[1];
+    expect(imageSrc).toBeDefined();
+    // The /@fs/ URL must be prefixed with the dev address so the browser
+    // routes the request to the Vite dev server, not the app server.
+    expect(imageSrc).toMatch(
+      /^http:\/\/host-placeholder\.test\/@fs\/.+sample\.png/,
+    );
+    // Verify it's not a bare /@fs/ URL (which would cause a 404).
+    expect(imageSrc).not.toMatch(/^"?\/@fs\//);
+  });
+
   it("can render a component with context", async () => {
     const response = await render({
       component: "context",

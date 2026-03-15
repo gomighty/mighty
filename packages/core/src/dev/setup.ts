@@ -17,11 +17,13 @@ import type {
 } from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
+import { rewriteFsUrls } from "@/utils/rewriteFsUrls";
 import type {
   MightyRenderFunction,
   MightyStartContainerFunction,
 } from "./render-vite";
 import { loadRenderersFromIntegrations } from "./renderers";
+import { createResolve } from "./resolve";
 import { getInjectedScriptsFromIntegrations } from "./scripts";
 import { getViteLogger } from "./viteLogger";
 
@@ -106,7 +108,13 @@ export async function setupDev(
       createContainer: MightyStartContainerFunction;
     };
 
-  await createContainer(loadedRenderers, options.getAddress);
+  const resolve = createResolve(
+    options.getAddress,
+    viteServer.environments.ssr,
+    finalConfig.root,
+  );
+
+  await createContainer(loadedRenderers, resolve);
 
   const injectedScripts = await getInjectedScriptsFromIntegrations(
     finalConfig.integrations,
@@ -144,7 +152,7 @@ export async function setupDev(
   ) => {
     const { componentPath, props, context, partial = true } = data;
 
-    const [renderedComponent, styleTags] = await Promise.all([
+    const [rawRenderedComponent, styleTags] = await Promise.all([
       renderComponent({
         componentPath,
         props,
@@ -163,6 +171,11 @@ export async function setupDev(
         })),
       ),
     ]);
+
+    const renderedComponent = rewriteFsUrls(
+      rawRenderedComponent,
+      options.getAddress(),
+    );
 
     const viteClientScript: Element = {
       type: "element",
