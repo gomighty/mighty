@@ -2,7 +2,31 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { DevEnvironment } from "vite";
 
-export async function resolveIdToUrl(
+/**
+ * Creates the `resolve` callback passed to AstroContainer.
+ *
+ * Translates import specifiers (e.g. `@astrojs/react/client.js`) into
+ * fully-qualified Vite dev-server URLs the browser can fetch.
+ */
+export function createResolve(
+  getAddress: () => string,
+  ssrEnvironment: DevEnvironment,
+  root: URL,
+): (s: string) => Promise<string> {
+  return async (s: string) => {
+    const address = getAddress();
+    if (s.startsWith("astro:scripts")) {
+      return `${address}/@id/${s}`;
+    }
+    if (s.startsWith("/@id")) {
+      return `${address}${s}`;
+    }
+    const resolved = await resolveIdToUrl(ssrEnvironment, s, root);
+    return `${address}${resolved}`;
+  };
+}
+
+async function resolveIdToUrl(
   environment: DevEnvironment,
   id: string,
   root?: URL,

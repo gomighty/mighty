@@ -16,7 +16,6 @@ export default defineConfig({
   copy: [
     { from: "src/build/server-entrypoint.mjs", to: "dist/build" },
     { from: "src/dev/render-vite.ts", to: "dist/dev" },
-    { from: "src/utils/resolveIdToUrl.ts", to: "dist/utils" },
     {
       from: "src/dev/components/error-page/*",
       to: "dist/dev/components/error-page",
