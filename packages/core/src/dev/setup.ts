@@ -149,7 +149,7 @@ export async function setupDev(
   ) => {
     const { componentPath, props, context, partial = true } = data;
 
-    const [renderedComponent, styleTags] = await Promise.all([
+    const [rawRenderedComponent, styleTags] = await Promise.all([
       renderComponent({
         componentPath,
         props,
@@ -168,6 +168,17 @@ export async function setupDev(
         })),
       ),
     ]);
+
+    // Rewrite bare /@fs/ URLs to include the Mighty dev address.
+    // Astro's image vite plugin (astro:assets:esm) hardcodes image src as
+    // "/@fs/<abs-path>" without the Vite base prefix. Without rewriting,
+    // the browser requests /@fs/... from the app server instead of the
+    // Vite dev server, resulting in a 404.
+    const address = options.getAddress();
+    const renderedComponent = rawRenderedComponent.replace(
+      /(["'(])\/@fs\//g,
+      `$1${address}/@fs/`,
+    );
 
     const viteClientScript: Element = {
       type: "element",
