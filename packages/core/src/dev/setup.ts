@@ -8,7 +8,7 @@ import {
 } from "astro";
 import { mergeConfig } from "astro/config";
 import type { Element } from "hast";
-import type { ViteDevServer } from "vite";
+import type { ErrorPayload, ViteDevServer } from "vite";
 import { getStylesForURL } from "@/dev/css";
 import type {
   MightyDevMiddleware,
@@ -217,19 +217,38 @@ export async function setupDev(
           throw error;
         }
 
+        const err = error as Error & Record<string, unknown>;
+
+        // Send error to Astro's error overlay via WebSocket.
+        // Astro's module loader intercepts hot.send() and enriches the payload
+        // with source code highlighting, hints, and docs links via
+        // collectErrorMetadata() + getViteErrorPayload().
+        // We preserve all error properties (loc, hint, frame, etc.) so the
+        // enrichment has full context — especially for AstroError subclasses.
+        const errPayload: ErrorPayload = {
+          type: "error",
+          err: {
+            name: err.name,
+            message: err.message,
+            stack: err.stack ?? "",
+            loc: err.loc,
+            hint: err.hint,
+            frame: err.frame,
+            fullCode: err.fullCode,
+            plugin: err.plugin,
+            pluginCode: err.pluginCode,
+            id: err.id,
+            cause: err.cause,
+          } as ErrorPayload["err"],
+        };
+
         setTimeout(() => {
-          viteServer.environments.client.hot.send({
-            type: "error",
-            err: {
-              message: (error as Error).message,
-              stack: (error as Error).stack ?? "",
-            },
-          });
+          viteServer.environments.client.hot.send(errPayload);
         }, 200);
 
         return {
           status: 500,
-          content: `<html><head><title>${(error as Error).name}</title><script type="module" src="${request.address}/@vite/client"></script></head><body></body></html>`,
+          content: `<html><head><title>${err.name}</title><script type="module" src="${request.address}/@vite/client"></script></head><body></body></html>`,
         };
       }
     },
