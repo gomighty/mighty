@@ -12,14 +12,6 @@ export type MightyServerOptions = {
   config?: AstroInlineConfig;
 };
 
-export type MightyDevOptions = MightyServerOptions & {
-  /**
-   * Whether to show the Mighty error page when an error occurs.
-   * @default true
-   */
-  showErrorPage?: boolean;
-};
-
 export type MightyStartOptions = MightyServerOptions;
 
 export type MightyRenderRequest = {
