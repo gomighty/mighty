@@ -14,12 +14,6 @@ export type MightyServerOptions = {
 
 export type MightyDevOptions = MightyServerOptions & {
   /**
-   * Specifies the address the Mighty development server will be available at.
-   *
-   * This is used to get correct paths for client-side assets.
-   */
-  getAddress: () => string;
-  /**
    * Whether to show the Mighty error page when an error occurs.
    * @default true
    */
@@ -49,10 +43,17 @@ export type MightyRenderRequest = {
   partial?: boolean;
 };
 
+export type MightyRenderDevRequest = MightyRenderRequest & {
+  /**
+   * The address the Mighty development server is available at.
+   */
+  address: string;
+};
+
 export type MightyDevMiddleware = {
   /** Renders an Astro component. */
   render: (
-    req: MightyRenderRequest,
+    req: MightyRenderDevRequest,
   ) => Promise<{ status: number; content: string }>;
   /**
    * The Connect middleware provider by the Vite/Astro development server.

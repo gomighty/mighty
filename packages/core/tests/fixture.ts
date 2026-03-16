@@ -6,10 +6,16 @@ import { toFetchResponse, toReqRes } from "fetch-to-node";
 import { build } from "@/build";
 import { setupDev } from "@/dev/setup";
 import { setupStart } from "@/start/setup";
-import type { MightyDevOptions, MightyServerOptions } from "@/types";
+import type {
+  MightyDevOptions,
+  MightyRenderRequest,
+  MightyServerOptions,
+} from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 
-export type DevRenderFunction = Awaited<ReturnType<typeof setupDev>>["render"];
+export type DevRenderFunction = (
+  req: MightyRenderRequest,
+) => Promise<{ status: number; content: string }>;
 export type StartRenderFunction = Awaited<
   ReturnType<typeof setupStart>
 >["render"];
@@ -21,7 +27,7 @@ export type GetFromViteMiddlewareFunction = (
 export function getFixture(fixtureName: string): {
   fixtureRoot: string;
   outDir: string;
-  startDevServer: (params?: Omit<MightyDevOptions, "getAddress">) => Promise<{
+  startDevServer: (params?: MightyDevOptions) => Promise<{
     render: DevRenderFunction;
     getFromViteMiddleware: GetFromViteMiddlewareFunction;
     stop: () => Promise<void>;
@@ -60,12 +66,14 @@ export function getFixture(fixtureName: string): {
     });
   };
 
+  const DEV_TEST_ADDRESS = "http://host-placeholder.test";
+
   return {
     fixtureRoot,
     outDir,
     startDevServer: async (params) => {
       const {
-        render,
+        render: rawRender,
         stop: stopDevServer,
         viteMiddleware,
       } = await setupDev({
@@ -77,11 +85,10 @@ export function getFixture(fixtureName: string): {
           },
           params?.config ?? {},
         ),
-        getAddress: () => "http://host-placeholder.test",
       });
 
       return {
-        render,
+        render: (req) => rawRender({ ...req, address: DEV_TEST_ADDRESS }),
         getFromViteMiddleware: async (path: string) => {
           const { req, res } = toReqRes(
             new Request(

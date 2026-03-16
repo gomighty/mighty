@@ -13,11 +13,11 @@ import { getStylesForURL } from "@/dev/css";
 import type {
   MightyDevMiddleware,
   MightyDevOptions,
-  MightyRenderRequest,
+  MightyRenderDevRequest,
 } from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
-import { rewriteFsUrls } from "@/utils/rewriteFsUrls";
+import { MIGHTY_DEV_PLACEHOLDER_ADDRESS } from "./constants";
 import type {
   MightyRenderFunction,
   MightyStartContainerFunction,
@@ -108,11 +108,7 @@ export async function setupDev(
       createContainer: MightyStartContainerFunction;
     };
 
-  const resolve = createResolve(
-    options.getAddress,
-    viteServer.environments.ssr,
-    finalConfig.root,
-  );
+  const resolve = createResolve(viteServer.environments.ssr, finalConfig.root);
 
   await createContainer(loadedRenderers, resolve);
 
@@ -138,7 +134,7 @@ export async function setupDev(
           tagName: "script",
           properties: {
             type: "module",
-            src: `${options.getAddress()}/@id/astro:scripts/page.js`,
+            src: `${MIGHTY_DEV_PLACEHOLDER_ADDRESS}/@id/astro:scripts/page.js`,
           },
           children: [],
         },
@@ -146,11 +142,11 @@ export async function setupDev(
     : () => [];
 
   const renderComponentByPath = async (
-    data: Omit<MightyRenderRequest, "component"> & {
+    data: Omit<MightyRenderDevRequest, "component"> & {
       componentPath: `${string}.astro`;
     },
   ) => {
-    const { componentPath, props, context, partial = true } = data;
+    const { componentPath, props, context, partial = true, address } = data;
 
     const [rawRenderedComponent, styleTags] = await Promise.all([
       renderComponent({
@@ -172,17 +168,17 @@ export async function setupDev(
       ),
     ]);
 
-    const renderedComponent = rewriteFsUrls(
-      rawRenderedComponent,
-      options.getAddress(),
-    );
+    // Rewrite image URLs to include the dev address
+    const renderedComponent = rawRenderedComponent
+      .replace(/(["'(])\/@fs\//g, `$1${MIGHTY_DEV_PLACEHOLDER_ADDRESS}/@fs/`)
+      .replaceAll(MIGHTY_DEV_PLACEHOLDER_ADDRESS, address);
 
     const viteClientScript: Element = {
       type: "element",
       tagName: "script",
       properties: {
         type: "module",
-        src: `${options.getAddress()}/@vite/client`,
+        src: `${MIGHTY_DEV_PLACEHOLDER_ADDRESS}/@vite/client`,
       },
       children: [],
     };
@@ -202,9 +198,9 @@ export async function setupDev(
   return {
     viteMiddleware: viteServer.middlewares,
     stop: () => viteServer.close(),
-    render: async (request: MightyRenderRequest) => {
+    render: async (request: MightyRenderDevRequest) => {
       try {
-        const { component, props, context, partial } = request;
+        const { component, props, context, partial, address } = request;
 
         const componentPath: `${string}.astro` = `${path.join(
           finalConfig.srcDir.pathname,
@@ -226,6 +222,7 @@ export async function setupDev(
             props,
             context,
             partial,
+            address,
           }),
         };
       } catch (error) {
@@ -249,6 +246,7 @@ export async function setupDev(
             },
             context: {},
             partial: false,
+            address: request.address,
           }),
         };
       }
