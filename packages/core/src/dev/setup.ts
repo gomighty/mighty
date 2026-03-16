@@ -209,7 +209,6 @@ export async function setupDev(
       } catch (error) {
         viteServer.ssrFixStacktrace(error as Error);
 
-        // Check hmr.overlay from the resolved Astro config (defaults to true)
         const hmr = finalConfig.vite?.server?.hmr;
         const overlayEnabled =
           typeof hmr === "object" ? hmr.overlay !== false : hmr !== false;
@@ -218,24 +217,19 @@ export async function setupDev(
           throw error;
         }
 
-        const err = error as Error;
-
-        // Send error to Astro's error overlay via WebSocket
-        // 200ms delay matches Astro's pattern — gives the browser time to load /@vite/client and connect
         setTimeout(() => {
           viteServer.environments.client.hot.send({
             type: "error",
             err: {
-              message: err.message,
-              stack: err.stack ?? "",
+              message: (error as Error).message,
+              stack: (error as Error).stack ?? "",
             },
           });
         }, 200);
 
-        // Return minimal HTML that loads Vite client (which renders the error overlay)
         return {
           status: 500,
-          content: `<html><head><title>${err.name}</title><script type="module" src="${request.address}/@vite/client"></script></head><body></body></html>`,
+          content: `<html><head><title>${(error as Error).name}</title><script type="module" src="${request.address}/@vite/client"></script></head><body></body></html>`,
         };
       }
     },

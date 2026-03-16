@@ -14,7 +14,7 @@ describe("dev error fixture", () => {
     await fixture.clean();
   });
 
-  it("can render an error page", async () => {
+  it("renders the Astro error overlay", async () => {
     const { render } = await fixture.startDevServer({
       config: { logLevel: "silent" },
     });
