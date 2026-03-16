@@ -169,9 +169,10 @@ export async function setupDev(
     ]);
 
     // Rewrite image URLs to include the dev address
-    const renderedComponent = rawRenderedComponent
-      .replace(/(["'(])\/@fs\//g, `$1${MIGHTY_DEV_PLACEHOLDER_ADDRESS}/@fs/`)
-      .replaceAll(MIGHTY_DEV_PLACEHOLDER_ADDRESS, address);
+    const renderedComponent = rawRenderedComponent.replace(
+      /(["'(])\/@fs\//g,
+      `$1${MIGHTY_DEV_PLACEHOLDER_ADDRESS}/@fs/`,
+    );
 
     const viteClientScript: Element = {
       type: "element",
@@ -192,7 +193,7 @@ export async function setupDev(
         ...headInlineScriptTags,
       ],
       partial,
-    );
+    ).replaceAll(MIGHTY_DEV_PLACEHOLDER_ADDRESS, address);
   };
 
   return {
