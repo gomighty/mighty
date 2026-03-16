@@ -8,16 +8,14 @@ import { runConnectMiddleware } from "./utils/runConnectMiddleware.ts";
 const MIGHTY_DEV_ROOT = "/__MIGHTY_DEV_ADDRESS__";
 
 export function devMiddleware(
-  options?: Omit<MightyDevOptions, "getAddress">,
+  options?: MightyDevOptions,
 ): StartMightyServerMiddlewareHandler {
-  let rootAddress: string = "";
   const mightyConfig: MightyDevOptions = {
     ...options,
     config: mergeConfig(
       { root: "./astro", vite: { base: MIGHTY_DEV_ROOT } },
       options?.config ?? {},
     ),
-    getAddress: () => new URL(MIGHTY_DEV_ROOT, rootAddress).toString(),
   };
 
   const setupDevPromise = dev(mightyConfig);
@@ -25,18 +23,18 @@ export function devMiddleware(
   return createMiddleware(async (c, next) => {
     const { render, viteMiddleware } = await setupDevPromise;
 
-    if (!rootAddress) {
-      rootAddress = new URL(c.req.url).origin;
-    }
-
     if (c.req.method === "GET" && c.req.path.includes(MIGHTY_DEV_ROOT)) {
       return runConnectMiddleware(viteMiddleware, c);
     }
 
+    const address = new URL(
+      MIGHTY_DEV_ROOT,
+      new URL(c.req.url).origin,
+    ).toString();
     const sharedData: Record<string, unknown> = {};
 
     c.setRenderer(async (req) => {
-      const response = await render({ ...req, context: sharedData });
+      const response = await render({ ...req, context: sharedData, address });
       return c.html(response.content, response.status as UnofficialStatusCode);
     });
 

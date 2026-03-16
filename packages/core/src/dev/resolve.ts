@@ -1,6 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { DevEnvironment } from "vite";
+import { MIGHTY_DEV_PLACEHOLDER_ADDRESS } from "./constants";
 
 /**
  * Creates the `resolve` callback passed to AstroContainer.
@@ -9,20 +10,18 @@ import type { DevEnvironment } from "vite";
  * fully-qualified Vite dev-server URLs the browser can fetch.
  */
 export function createResolve(
-  getAddress: () => string,
   ssrEnvironment: DevEnvironment,
   root: URL,
 ): (s: string) => Promise<string> {
   return async (s: string) => {
-    const address = getAddress();
     if (s.startsWith("astro:scripts")) {
-      return `${address}/@id/${s}`;
+      return `${MIGHTY_DEV_PLACEHOLDER_ADDRESS}/@id/${s}`;
     }
     if (s.startsWith("/@id")) {
-      return `${address}${s}`;
+      return `${MIGHTY_DEV_PLACEHOLDER_ADDRESS}${s}`;
     }
     const resolved = await resolveIdToUrl(ssrEnvironment, s, root);
-    return `${address}${resolved}`;
+    return `${MIGHTY_DEV_PLACEHOLDER_ADDRESS}${resolved}`;
   };
 }
 
