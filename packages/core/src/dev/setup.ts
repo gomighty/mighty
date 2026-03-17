@@ -1,6 +1,7 @@
 import { access } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   type AstroConfig,
   type AstroInlineConfig,
@@ -29,6 +30,39 @@ import { getViteLogger } from "./viteLogger";
 
 const require = createRequire(import.meta.url);
 const devDir = path.join(path.dirname(require.resolve("@gomighty/core/dev")));
+
+/**
+ * Extract error location from the first actual stack frame.
+ *
+ * Astro's `collectInfoFromStacktrace` searches for a line containing "src" or
+ * "node_modules" — but if the error *message* contains a component path like
+ * "astro/src/pages/index.astro", it matches the message line instead of a
+ * stack frame. By extracting `loc` ourselves and passing it in the payload,
+ * `collectInfoFromStacktrace` skips its fallback heuristic entirely.
+ */
+function extractLocFromStack(
+  stack: string,
+): { file: string; line: number; column: number } | undefined {
+  for (const line of stack.split("\n")) {
+    if (!line.trimStart().startsWith("at ")) continue;
+    const match =
+      /\((.+):(\d+):(\d+)\)/.exec(line) ?? /at\s+(.+):(\d+):(\d+)/.exec(line);
+    if (match?.[1] && match[2] && match[3]) {
+      let file = match[1];
+      try {
+        file = fileURLToPath(file);
+      } catch {
+        // Not a file:// URL, use as-is
+      }
+      return {
+        file,
+        line: Number.parseInt(match[2]),
+        column: Number.parseInt(match[3]),
+      };
+    }
+  }
+  return undefined;
+}
 
 export async function setupDev(
   options: MightyServerOptions,
@@ -231,7 +265,7 @@ export async function setupDev(
             name: err.name,
             message: err.message,
             stack: err.stack ?? "",
-            loc: err.loc,
+            loc: err.loc ?? extractLocFromStack(err.stack ?? ""),
             hint: err.hint,
             frame: err.frame,
             fullCode: err.fullCode,
