@@ -232,7 +232,7 @@ export async function setupDev(
             title: err.title,
             message: err.message,
             stack: err.stack ?? "",
-            loc: err.loc,
+            loc: err.loc ?? { line: 1, column: 1 },
             hint: err.hint,
             frame: err.frame,
             fullCode: err.fullCode,
