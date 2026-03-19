@@ -23,7 +23,11 @@ export function devMiddleware(
   return createMiddleware(async (c, next) => {
     const { render, viteMiddleware } = await setupDevPromise;
 
-    if (c.req.method === "GET" && c.req.path.includes(MIGHTY_DEV_ROOT)) {
+    if (
+      c.req.method === "GET" &&
+      (c.req.path.includes(MIGHTY_DEV_ROOT) ||
+        c.req.path === "/__open-in-editor")
+    ) {
       return runConnectMiddleware(viteMiddleware, c);
     }
 
