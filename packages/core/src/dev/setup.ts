@@ -25,7 +25,6 @@ import type {
 import { loadRenderersFromIntegrations } from "./renderers";
 import { createResolve } from "./resolve";
 import { getInjectedScriptsFromIntegrations } from "./scripts";
-import { getViteLogger } from "./viteLogger";
 
 const require = createRequire(import.meta.url);
 const devDir = path.join(path.dirname(require.resolve("@gomighty/core/dev")));
@@ -38,7 +37,6 @@ export async function setupDev(
 
   const mightyConfig: AstroInlineConfig = {
     vite: {
-      customLogger: getViteLogger(),
       server: {
         middlewareMode: true,
         cors: false,
