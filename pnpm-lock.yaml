@@ -41,9 +41,6 @@ importers:
       '@shikijs/transformers':
         specifier: ^4.0.0
         version: 4.0.1
-      '@typescript/native-preview':
-        specifier: ^7.0.0-dev
-        version: 7.0.0-dev.20260319.1
       astro:
         specifier: 'catalog:'
         version: 6.0.4(@types/node@25.3.5)(jiti@2.6.1)(rollup@4.59.0)(typescript@5.9.3)
