@@ -1,11 +1,11 @@
-import type { MightyDevMiddleware, MightyDevOptions } from "@/types";
+import type { MightyDevMiddleware, MightyServerOptions } from "@/types";
 import { setupDev } from "./setup";
 
 /**
  * Starts the Mighty development server.
  */
 export async function dev(
-  options: MightyDevOptions,
+  options: MightyServerOptions,
 ): Promise<MightyDevMiddleware> {
   return setupDev(options);
 }

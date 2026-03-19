@@ -6,11 +6,7 @@ import { toFetchResponse, toReqRes } from "fetch-to-node";
 import { build } from "@/build";
 import { setupDev } from "@/dev/setup";
 import { setupStart } from "@/start/setup";
-import type {
-  MightyDevOptions,
-  MightyRenderRequest,
-  MightyServerOptions,
-} from "@/types";
+import type { MightyRenderRequest, MightyServerOptions } from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 
 export type DevRenderFunction = (
@@ -27,7 +23,7 @@ export type GetFromViteMiddlewareFunction = (
 export function getFixture(fixtureName: string): {
   fixtureRoot: string;
   outDir: string;
-  startDevServer: (params?: MightyDevOptions) => Promise<{
+  startDevServer: (params?: MightyServerOptions) => Promise<{
     render: DevRenderFunction;
     getFromViteMiddleware: GetFromViteMiddlewareFunction;
     stop: () => Promise<void>;

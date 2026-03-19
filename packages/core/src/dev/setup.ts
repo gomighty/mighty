@@ -12,8 +12,8 @@ import type { ViteDevServer } from "vite";
 import { getStylesForURL } from "@/dev/css";
 import type {
   MightyDevMiddleware,
-  MightyDevOptions,
   MightyRenderDevRequest,
+  MightyServerOptions,
 } from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
@@ -31,7 +31,7 @@ const require = createRequire(import.meta.url);
 const devDir = path.join(path.dirname(require.resolve("@gomighty/core/dev")));
 
 export async function setupDev(
-  options: MightyDevOptions,
+  options: MightyServerOptions,
 ): Promise<MightyDevMiddleware> {
   let finalConfig: AstroConfig;
   let viteServer: ViteDevServer;
@@ -42,9 +42,6 @@ export async function setupDev(
       server: {
         middlewareMode: true,
         cors: false,
-        hmr: {
-          overlay: false,
-        },
       },
       plugins: [
         {
@@ -141,67 +138,12 @@ export async function setupDev(
       ]
     : () => [];
 
-  const renderComponentByPath = async (
-    data: Omit<MightyRenderDevRequest, "component"> & {
-      componentPath: `${string}.astro`;
-    },
-  ) => {
-    const { componentPath, props, context, partial = true, address } = data;
-
-    const [rawRenderedComponent, styleTags] = await Promise.all([
-      renderComponent({
-        componentPath,
-        props,
-        context,
-        partial,
-      }),
-      getStylesForURL(componentPath, viteServer).then((styles): Element[] =>
-        styles.styles.map((style) => ({
-          type: "element",
-          tagName: "style",
-          properties: {
-            type: "text/css",
-            "data-vite-dev-id": style.id,
-          },
-          children: [{ type: "text", value: style.content }],
-        })),
-      ),
-    ]);
-
-    // Rewrite image URLs to include the dev address
-    const renderedComponent = rawRenderedComponent.replace(
-      /(["'(])\/@fs\//g,
-      `$1${MIGHTY_DEV_PLACEHOLDER_ADDRESS}/@fs/`,
-    );
-
-    const viteClientScript: Element = {
-      type: "element",
-      tagName: "script",
-      properties: {
-        type: "module",
-        src: `${MIGHTY_DEV_PLACEHOLDER_ADDRESS}/@vite/client`,
-      },
-      children: [],
-    };
-
-    return injectTagsIntoHead(
-      renderedComponent,
-      [
-        ...styleTags,
-        viteClientScript,
-        ...getPageScripts(),
-        ...headInlineScriptTags,
-      ],
-      partial,
-    ).replaceAll(MIGHTY_DEV_PLACEHOLDER_ADDRESS, address);
-  };
-
   return {
     viteMiddleware: viteServer.middlewares,
     stop: () => viteServer.close(),
     render: async (request: MightyRenderDevRequest) => {
       try {
-        const { component, props, context, partial, address } = request;
+        const { component, props, context, partial = true, address } = request;
 
         const componentPath: `${string}.astro` = `${path.join(
           finalConfig.srcDir.pathname,
@@ -216,39 +158,75 @@ export async function setupDev(
           return { status: 404, content: `Component ${component} not found` };
         }
 
-        return {
-          status: 200,
-          content: await renderComponentByPath({
+        const [rawRenderedComponent, styleTags] = await Promise.all([
+          renderComponent({
             componentPath,
             props,
             context,
             partial,
-            address,
           }),
+          getStylesForURL(componentPath, viteServer).then((styles): Element[] =>
+            styles.styles.map((style) => ({
+              type: "element",
+              tagName: "style",
+              properties: {
+                type: "text/css",
+                "data-vite-dev-id": style.id,
+              },
+              children: [{ type: "text", value: style.content }],
+            })),
+          ),
+        ]);
+
+        // Rewrite image URLs to include the dev address
+        const renderedComponent = rawRenderedComponent.replace(
+          /(["'(])\/@fs\//g,
+          `$1${MIGHTY_DEV_PLACEHOLDER_ADDRESS}/@fs/`,
+        );
+
+        const viteClientScript: Element = {
+          type: "element",
+          tagName: "script",
+          properties: {
+            type: "module",
+            src: `${MIGHTY_DEV_PLACEHOLDER_ADDRESS}/@vite/client`,
+          },
+          children: [],
         };
+
+        const content = injectTagsIntoHead(
+          renderedComponent,
+          [
+            ...styleTags,
+            viteClientScript,
+            ...getPageScripts(),
+            ...headInlineScriptTags,
+          ],
+          partial,
+        ).replaceAll(MIGHTY_DEV_PLACEHOLDER_ADDRESS, address);
+
+        return { status: 200, content };
       } catch (error) {
         viteServer.ssrFixStacktrace(error as Error);
 
-        if (!(options.showErrorPage ?? true)) {
+        const hmr = finalConfig.vite?.server?.hmr;
+        const overlayEnabled =
+          typeof hmr === "object" ? hmr.overlay !== false : hmr !== false;
+
+        if (!overlayEnabled) {
           throw error;
         }
 
+        setTimeout(() => {
+          viteServer.environments.client.hot.send({
+            type: "error",
+            err: error as Error & { stack: string },
+          });
+        }, 200);
+
         return {
           status: 500,
-          content: await renderComponentByPath({
-            componentPath: path.join(
-              devDir,
-              "components",
-              "error-page",
-              "ErrorPage.astro",
-            ) as `${string}.astro`,
-            props: {
-              error: error as Error,
-            },
-            context: {},
-            partial: false,
-            address: request.address,
-          }),
+          content: `<html><head><title>${(error as Error).name}</title><script type="module" src="${request.address}/@vite/client"></script></head><body></body></html>`,
         };
       }
     },
