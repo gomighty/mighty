@@ -6,7 +6,7 @@
     "@types/node": "^25.3.5",
     "tsdown": "^0.21.0",
     "typescript": "^5.9.2",
-    "vitest": "^3.1.4"
+    "vitest": "^4.1.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
