@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "tsdown",
-    "typecheck": "tsc"
+    "typecheck": "tsgo"
   },
   "devDependencies": {
     "vite": "^7.3.1"
