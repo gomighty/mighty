@@ -7,11 +7,11 @@ import { mergeConfig } from "astro/config";
 import { Hono } from "hono";
 import { devMiddleware } from "@/dev";
 import { startMiddleware } from "@/start";
-import type { StartMightyServerMiddlewareHandler } from "@/types";
+import type { MightyMiddlewareHandler } from "@/types";
 
 type AppEnv = {
   Variables: {
-    shareWithAstroComponent: (data: Record<string, unknown>) => void;
+    share: (data: Record<string, unknown>) => void;
   };
 };
 
@@ -21,11 +21,11 @@ export function getFixture(fixtureName: string): {
   build: (params?: MightyServerOptions) => Promise<void>;
   createStartApp: (params?: MightyServerOptions) => {
     app: Hono<AppEnv>;
-    middleware: StartMightyServerMiddlewareHandler;
+    middleware: MightyMiddlewareHandler;
   };
   createDevApp: (params?: MightyServerOptions) => {
     app: Hono<AppEnv>;
-    middleware: StartMightyServerMiddlewareHandler;
+    middleware: MightyMiddlewareHandler;
     stop: () => Promise<void>;
   };
   clean: () => Promise<void>;

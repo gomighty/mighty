@@ -7,6 +7,9 @@
     "url": "git+https://github.com/gomighty/mighty.git"
   },
   "type": "module",
+  "bin": {
+    "mighty-hono": "./dist/cli.mjs"
+  },
   "exports": {
     ".": "./dist/index.mjs",
     "./server": "./dist/server.mjs",

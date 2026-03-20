@@ -20,8 +20,8 @@ declare module "hono" {
   }
 }
 
-export type StartMightyServerMiddlewareHandler = MiddlewareHandler<{
+export type MightyMiddlewareHandler = MiddlewareHandler<{
   Variables: {
-    shareWithAstroComponent: (data: Record<string, unknown>) => void;
+    share: (data: Record<string, unknown>) => void;
   };
 }>;

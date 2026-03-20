@@ -54,7 +54,7 @@ describe("dev middleware", () => {
       const devApp = fixture.createDevApp();
       stop = devApp.stop;
       const app = devApp.app.get("/", (c) => {
-        c.var.shareWithAstroComponent({ user: "alice" });
+        c.var.share({ user: "alice" });
         return c.render({ component: "index", props: {} });
       });
 
@@ -70,11 +70,11 @@ describe("dev middleware", () => {
       stop = devApp.stop;
       const app = devApp.app
         .get("/a", (c) => {
-          c.var.shareWithAstroComponent({ reqId: "a" });
+          c.var.share({ reqId: "a" });
           return c.render({ component: "index", props: {} });
         })
         .get("/b", (c) => {
-          c.var.shareWithAstroComponent({ reqId: "b" });
+          c.var.share({ reqId: "b" });
           return c.render({ component: "index", props: {} });
         });
 

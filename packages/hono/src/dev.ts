@@ -2,14 +2,14 @@ import { dev, type MightyServerOptions } from "@gomighty/core";
 import { mergeConfig } from "astro/config";
 import { createMiddleware } from "hono/factory";
 import type { UnofficialStatusCode } from "hono/utils/http-status";
-import type { StartMightyServerMiddlewareHandler } from "./types";
+import type { MightyMiddlewareHandler } from "./types";
 import { runConnectMiddleware } from "./utils/runConnectMiddleware.ts";
 
 const MIGHTY_DEV_ROOT = "/__MIGHTY_DEV_ADDRESS__";
 
 export function devMiddleware(
   options?: MightyServerOptions,
-): StartMightyServerMiddlewareHandler {
+): MightyMiddlewareHandler {
   const mightyConfig: MightyServerOptions = {
     ...options,
     config: mergeConfig(
@@ -42,7 +42,7 @@ export function devMiddleware(
       return c.html(response.content, response.status as UnofficialStatusCode);
     });
 
-    c.set("shareWithAstroComponent", (dataToShare: Record<string, unknown>) => {
+    c.set("share", (dataToShare: Record<string, unknown>) => {
       Object.assign(sharedData, dataToShare);
     });
 

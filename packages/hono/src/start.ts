@@ -2,11 +2,11 @@ import { type MightyStartOptions, start } from "@gomighty/core";
 import { mergeConfig } from "astro/config";
 import { createMiddleware } from "hono/factory";
 import type { UnofficialStatusCode } from "hono/utils/http-status";
-import type { StartMightyServerMiddlewareHandler } from "./types";
+import type { MightyMiddlewareHandler } from "./types";
 
 export function startMiddleware(
   options?: MightyStartOptions,
-): StartMightyServerMiddlewareHandler {
+): MightyMiddlewareHandler {
   const mightyConfig: MightyStartOptions = {
     config: mergeConfig({ root: "./astro" }, options?.config ?? {}),
   };
@@ -25,7 +25,7 @@ export function startMiddleware(
       return c.html(response.content, response.status as UnofficialStatusCode);
     });
 
-    c.set("shareWithAstroComponent", (dataToShare: Record<string, unknown>) => {
+    c.set("share", (dataToShare: Record<string, unknown>) => {
       Object.assign(sharedData, dataToShare);
     });
 
