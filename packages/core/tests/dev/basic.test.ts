@@ -43,6 +43,11 @@ describe("dev basic fixture", () => {
     expect(response.content).toBe("<p>Hello World</p>");
   });
 
+  it("can render with no explicit props or context", async () => {
+    const response = await render({ component: "index" });
+    expect(response.status).toBe(200);
+  });
+
   it("can render a partial with dot notation", async () => {
     const response = await render({
       component: "nested.index",

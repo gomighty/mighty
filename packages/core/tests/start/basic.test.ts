@@ -59,6 +59,13 @@ describe("start basic fixture", () => {
     expect(response).toEqual({ status: 200, content: "<p>Hello World!</p>" });
   });
 
+  it("can render with no explicit props or context", async () => {
+    await fixture.build({ config: { output: "server" } });
+    const { render } = await fixture.startProdServer();
+    const response = await render({ component: "index" });
+    expect(response).toEqual({ status: 200, content: "<p>Hello World!</p>" });
+  });
+
   it("can render an on-demand page", async () => {
     await fixture.build({ config: { output: "server" } });
     const { render } = await fixture.startProdServer();

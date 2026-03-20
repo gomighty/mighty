@@ -37,6 +37,15 @@ describe("dev middleware", () => {
       const res = await app.request("/");
       expect(res.status).toBe(404);
     });
+
+    it("can render with no explicit props", async () => {
+      const devApp = fixture.createDevApp();
+      stop = devApp.stop;
+      const app = devApp.app.get("/", (c) => c.render({ component: "index" }));
+
+      const res = await app.request("/");
+      expect(res.status).toBe(200);
+    });
   });
 
   describe("shared data", () => {

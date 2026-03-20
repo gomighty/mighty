@@ -141,7 +141,13 @@ export async function setupDev(
     stop: () => viteServer.close(),
     render: async (request: MightyRenderDevRequest) => {
       try {
-        const { component, props, context, partial = true, address } = request;
+        const {
+          component,
+          props = {},
+          context = {},
+          partial = true,
+          address,
+        } = request;
 
         const componentPath: `${string}.astro` = `${path.join(
           finalConfig.srcDir.pathname,

@@ -33,6 +33,17 @@ describe("start middleware", () => {
       const res = await app.request("/");
       expect(res.status).toBe(404);
     });
+
+    it("can render with no explicit props", async () => {
+      const startApp = fixture.createStartApp();
+      const app = startApp.app.get("/", (c) =>
+        c.render({ component: "index" }),
+      );
+
+      const res = await app.request("/");
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe("<p>Hello World!</p>");
+    });
   });
 
   describe("prerendered fixture", () => {
