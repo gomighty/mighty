@@ -34,7 +34,7 @@ export async function setupStart(
 
   return {
     render: async (request: MightyRenderRequest) => {
-      const { component, props, context, partial = true } = request;
+      const { component, props = {}, context = {}, partial = true } = request;
 
       const componentPath = path.join(
         "src",

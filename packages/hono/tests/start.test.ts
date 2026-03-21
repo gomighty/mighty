@@ -17,7 +17,7 @@ describe("start middleware", () => {
     it("can render an on-demand component", async () => {
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) =>
-        c.render({ component: "index", props: {} }),
+        c.render({ component: "index" }),
       );
       const res = await app.request("/");
       expect(res.status).toBe(200);
@@ -27,7 +27,7 @@ describe("start middleware", () => {
     it("returns 404 for a non-existent component", async () => {
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) =>
-        c.render({ component: "non-existent", props: {} }),
+        c.render({ component: "non-existent" }),
       );
 
       const res = await app.request("/");
@@ -48,7 +48,7 @@ describe("start middleware", () => {
     it("redirects for a prerendered page", async () => {
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) =>
-        c.render({ component: "index", props: {} }),
+        c.render({ component: "index" }),
       );
 
       const res = await app.request("/", { redirect: "manual" });
@@ -71,7 +71,7 @@ describe("start middleware", () => {
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) => {
         c.var.share({ user: "alice" });
-        return c.render({ component: "index", props: {} });
+        return c.render({ component: "index" });
       });
 
       const res = await app.request("/");
@@ -86,11 +86,11 @@ describe("start middleware", () => {
       const app = startApp.app
         .get("/a", (c) => {
           c.var.share({ reqId: "a" });
-          return c.render({ component: "index", props: {} });
+          return c.render({ component: "index" });
         })
         .get("/b", (c) => {
           c.var.share({ reqId: "b" });
-          return c.render({ component: "index", props: {} });
+          return c.render({ component: "index" });
         });
 
       const [resA, resB] = await Promise.all([
@@ -111,7 +111,7 @@ describe("start middleware", () => {
       const app = startApp.app.get("/", (c) => {
         c.var.share({ user: "alice" });
         c.var.share({ theme: "dark" });
-        return c.render({ component: "index", props: {} });
+        return c.render({ component: "index" });
       });
 
       const res = await app.request("/");
@@ -128,7 +128,7 @@ describe("start middleware", () => {
       fixture = getFixture("basic");
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) =>
-        c.render({ component: "index", props: {} }),
+        c.render({ component: "index" }),
       );
 
       const res = await app.request("/");

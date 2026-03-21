@@ -10,7 +10,13 @@ export type MightyHonoRenderRequest = {
   /**
    * An object containing the props to pass to the Astro component.
    */
-  props: Record<string, unknown>;
+  props?: Record<string, unknown>;
+  /**
+   * Whether to render the component as a partial (fragment) or a full page.
+   *
+   * @default true
+   */
+  partial?: boolean;
 };
 
 declare module "hono" {

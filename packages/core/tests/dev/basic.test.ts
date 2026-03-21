@@ -24,7 +24,6 @@ describe("dev basic fixture", () => {
       props: {
         title: "Hello World",
       },
-      context: {},
       partial: true,
     });
     expect(response.status).toBe(200);
@@ -37,7 +36,6 @@ describe("dev basic fixture", () => {
       props: {
         title: "Hello World",
       },
-      context: {},
     });
     expect(response.status).toBe(200);
     expect(response.content).toBe("<p>Hello World</p>");
@@ -49,7 +47,6 @@ describe("dev basic fixture", () => {
       props: {
         title: "Hello World",
       },
-      context: {},
       partial: true,
     });
     expect(response.status).toBe(200);
@@ -59,8 +56,6 @@ describe("dev basic fixture", () => {
   it("returns 404 for a non-existent component", async () => {
     const response = await render({
       component: "non-existent",
-      props: {},
-      context: {},
       partial: true,
     });
     expect(response.status).toBe(404);
@@ -73,7 +68,6 @@ describe("dev basic fixture", () => {
       props: {
         title: "Hello World",
       },
-      context: {},
       partial: false,
     });
     expect(response.status).toBe(200);
@@ -86,8 +80,6 @@ describe("dev basic fixture", () => {
   it("can render a page with styles", async () => {
     const response = await render({
       component: "styles",
-      props: {},
-      context: {},
       partial: false,
     });
     expect(response.status).toBe(200);
@@ -107,8 +99,6 @@ describe("dev basic fixture", () => {
   it("can render a page with styles from a child component", async () => {
     const response = await render({
       component: "stylesWithChild",
-      props: {},
-      context: {},
       partial: false,
     });
     expect(response.status).toBe(200);
@@ -131,8 +121,6 @@ describe("dev basic fixture", () => {
   it("rewrites image /@fs/ URLs to include the dev address", async () => {
     const response = await render({
       component: "imgTag",
-      props: {},
-      context: {},
       partial: true,
     });
     expect(response.status).toBe(200);
@@ -151,7 +139,6 @@ describe("dev basic fixture", () => {
   it("can render a component with context", async () => {
     const response = await render({
       component: "context",
-      props: {},
       context: {
         notifications: ["Hello World"],
         user: {

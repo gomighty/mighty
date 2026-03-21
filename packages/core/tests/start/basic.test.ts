@@ -21,8 +21,6 @@ describe("start basic fixture", () => {
 
     const response = await render({
       component: "index",
-      props: {},
-      context: {},
     });
     expect(response).toEqual({ redirectTo: "/index.html" });
 
@@ -40,8 +38,6 @@ describe("start basic fixture", () => {
 
     const response = await render({
       component: "index",
-      props: {},
-      context: {},
       partial: true,
     });
     expect(response).toEqual({ status: 200, content: "<p>Hello World!</p>" });
@@ -53,8 +49,6 @@ describe("start basic fixture", () => {
 
     const response = await render({
       component: "index",
-      props: {},
-      context: {},
     });
     expect(response).toEqual({ status: 200, content: "<p>Hello World!</p>" });
   });
@@ -65,8 +59,6 @@ describe("start basic fixture", () => {
 
     const response = await render({
       component: "page",
-      props: {},
-      context: {},
       partial: false,
     });
     expect(response).toEqual({
@@ -85,7 +77,6 @@ describe("start basic fixture", () => {
       props: {
         title: "This is a prop!",
       },
-      context: {},
       partial: true,
     });
     expect(response).toEqual({
@@ -100,8 +91,6 @@ describe("start basic fixture", () => {
 
     const response = (await render({
       component: "imgTag",
-      props: {},
-      context: {},
       partial: true,
     })) as { status: number; content: string };
     expect(response.status).toBe(200);
@@ -132,8 +121,6 @@ describe("start basic fixture", () => {
 
     const response = await render({
       component: "styles",
-      props: {},
-      context: {},
       partial: false,
     });
     expect(response).toEqual({ redirectTo: "/styles/index.html" });
@@ -160,8 +147,6 @@ describe("start basic fixture", () => {
 
     const response = await render({
       component: "styles",
-      props: {},
-      context: {},
       partial: false,
     });
     expect(response).toEqual({ redirectTo: "/styles/index.html" });
@@ -197,8 +182,6 @@ describe("start basic fixture", () => {
 
     const response = (await render({
       component: "styles",
-      props: {},
-      context: {},
       partial: false,
     })) as { status: number; content: string };
     expect(response.status).toBe(200);
@@ -220,8 +203,6 @@ describe("start basic fixture", () => {
 
     const response = (await render({
       component: "styles",
-      props: {},
-      context: {},
       partial: false,
     })) as { status: number; content: string };
     expect(response.status).toBe(200);
@@ -252,8 +233,6 @@ describe("start basic fixture", () => {
 
     const response = await render({
       component: "scriptTag",
-      props: {},
-      context: {},
       partial: false,
     });
     expect(response).toEqual({ redirectTo: "/scriptTag/index.html" });
@@ -277,8 +256,6 @@ describe("start basic fixture", () => {
 
     const response = await render({
       component: "scriptTag",
-      props: {},
-      context: {},
       partial: false,
     });
     expect(response).toEqual({ redirectTo: "/scriptTag/index.html" });
@@ -317,8 +294,6 @@ describe("start basic fixture", () => {
 
     const response = (await render({
       component: "scriptTag",
-      props: {},
-      context: {},
       partial: false,
     })) as { status: number; content: string };
     expect(response.status).toBe(200);
@@ -337,8 +312,6 @@ describe("start basic fixture", () => {
 
     const response = (await render({
       component: "scriptTag",
-      props: {},
-      context: {},
       partial: false,
     })) as { status: number; content: string };
     expect(response.status).toBe(200);

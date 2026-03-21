@@ -18,7 +18,6 @@ describe("start context fixture", () => {
 
     const response = await render({
       component: "index",
-      props: {},
       context: {
         notifications: ["Hello World"],
         user: {

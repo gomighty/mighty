@@ -21,8 +21,6 @@ describe("dev error fixture", () => {
 
     const response = await render({
       component: "error",
-      props: {},
-      context: {},
       partial: false,
     });
     expect(response.status).toBe(500);
@@ -42,8 +40,6 @@ describe("dev error fixture", () => {
     await expect(
       render({
         component: "error",
-        props: {},
-        context: {},
         partial: false,
       }),
     ).rejects.toThrow();

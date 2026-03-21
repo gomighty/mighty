@@ -21,8 +21,6 @@ describe("dev partytown fixture", () => {
   it("can render a page with partytown", async () => {
     const response = await render({
       component: "basic",
-      props: {},
-      context: {},
       partial: false,
     });
 
