@@ -27,7 +27,6 @@ describe("dev alpinejs fixture", () => {
       props: {
         initialCount: 0,
       },
-      context: {},
       partial: false,
     });
     expect(response.status).toBe(200);

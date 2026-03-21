@@ -24,13 +24,13 @@ export type MightyRenderRequest = {
   /**
    * An object containing the props to pass to the Astro component.
    */
-  props: Record<string, unknown>;
+  props?: Record<string, unknown>;
   /**
    * An object containing additional request data.
    *
    * This can be used to pass shared data that you want to pass to all components, or backend-related info (e.g. user data).
    */
-  context: Record<string, unknown>;
+  context?: Record<string, unknown>;
   /** @default true */
   partial?: boolean;
 };
