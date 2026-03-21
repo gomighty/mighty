@@ -18,9 +18,7 @@ describe("dev middleware", () => {
     it("can render an on-demand component", async () => {
       const devApp = fixture.createDevApp();
       stop = devApp.stop;
-      const app = devApp.app.get("/", (c) =>
-        c.render({ component: "index", props: {} }),
-      );
+      const app = devApp.app.get("/", (c) => c.render({ component: "index" }));
 
       const res = await app.request("/");
       expect(res.status).toBe(200);
@@ -31,20 +29,11 @@ describe("dev middleware", () => {
       const devApp = fixture.createDevApp();
       stop = devApp.stop;
       const app = devApp.app.get("/", (c) =>
-        c.render({ component: "non-existent", props: {} }),
+        c.render({ component: "non-existent" }),
       );
 
       const res = await app.request("/");
       expect(res.status).toBe(404);
-    });
-
-    it("can render with no explicit props", async () => {
-      const devApp = fixture.createDevApp();
-      stop = devApp.stop;
-      const app = devApp.app.get("/", (c) => c.render({ component: "index" }));
-
-      const res = await app.request("/");
-      expect(res.status).toBe(200);
     });
   });
 
@@ -64,7 +53,7 @@ describe("dev middleware", () => {
       stop = devApp.stop;
       const app = devApp.app.get("/", (c) => {
         c.var.shareWithAstroComponent({ user: "alice" });
-        return c.render({ component: "index", props: {} });
+        return c.render({ component: "index" });
       });
 
       const res = await app.request("/");
@@ -80,11 +69,11 @@ describe("dev middleware", () => {
       const app = devApp.app
         .get("/a", (c) => {
           c.var.shareWithAstroComponent({ reqId: "a" });
-          return c.render({ component: "index", props: {} });
+          return c.render({ component: "index" });
         })
         .get("/b", (c) => {
           c.var.shareWithAstroComponent({ reqId: "b" });
-          return c.render({ component: "index", props: {} });
+          return c.render({ component: "index" });
         });
 
       const [resA, resB] = await Promise.all([

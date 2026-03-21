@@ -28,7 +28,6 @@ describe("dev react fixture", () => {
       props: {
         title: "Hello World",
       },
-      context: {},
       partial: true,
     });
 
@@ -44,7 +43,6 @@ describe("dev react fixture", () => {
       props: {
         title: "Hello World",
       },
-      context: {},
       partial: true,
     });
 
