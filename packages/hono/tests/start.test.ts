@@ -70,7 +70,7 @@ describe("start middleware", () => {
     it("passes shared data to the rendered component", async () => {
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) => {
-        c.var.shareWithAstroComponent({ user: "alice" });
+        c.var.share({ user: "alice" });
         return c.render({ component: "index" });
       });
 
@@ -85,11 +85,11 @@ describe("start middleware", () => {
       const startApp = fixture.createStartApp();
       const app = startApp.app
         .get("/a", (c) => {
-          c.var.shareWithAstroComponent({ reqId: "a" });
+          c.var.share({ reqId: "a" });
           return c.render({ component: "index" });
         })
         .get("/b", (c) => {
-          c.var.shareWithAstroComponent({ reqId: "b" });
+          c.var.share({ reqId: "b" });
           return c.render({ component: "index" });
         });
 
@@ -106,11 +106,11 @@ describe("start middleware", () => {
       );
     });
 
-    it("accumulates multiple shareWithAstroComponent calls", async () => {
+    it("accumulates multiple share calls", async () => {
       const startApp = fixture.createStartApp();
       const app = startApp.app.get("/", (c) => {
-        c.var.shareWithAstroComponent({ user: "alice" });
-        c.var.shareWithAstroComponent({ theme: "dark" });
+        c.var.share({ user: "alice" });
+        c.var.share({ theme: "dark" });
         return c.render({ component: "index" });
       });
 
