@@ -1,10 +1,10 @@
-import type { MightyServerOptions } from "@gomighty/core";
 import { devMiddleware } from "./dev";
+import { getMode } from "./options";
 import { startMiddleware } from "./start";
-import type { MightyMiddlewareHandler } from "./types";
+import type { MightyHonoOptions, MightyMiddlewareHandler } from "./types";
 
-export function mighty(options?: MightyServerOptions): MightyMiddlewareHandler {
-  if (process.env.NODE_ENV === "development") {
+export function mighty(options?: MightyHonoOptions): MightyMiddlewareHandler {
+  if (getMode(options) === "development") {
     return devMiddleware(options);
   }
   return startMiddleware(options);

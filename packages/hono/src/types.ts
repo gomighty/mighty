@@ -1,3 +1,4 @@
+import type { MightyServerOptions } from "@gomighty/core";
 import type { MiddlewareHandler } from "hono";
 
 export type MightyHonoRenderRequest = {
@@ -30,4 +31,21 @@ export type MightyMiddlewareHandler = MiddlewareHandler<{
   Variables: {
     share: (data: Record<string, unknown>) => void;
   };
-}>;
+}> & {
+  stop?: () => Promise<void>;
+};
+
+export type MightyHonoMode = "development" | "production";
+
+export type MightyHonoOptions = MightyServerOptions & {
+  /**
+   * Explicit runtime mode. Defaults to inferring from NODE_ENV for backwards compatibility.
+   */
+  mode?: MightyHonoMode;
+  /**
+   * Astro project root. This is merged into `config.root`.
+   *
+   * @default "./astro"
+   */
+  root?: string;
+};

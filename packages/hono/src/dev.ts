@@ -1,26 +1,27 @@
-import { dev, type MightyServerOptions } from "@gomighty/core";
-import { mergeConfig } from "astro/config";
+import { dev } from "@gomighty/core";
+import type { AstroInlineConfig } from "astro";
 import { createMiddleware } from "hono/factory";
 import type { UnofficialStatusCode } from "hono/utils/http-status";
-import type { MightyMiddlewareHandler } from "./types";
+import { getCoreOptions } from "./options";
+import type { MightyHonoOptions, MightyMiddlewareHandler } from "./types";
 import { runConnectMiddleware } from "./utils/runConnectMiddleware.ts";
 
 const MIGHTY_DEV_ROOT = "/__MIGHTY_DEV_ADDRESS__";
 
 export function devMiddleware(
-  options?: MightyServerOptions,
+  options?: MightyHonoOptions,
 ): MightyMiddlewareHandler {
-  const mightyConfig: MightyServerOptions = {
+  const mightyConfig = getCoreOptions({
     ...options,
-    config: mergeConfig(
-      { root: "./astro", vite: { base: MIGHTY_DEV_ROOT } },
-      options?.config ?? {},
-    ),
-  };
+    config: {
+      ...options?.config,
+      vite: mergeDevViteConfig(options?.config?.vite),
+    },
+  });
 
   const setupDevPromise = dev(mightyConfig);
 
-  return createMiddleware(async (c, next) => {
+  const middleware = createMiddleware(async (c, next) => {
     const { render, viteMiddleware } = await setupDevPromise;
 
     if (
@@ -47,5 +48,21 @@ export function devMiddleware(
     });
 
     await next();
-  });
+  }) as MightyMiddlewareHandler;
+
+  middleware.stop = async () => {
+    const { stop } = await setupDevPromise;
+    await stop();
+  };
+
+  return middleware;
+}
+
+function mergeDevViteConfig(
+  viteConfig: AstroInlineConfig["vite"],
+): AstroInlineConfig["vite"] {
+  return {
+    ...viteConfig,
+    base: MIGHTY_DEV_ROOT,
+  };
 }

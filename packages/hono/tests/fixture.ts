@@ -82,8 +82,10 @@ export function getFixture(fixtureName: string): {
     },
     createStartApp: (params) => {
       const middleware = startMiddleware({
+        ...params,
+        root: fixtureRoot,
         config: mergeConfig<AstroInlineConfig>(
-          { root: fixtureRoot, outDir, logLevel: "warn" },
+          { outDir, logLevel: "warn" },
           params?.config ?? {},
         ),
       });
@@ -93,13 +95,21 @@ export function getFixture(fixtureName: string): {
     createDevApp: (params) => {
       const middleware = devMiddleware({
         ...params,
+        root: fixtureRoot,
         config: mergeConfig<AstroInlineConfig>(
-          { root: fixtureRoot, logLevel: "warn" },
+          { logLevel: "warn" },
           params?.config ?? {},
         ),
       });
       const app = new Hono().use(middleware);
-      return { app, middleware, stop: clean };
+      return {
+        app,
+        middleware,
+        stop: async () => {
+          await middleware.stop?.();
+          await clean();
+        },
+      };
     },
     clean,
   };

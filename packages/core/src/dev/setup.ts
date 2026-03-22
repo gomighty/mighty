@@ -5,10 +5,13 @@ import {
   type AstroConfig,
   type AstroInlineConfig,
   dev as astroDev,
+  type RouteInfo,
+  type SSRLoadedRenderer,
 } from "astro";
 import { mergeConfig } from "astro/config";
 import type { Element } from "hast";
 import type { ViteDevServer } from "vite";
+import { getRouteHeadElements } from "@/astro/route-assets";
 import { getStylesForURL } from "@/dev/css";
 import type {
   MightyDevMiddleware,
@@ -22,9 +25,7 @@ import type {
   MightyRenderFunction,
   MightyStartContainerFunction,
 } from "./render-vite";
-import { loadRenderersFromIntegrations } from "./renderers";
 import { createResolve } from "./resolve";
-import { getInjectedScriptsFromIntegrations } from "./scripts";
 
 const require = createRequire(import.meta.url);
 const devDir = path.join(path.dirname(require.resolve("@gomighty/core/dev")));
@@ -34,6 +35,9 @@ export async function setupDev(
 ): Promise<MightyDevMiddleware> {
   let finalConfig: AstroConfig;
   let viteServer: ViteDevServer;
+  const existingUnhandledRejectionListeners = new Set(
+    process.listeners("unhandledRejection"),
+  );
 
   const mightyConfig: AstroInlineConfig = {
     vite: {
@@ -41,17 +45,6 @@ export async function setupDev(
         middlewareMode: true,
         cors: false,
       },
-      plugins: [
-        {
-          name: "mighty-remove-unhandled-rejection-listener-hack",
-          closeBundle() {
-            // HACK: We remove the "unhandledRejection" event listener added by Astro
-            // https://github.com/withastro/astro/blob/eadc9dd277d0075d7bff0e33c7a86f3fb97fdd61/packages/astro/src/vite-plugin-astro-server/plugin.ts#L125
-            // The original removal logic assumes a Vite server is running, which is not the case in middleware mode
-            process.removeAllListeners("unhandledRejection");
-          },
-        },
-      ],
     },
     integrations: [
       {
@@ -80,6 +73,11 @@ export async function setupDev(
   };
 
   await astroDev(mergeConfig(mightyConfig, options.config ?? {}));
+  for (const listener of process.listeners("unhandledRejection")) {
+    if (!existingUnhandledRejectionListeners.has(listener)) {
+      process.off("unhandledRejection", listener);
+    }
+  }
 
   // @ts-expect-error - finalConfig is defined at this point
   if (!finalConfig) {
@@ -91,11 +89,14 @@ export async function setupDev(
     throw new Error("viteServer is not defined");
   }
 
-  // We need to import the renderers here and not in the render-vite.ts file. Not sure why...
-  const loadedRenderers = await loadRenderersFromIntegrations(
-    finalConfig.integrations,
-    viteServer,
-  );
+  const [{ routes }, { renderers }] = await Promise.all([
+    viteServer.ssrLoadModule("virtual:astro:routes") as Promise<{
+      routes: RouteInfo[];
+    }>,
+    viteServer.ssrLoadModule("virtual:astro:renderers") as Promise<{
+      renderers: SSRLoadedRenderer[];
+    }>,
+  ]);
 
   const { render: renderComponent, createContainer } =
     (await viteServer.ssrLoadModule(path.join(devDir, "./render-vite.ts"))) as {
@@ -105,36 +106,7 @@ export async function setupDev(
 
   const resolve = createResolve(viteServer.environments.ssr, finalConfig.root);
 
-  await createContainer(loadedRenderers, resolve);
-
-  const injectedScripts = await getInjectedScriptsFromIntegrations(
-    finalConfig.integrations,
-  );
-
-  const headInlineScriptTags: Element[] = injectedScripts
-    .filter((script) => script.stage === "head-inline")
-    .map((script) => ({
-      type: "element",
-      tagName: "script",
-      properties: {},
-      children: [{ type: "text", value: script.content }],
-    }));
-
-  const getPageScripts: () => Element[] = injectedScripts.some(
-    (script) => script.stage === "page",
-  )
-    ? () => [
-        {
-          type: "element",
-          tagName: "script",
-          properties: {
-            type: "module",
-            src: `${MIGHTY_DEV_PLACEHOLDER_ADDRESS}/@id/astro:scripts/page.js`,
-          },
-          children: [],
-        },
-      ]
-    : () => [];
+  await createContainer(renderers, resolve);
 
   return {
     viteMiddleware: viteServer.middlewares,
@@ -149,16 +121,25 @@ export async function setupDev(
           address,
         } = request;
 
-        const componentPath: `${string}.astro` = `${path.join(
-          finalConfig.srcDir.pathname,
+        const routeComponentPath = path.join(
+          "src",
           "pages",
           ...dotStringToPath(component),
+        );
+        const componentPath: `${string}.astro` = `${path.join(
+          finalConfig.root.pathname,
+          routeComponentPath,
         )}.astro`;
 
         const doesComponentExist = await access(componentPath)
           .then(() => true)
           .catch(() => false);
         if (!doesComponentExist) {
+          return { status: 404, content: `Component ${component} not found` };
+        }
+
+        const routeInfo = findRouteInfo(routes, routeComponentPath);
+        if (!routeInfo) {
           return { status: 404, content: `Component ${component} not found` };
         }
 
@@ -201,10 +182,11 @@ export async function setupDev(
         const content = injectTagsIntoHead(
           renderedComponent,
           [
-            ...styleTags,
+            ...mergeRouteHeadElements(
+              prefixDevAssetElements(getRouteHeadElements(routeInfo)),
+              styleTags,
+            ),
             viteClientScript,
-            ...getPageScripts(),
-            ...headInlineScriptTags,
           ],
           partial,
         ).replaceAll(MIGHTY_DEV_PLACEHOLDER_ADDRESS, address);
@@ -235,4 +217,53 @@ export async function setupDev(
       }
     },
   };
+}
+
+function findRouteInfo(
+  routes: RouteInfo[],
+  componentPath: string,
+): RouteInfo | undefined {
+  return routes.find(
+    (route) => route.routeData.component === `${componentPath}.astro`,
+  );
+}
+
+function mergeRouteHeadElements(
+  routeHeadElements: Element[],
+  styleTags: Element[],
+): Element[] {
+  const routeStyleSources = new Set(
+    routeHeadElements
+      .filter((element) => element.tagName === "link")
+      .map((element) => String(element.properties?.href ?? "")),
+  );
+
+  return [
+    ...styleTags.filter(
+      (tag) =>
+        tag.tagName !== "link" ||
+        !routeStyleSources.has(String(tag.properties?.href ?? "")),
+    ),
+    ...routeHeadElements,
+  ];
+}
+
+function prefixDevAssetElements(elements: Element[]): Element[] {
+  return elements.map((element) => {
+    if (element.tagName === "script" || element.tagName === "link") {
+      const key = element.tagName === "script" ? "src" : "href";
+      const value = element.properties?.[key];
+      if (typeof value === "string" && value.startsWith("/")) {
+        return {
+          ...element,
+          properties: {
+            ...element.properties,
+            [key]: `${MIGHTY_DEV_PLACEHOLDER_ADDRESS}${value}`,
+          },
+        };
+      }
+    }
+
+    return element;
+  });
 }

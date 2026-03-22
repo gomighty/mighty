@@ -1,7 +1,9 @@
 import path from "node:path";
+import type { RouteInfo } from "astro";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
-import type { Element } from "hast";
+import { loadBuildManifest, loadBuiltPageModule } from "@/astro/manifest";
+import { getRouteHeadElements } from "@/astro/route-assets";
 import { runInContext } from "@/context";
 import type {
   MightyRenderRequest,
@@ -9,24 +11,16 @@ import type {
   MightyStartMiddleware,
 } from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
-import { getBuildPathsFromInlineConfig } from "@/utils/getBuildPathsFromInlineConfig";
 import { injectTagsIntoHead } from "@/utils/injectTagsIntoHead";
-import { importManifestAndRenderers } from "./importManifestAndRenderers";
 
 export async function setupStart(
   options: MightyServerOptions,
 ): Promise<MightyStartMiddleware> {
-  const { buildServerPath } = getBuildPathsFromInlineConfig(
-    options.config ?? {},
-  );
-
-  const { manifest, renderers } = await importManifestAndRenderers(
-    options.config ?? {},
-  );
+  const manifest = await loadBuildManifest(options.config ?? {});
 
   const container = await AstroContainer.create({
     manifest,
-    renderers,
+    renderers: manifest.renderers,
     async resolve(s) {
       return manifest.entryModules[s] ?? s;
     },
@@ -58,52 +52,43 @@ export async function setupStart(
         };
       }
 
-      const entryModule =
-        manifest.entryModules[
-          `\u0000virtual:astro:page:${componentPath}@_@astro`
-        ];
+      const entryModule = await loadBuiltPageModule(manifest, componentPath);
+
       if (!entryModule) {
         return { status: 404, content: `Component ${component} not found` };
       }
 
-      const styleTags: Element[] = routeInfo.styles.map((style) => {
-        if (style.type === "inline") {
-          return {
-            type: "element",
-            tagName: "style",
-            properties: {
-              type: "text/css",
-            },
-            children: [{ type: "text", value: style.content }],
-          };
-        }
-        if (style.type === "external") {
-          return {
-            type: "element",
-            tagName: "link",
-            properties: {
-              rel: "stylesheet",
-              href: style.src,
-            },
-            children: [],
-          };
-        }
-        throw new Error(
-          `Unknown style type in manifest: ${JSON.stringify(style)}`,
-        );
-      });
-
-      const componentModule: AstroComponentFactory = await import(
-        path.join(buildServerPath, entryModule)
-      ).then((module) => module.page().default);
+      const componentModule = await resolvePageComponent(
+        entryModule,
+        routeInfo,
+      );
       const renderedComponent = await runInContext(context, () =>
         container.renderToString(componentModule, { props, partial }),
       );
 
       return {
         status: 200,
-        content: injectTagsIntoHead(renderedComponent, styleTags, partial),
+        content: injectTagsIntoHead(
+          renderedComponent,
+          getRouteHeadElements(routeInfo),
+          partial,
+        ),
       };
     },
   };
+}
+
+async function resolvePageComponent(
+  entryModule: {
+    page?: () => Promise<{ default: AstroComponentFactory }>;
+  },
+  routeInfo: RouteInfo,
+): Promise<AstroComponentFactory> {
+  if ("page" in entryModule && typeof entryModule.page === "function") {
+    return (await entryModule.page()).default;
+  }
+
+  throw new Error(
+    `Failed to load page module for ${routeInfo.routeData.route}`,
+  );
 }

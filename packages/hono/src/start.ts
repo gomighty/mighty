@@ -1,15 +1,13 @@
-import { type MightyStartOptions, start } from "@gomighty/core";
-import { mergeConfig } from "astro/config";
+import { start } from "@gomighty/core";
 import { createMiddleware } from "hono/factory";
 import type { UnofficialStatusCode } from "hono/utils/http-status";
-import type { MightyMiddlewareHandler } from "./types";
+import { getCoreOptions } from "./options";
+import type { MightyHonoOptions, MightyMiddlewareHandler } from "./types";
 
 export function startMiddleware(
-  options?: MightyStartOptions,
+  options?: MightyHonoOptions,
 ): MightyMiddlewareHandler {
-  const mightyConfig: MightyStartOptions = {
-    config: mergeConfig({ root: "./astro" }, options?.config ?? {}),
-  };
+  const mightyConfig = getCoreOptions(options);
 
   const setupStartPromise = start(mightyConfig);
 

@@ -1,15 +1,29 @@
-# core
+# Mighty
 
-To install dependencies:
+Mighty is an Astro rendering runtime split into two workspace packages:
 
-```bash
-bun install
+- `@gomighty/core`: build, dev, start, and shared request context primitives.
+- `@gomighty/hono`: a Hono adapter and CLI on top of `@gomighty/core`.
+
+## Workspace
+
+```text
+packages/
+  core/  Astro runtime and build pipeline
+  hono/  Hono middleware adapter and CLI
 ```
 
-To run:
+## Development
 
-```bash
-bun run index.ts
+```sh
+pnpm install
+pnpm build
+pnpm run typecheck
+pnpm run ci:biome
+pnpm test
 ```
 
-This project was created using `bun init` in bun v1.2.12. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## Notes
+
+- Astro internals are intentionally isolated under `packages/core/src/astro`.
+- The Hono adapter accepts explicit `mode` and `root` options so app behavior is not tied to `NODE_ENV` or a fixed `./astro` layout.
