@@ -7,7 +7,8 @@ Available commands:
   build  Build optimized Astro components for production
 
   Options:
-    --root <path>  Astro root directory (default: ./astro)`;
+    --root <path>  Astro root directory (default: ./astro)
+    -h, --help     Show this help message`;
 
 type CliCommand = "build" | "help";
 
@@ -30,13 +31,6 @@ function parseCliCommand(command: string | undefined): CliCommand {
   return "help";
 }
 
-class CliError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "CliError";
-  }
-}
-
 function parseCliArgs(args: string[]): CliParseResult {
   try {
     const { positionals, values } = parseArgs({
@@ -47,12 +41,17 @@ function parseCliArgs(args: string[]): CliParseResult {
           type: "string",
           default: "./astro",
         },
+        help: {
+          type: "boolean",
+          short: "h",
+          default: false,
+        },
       },
       strict: true,
     });
 
     return {
-      command: parseCliCommand(positionals[0]),
+      command: values.help ? "help" : parseCliCommand(positionals[0]),
       root: values.root,
     };
   } catch (error) {
@@ -66,7 +65,7 @@ export async function runCli(args: string[]): Promise<void> {
   const { command, root, error } = parseCliArgs(args);
 
   if (error !== undefined) {
-    throw new CliError(`${error}\n\n${helpText}`);
+    throw new Error(`${error}\n\n${helpText}`);
   }
 
   switch (command) {
@@ -76,7 +75,7 @@ export async function runCli(args: string[]): Promise<void> {
       });
       return;
     case "help":
-      throw new CliError(helpText);
+      throw new Error(helpText);
     default: {
       const _: never = command;
       throw new Error(`Unknown command: ${command}`);

@@ -15,6 +15,14 @@ describe("cli", () => {
     await fixture.clean();
   });
 
+  it("shows help with --help flag", async () => {
+    await expect(runCli(["--help"])).rejects.toThrow("Usage: mighty-hono");
+  });
+
+  it("shows help with -h flag", async () => {
+    await expect(runCli(["-h"])).rejects.toThrow("Usage: mighty-hono");
+  });
+
   it("rejects a missing --root value", async () => {
     await expect(runCli(["build", "--root"])).rejects.toThrow(
       "Option '--root <value>' argument missing",
