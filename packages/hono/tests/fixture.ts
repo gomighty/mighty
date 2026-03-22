@@ -44,6 +44,10 @@ export function getFixture(fixtureName: string): {
 
   const clean = async (): Promise<void> => {
     await rm(outDir, { recursive: true, force: true });
+    await rm(path.join(fixtureRoot, "dist"), {
+      recursive: true,
+      force: true,
+    });
     await rm(path.join(fixtureRoot, ".astro"), {
       recursive: true,
       force: true,
