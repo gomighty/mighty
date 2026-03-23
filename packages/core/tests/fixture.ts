@@ -47,16 +47,17 @@ export function getFixture(fixtureName: string): {
     `dist-${Math.random().toString(36).substring(2, 15)}`,
   );
 
+  // Isolate Vite dep-optimization cache per Vitest run to prevent
+  // ENOTEMPTY race when multiple `pnpm test` processes run in parallel.
+  const viteCacheDir = path.join(
+    import.meta.dirname,
+    "..",
+    "node_modules",
+    `.vite-${process.ppid || process.pid}`,
+  );
+
   const clean = async () => {
     await rm(outDir, {
-      recursive: true,
-      force: true,
-    });
-    await rm(path.join(fixtureRoot, ".astro"), {
-      recursive: true,
-      force: true,
-    });
-    await rm(path.join(fixtureRoot, "node_modules"), {
       recursive: true,
       force: true,
     });
@@ -78,6 +79,7 @@ export function getFixture(fixtureName: string): {
           {
             root: fixtureRoot,
             logLevel: "warn",
+            vite: { cacheDir: viteCacheDir },
           },
           params?.config ?? {},
         ),
@@ -115,6 +117,7 @@ export function getFixture(fixtureName: string): {
             outDir,
             logLevel: "warn",
             vite: {
+              cacheDir: viteCacheDir,
               build: {
                 rollupOptions: { external: ["@/context"] },
               },

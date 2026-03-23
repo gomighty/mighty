@@ -3,23 +3,26 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("dev error fixture", () => {
   let fixture: ReturnType<typeof getFixture>;
+  let stop: () => Promise<void>;
 
   beforeEach(() => {
     fixture = getFixture("dev.basic");
+    stop = () => fixture.clean();
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(async () => {
     vi.restoreAllMocks();
-    await fixture.clean();
+    await stop();
   });
 
   it("renders the Astro error overlay", async () => {
-    const { render } = await fixture.startDevServer({
+    const devServer = await fixture.startDevServer({
       config: { logLevel: "silent" },
     });
+    stop = devServer.stop;
 
-    const response = await render({
+    const response = await devServer.render({
       component: "error",
       partial: false,
     });
@@ -30,15 +33,16 @@ describe("dev error fixture", () => {
   });
 
   it("throws an error when hmr.overlay is false", async () => {
-    const { render } = await fixture.startDevServer({
+    const devServer = await fixture.startDevServer({
       config: {
         logLevel: "silent",
         vite: { server: { hmr: { overlay: false } } },
       },
     });
+    stop = devServer.stop;
 
     await expect(
-      render({
+      devServer.render({
         component: "error",
         partial: false,
       }),

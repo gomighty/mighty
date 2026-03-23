@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile, rm, symlink } from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { runCli } from "../src/cli/run";
@@ -30,12 +30,25 @@ describe("cli", () => {
   });
 
   it("builds the fixture when --root is provided before the command", async () => {
+    // Use the unique outDir as a build root (with symlinks to fixture source)
+    // to avoid parallel build conflicts on the shared dist/ directory.
+    const buildRoot = fixture.outDir;
+    await mkdir(buildRoot, { recursive: true });
+    await symlink(
+      path.join(fixture.fixtureRoot, "astro.config.ts"),
+      path.join(buildRoot, "astro.config.ts"),
+    );
+    await symlink(
+      path.join(fixture.fixtureRoot, "src"),
+      path.join(buildRoot, "src"),
+    );
+
     await expect(
-      runCli(["--root", fixture.fixtureRoot, "build"]),
+      runCli(["--root", buildRoot, "build"]),
     ).resolves.toBe(undefined);
 
     const output = await readFile(
-      path.join(fixture.fixtureRoot, "dist", "client", "index.html"),
+      path.join(buildRoot, "dist", "client", "index.html"),
       "utf-8",
     );
 

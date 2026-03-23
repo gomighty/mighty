@@ -8,6 +8,8 @@ export default defineConfig({
       "@/": `${path.resolve(import.meta.dirname, "src")}/`,
       "@tests/": `${path.resolve(import.meta.dirname, "tests")}/`,
     },
-    testTimeout: 30000,
+    testTimeout: 120000,
+    hookTimeout: 60000,
+    pool: "forks",
   },
 });

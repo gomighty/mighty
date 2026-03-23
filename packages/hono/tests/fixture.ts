@@ -42,20 +42,17 @@ export function getFixture(fixtureName: string): {
     `dist-${Math.random().toString(36).substring(2, 15)}`,
   );
 
+  // Isolate Vite dep-optimization cache per Vitest run to prevent
+  // ENOTEMPTY race when multiple `pnpm test` processes run in parallel.
+  const viteCacheDir = path.join(
+    import.meta.dirname,
+    "..",
+    "node_modules",
+    `.vite-${process.ppid || process.pid}`,
+  );
+
   const clean = async (): Promise<void> => {
     await rm(outDir, { recursive: true, force: true });
-    await rm(path.join(fixtureRoot, "dist"), {
-      recursive: true,
-      force: true,
-    });
-    await rm(path.join(fixtureRoot, ".astro"), {
-      recursive: true,
-      force: true,
-    });
-    await rm(path.join(fixtureRoot, "node_modules"), {
-      recursive: true,
-      force: true,
-    });
   };
 
   return {
@@ -69,6 +66,7 @@ export function getFixture(fixtureName: string): {
             outDir,
             logLevel: "warn",
             vite: {
+              cacheDir: viteCacheDir,
               build: {
                 rollupOptions: {
                   external: ["@gomighty/core/context"],
@@ -94,7 +92,7 @@ export function getFixture(fixtureName: string): {
       const middleware = devMiddleware({
         ...params,
         config: mergeConfig<AstroInlineConfig>(
-          { root: fixtureRoot, logLevel: "warn" },
+          { root: fixtureRoot, logLevel: "warn", vite: { cacheDir: viteCacheDir } },
           params?.config ?? {},
         ),
       });
