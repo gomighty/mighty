@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "@gomighty/tsconfig/base.json",
   "include": ["src/**/*.ts", "tests/**/*.ts"],
   "compilerOptions": {
     "rootDir": ".",

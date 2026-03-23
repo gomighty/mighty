@@ -45,6 +45,7 @@
     "@astrojs/alpinejs": "0.5.0",
     "@astrojs/partytown": "^2.1.5",
     "@astrojs/react": "5.0.0",
+    "@gomighty/tsconfig": "workspace:*",
     "@types/alpinejs": "^3.13.11",
     "@types/hast": "^3.0.4",
     "@types/react": "^19.2.14",

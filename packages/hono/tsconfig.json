@@ -1,11 +1,11 @@
 {
-  "extends": "../../tsconfig.json",
-  "include": ["src/**/*.ts"],
+  "extends": "@gomighty/tsconfig/base.json",
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
   "compilerOptions": {
+    "rootDir": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "outDir": "./dist"
   }
 }

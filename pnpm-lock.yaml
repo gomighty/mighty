@@ -69,6 +69,9 @@ importers:
       '@astrojs/react':
         specifier: 5.0.0
         version: 5.0.0(@types/node@25.3.5)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(jiti@2.6.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@gomighty/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@types/alpinejs':
         specifier: ^3.13.11
         version: 3.13.11
@@ -121,9 +124,14 @@ importers:
         specifier: ^4.0.15
         version: 4.3.6
     devDependencies:
+      '@gomighty/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       vite:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@25.3.5)(jiti@2.6.1)
+
+  packages/tsconfig: {}
 
 packages:
 

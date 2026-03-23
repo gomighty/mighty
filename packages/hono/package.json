@@ -28,6 +28,7 @@
     "typecheck": "tsgo"
   },
   "devDependencies": {
+    "@gomighty/tsconfig": "workspace:*",
     "vite": "^7.3.1"
   }
 }
