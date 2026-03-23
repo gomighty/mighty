@@ -92,7 +92,11 @@ export function getFixture(fixtureName: string): {
       const middleware = devMiddleware({
         ...params,
         config: mergeConfig<AstroInlineConfig>(
-          { root: fixtureRoot, logLevel: "warn", vite: { cacheDir: viteCacheDir } },
+          {
+            root: fixtureRoot,
+            logLevel: "warn",
+            vite: { cacheDir: viteCacheDir },
+          },
           params?.config ?? {},
         ),
       });

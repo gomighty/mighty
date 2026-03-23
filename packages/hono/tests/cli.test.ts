@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm, symlink } from "node:fs/promises";
+import { mkdir, readFile, symlink } from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { runCli } from "../src/cli/run";
@@ -43,9 +43,9 @@ describe("cli", () => {
       path.join(buildRoot, "src"),
     );
 
-    await expect(
-      runCli(["--root", buildRoot, "build"]),
-    ).resolves.toBe(undefined);
+    await expect(runCli(["--root", buildRoot, "build"])).resolves.toBe(
+      undefined,
+    );
 
     const output = await readFile(
       path.join(buildRoot, "dist", "client", "index.html"),
