@@ -64,7 +64,7 @@ describe("start basic fixture", () => {
     expect(response).toEqual({
       status: 200,
       content:
-        "<!DOCTYPE html><html><head></head> <body> <p>Hello World!</p> </body></html>",
+        '<!DOCTYPE html><html lang="en"><head></head> <body> <p>Hello World!</p> </body></html>',
     });
   });
 
@@ -96,7 +96,7 @@ describe("start basic fixture", () => {
     expect(response.status).toBe(200);
 
     const imageSrc = response.content.match(
-      /<img src="([^"]+)" width="96" height="96">/,
+      /<img src="([^"]+)" width="96" height="96" alt="">/,
     )?.[1] as string;
     expect(imageSrc).toMatch(/^\/_astro\//);
 
