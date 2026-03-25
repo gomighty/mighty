@@ -16,7 +16,8 @@
   },
   "scripts": {
     "ci:biome": "biome ci",
-    "build": "tsdown && pnpm --filter @gomighty/docs run build",
+    "build": "tsdown",
+    "build:docs": "pnpm --filter @gomighty/docs run build",
     "typecheck": "pnpm -r run typecheck",
     "test": "vitest run"
   }
