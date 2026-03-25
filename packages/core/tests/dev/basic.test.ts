@@ -73,7 +73,7 @@ describe("dev basic fixture", () => {
     expect(response.status).toBe(200);
 
     expect(response.content).toBe(
-      '<!DOCTYPE html><html><head><script type="module" src="http://host-placeholder.test/@vite/client"></script></head> <body> <p>Hello World</p> </body></html>',
+      '<!DOCTYPE html><html lang="en"><head><script type="module" src="http://host-placeholder.test/@vite/client"></script></head> <body> <p>Hello World</p> </body></html>',
     );
   });
 

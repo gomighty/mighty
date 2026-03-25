@@ -5,11 +5,15 @@ import MightyLogo from "@/assets/mighty.svg";
 const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
 
 const anchorHref = Astro.url.pathname === "/" ? "/#" : siteTitleHref;
+
+const titleClassList = {
+  "sr-only": config.logo?.replacesTitle,
+};
 ---
 
 <a href={anchorHref} class="site-title sl-flex">
   <MightyLogo class="site-title-logo" />
-  <span class:list={{ "sr-only": config.logo?.replacesTitle }} translate="no">
+  <span class:list={titleClassList} translate="no">
     {siteTitle}
   </span>
 </a>
@@ -50,6 +54,7 @@ const anchorHref = Astro.url.pathname === "/" ? "/#" : siteTitleHref;
   }
 
   .site-title-rotate-after-view-transition svg path {
+    /* biome-ignore lint/complexity/noImportantStyles: required here to work with view transitions */
     transition: none !important;
     transform: rotateY(540deg);
     cursor: pointer;

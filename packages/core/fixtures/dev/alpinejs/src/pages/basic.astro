@@ -6,13 +6,13 @@ interface Props {
 const { initialCount } = Astro.props;
 ---
 
-<html>
+<html lang="en">
   <head></head>
   <body>
     <div class="counter" x-data={`{ count: ${initialCount} }`}>
-      <button x-on:click="count--">-</button>
+      <button type="button" x-on:click="count--">-</button>
       <pre x-text="count">{ initialCount }</pre>
-      <button x-on:click="count++">+</button>
+      <button type="button" x-on:click="count++">+</button>
     </div>
   </body>
 </html>

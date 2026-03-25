@@ -15,7 +15,9 @@ export function injectTagsIntoHead(
   visit(tree, "element", (node) => {
     if (node.tagName === "head" && node.position) {
       hasHead = true;
-      children.forEach((child) => node.children.push(child));
+      children.forEach((child) => {
+        node.children.push(child);
+      });
       return EXIT;
     }
   });
