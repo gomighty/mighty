@@ -12,7 +12,7 @@
     "typecheck": "astro check"
   },
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.38.2",
