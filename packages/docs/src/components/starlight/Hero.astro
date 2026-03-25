@@ -22,13 +22,13 @@ const PAGE_TITLE_ID = "_top";
             ({
               attrs: { class: className, ...attrs } = {},
               icon,
-              link: href,
+              link,
               text,
               variant,
             }) => (
               <LinkButton
-                {href}
-                {variant}
+                href={link}
+                variant={variant}
                 icon={icon?.name}
                 class:list={[className]}
                 {...attrs}
