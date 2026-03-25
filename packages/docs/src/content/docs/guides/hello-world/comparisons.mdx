@@ -1,0 +1,147 @@
+---
+title: Comparisons
+description: See how Mighty stacks up against other popular solutions like Inertia.js, Livewire, and Astro itself.
+sidebar:
+  order: 2
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+There are a multitude of ways to build web applications, each with its strengths and weaknesses.
+
+In this page, we compare Mighty to other similar solutions, showcasing different tradeoffs depending on your use case.
+
+This isn't necessarily a "Mighty vs. X" situation; as you will see, some of these solutions can actually be paired with Mighty to improve developer experience!
+
+<Aside>
+  If you're the author of one of these solutions, or if you have experience in
+  one of them, feel free to contribute to this page by leaving a PR!
+</Aside>
+
+## Astro itself
+
+Let's first address the elephant in the room: why not **_just use Astro_?**
+
+While Astro prerenders all pages by default, it can be configured to render pages on-demand on the server, making it a full-stack framework.
+
+Astro's developer experience is fantastic, and depending on your use case, you might just want to build your backend on top of it.
+
+However, there are some limitations in Astro's model:
+
+- Astro is limited to building JavaScript/TypeScript backends, as it is a JavaScript framework.
+- To use a backend built in another language, you'll have to build an API to interface with your Astro application.
+- You're also bound to Astro's project structure, and all its decisions regarding file-based routing, middleware design, etc.
+
+Of course, these limitations might not matter if your use case fits Astro's model, in which case you might not need Mighty!
+
+But if the above sounds like a dealbreaker, or if you want the freedom to use any backend without fussing around with APIs, Mighty is a great choice.
+
+## Inertia.js
+
+[Inertia.js](https://inertiajs.com/) allows you to build a modern Single-Page App (SPA) on top of your backend, without having to implement APIs or client-side routing.
+
+In this sense, it's very similar to what Mighty is trying to do, and Inertia.js is in fact a big inspiration for Mighty!
+
+There are some important differences between the two projects:
+
+- Inertia.js is designed for SPAs (be they server- or client-rendered), while Mighty helps you build Multi-Page Apps (MPAs).
+- Inertia.js supports [a wide range of backends](https://inertiajs.com/community-adapters), while Mighty currently has official support for Laravel and Hono (for now!).
+- Given its MPA nature, Mighty is more deeply integrated with the backend, letting you use backend context (e.g. user info) on the Astro side.
+
+Depending on your requirements, you might opt for Inertia.js to build an interaction-rich SPA app!
+
+You might want to consider Mighty if your app doesn't require fine-grained interactions everywhere, or if you prefer to avoid having a UI framework take over your entire page.
+
+<Aside>
+We plan to implement an SPA mode in Mighty, similar to what Inertia.js does!
+
+Mighty will eventually aim to be a drop-in replacement for Inertia.js, with deeper integration with the backend.
+
+</Aside>
+
+## Laravel-specific solutions
+
+### Blade
+
+[Blade](https://laravel.com/docs/12.x/blade) is Laravel's built-in, battle-tested, and feature-rich templating engine.
+
+Blade is similar to Astro as it is mainly used to build MPAs, and it can perfectly meet your needs, especially when coupled with a lightweight JavaScript library like [Alpine.js](https://alpinejs.dev/).
+
+On the other hand, if you want both Astro's unmatched developer experience on the frontend and Laravel's batteries-included approach, Mighty helps bridge the gap between them.
+
+Mighty can also be used **_alongside_** Blade, with the ability to render Astro components inside your Blade views.
+
+### Livewire
+
+[Livewire](https://livewire.laravel.com/) is a full-stack framework for Laravel for building dynamic interfaces in PHP, with no or little JavaScript required.
+
+Livewire builds on top of Blade and Alpine.js to deliver a reactive, SPA-like experience, while Mighty is more geared for building MPAs.
+
+If your use case requires you to build in PHP as much as possible, Livewire is an excellent choice!
+
+Alternatively, if you prefer to leverage Astro's great developer experience, you might want to consider Mighty.
+
+Since Livewire uses Blade, you can use Mighty **_alongside_** Livewire, with the ability to render Astro components inside your Livewire components.
+
+<Aside>
+We plan to implement Livewire support inside Astro components!
+
+You will be able to use HTML directives (e.g. `wire:click`) as well as the `$wire` object to interact with Livewire components.
+
+</Aside>
+
+### Mingle.js
+
+[Mingle.js](https://github.com/ijpatricio/mingle) is a library that allows you to use React/Vue components in Livewire.
+
+This is similar to Mighty's support for Livewire, though Mighty supports more UI frameworks out of the box, including Svelte, SolidJS, and Angular.
+
+Mingle.js includes support for using Livewire directives inside React/Vue components, a feature not yet implemented in Mighty.
+
+### Hybridly
+
+[Hybridly](https://hybridly.dev/) is an alternative to [Inertia.js](#inertiajs), built using Laravel and Vue.
+
+Compared to Inertia.js, Hybridly puts emphasis on end-to-end type safety, as well as providing common building blocks such as headless dialogs and tables, filtering and more.
+
+As a developer experience focused library, Mighty aims to provide a similar level of type safety as Hybridly.
+
+### Fusion
+
+[Fusion](https://github.com/fusion-php/fusion) was a project aiming to unite a Vue frontend and a Laravel backend in the same Single-File Component file.
+
+```vue
+<php>
+  // Define a prop in PHP
+  $name = prop(Auth::user()->name);
+</php>
+
+<template>
+  <!-- Use it in Vue! -->
+  Hello {{ name }}!
+</template>
+```
+
+Fusion, while very appealing and ambitious, failed to gain traction and was put on hold for a variety of reasons:
+
+- Confusion regarding the execution model; some people thought Fusion executed PHP code **inside** of Vue, which was not the case
+- Lack of support for React and other frameworks
+- Lack of interest from the community; Fusion was built on top of Inertia.js, which meant it was not doing much more than what Inertia.js was doing
+
+Mighty is in a unique position to solve most or all of these concerns, with potential support for far more frameworks than Fusion ever did.
+
+This is our current stance on the matter:
+
+- We **will be implementing** file-based routing and some version of frontend-backend colocation in the future, with support for more frameworks than Fusion.
+- We **might not implement** same-file colocation support, as this might lead to confusion on where code actually executes
+
+## Hono-specific solutions
+
+### HonoX
+
+<Aside title="Call for contributions!">
+While we see HonoX as similar to Mighty in some aspects, we do not have enough information to do a valid comparison.
+
+If you have experience in HonoX, please feel free to leave a PR and fill this section!
+
+</Aside>

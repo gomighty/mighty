@@ -1,0 +1,39 @@
+---
+title: The development server
+description: Learn about Mighty's development server, how it works on top of Astro's development server, and how to run it with your specific backend adapter.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Mighty provides a development server, built on top of Astro's own server to integrate with other backends.
+
+<Aside>
+When using Hono, Mighty runs the development server in [**middleware mode**](https://vite.dev/config/server-options.html#server-middlewaremode).
+
+In this case, there is no need to run the server separately.
+
+</Aside>
+
+## How it works
+
+When starting the development server, Mighty:
+
+1. Reads the [Astro config file](https://docs.astro.build/en/guides/configuring-astro/#the-astro-config-file) in the project root.
+1. Analyzes included integrations, and adds required configuration for UI renderers (e.g. React) and script injections (e.g. Alpine.js).
+1. Runs Astro's development server, with custom component rendering middleware included.
+
+In addition, backend adapters may perform additional tasks for better integration, e.g. injecting Astro styles in the `<head>` tag of Blade views (for Laravel).
+
+<Aside type="caution">
+Mighty will **not** read Vite config files (e.g. vite.config.js), even those managed by the backend you use.
+
+Mighty runs in a different context than other frameworks, and will not be affected by any changes to these frameworks' bundler configuration.
+
+</Aside>
+
+## Run the development server
+
+To run the development server, refer to the instructions your backend adapter provides:
+
+- [Laravel](/guides/backend-adapters/laravel#run-the-development-server)
+- [Hono](/guides/backend-adapters/hono#run-the-development-server)

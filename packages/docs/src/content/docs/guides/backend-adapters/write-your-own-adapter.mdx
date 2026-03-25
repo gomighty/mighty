@@ -1,0 +1,173 @@
+---
+title: Write your own adapter
+sidebar:
+  order: 4
+---
+
+import { Aside, FileTree } from "@astrojs/starlight/components";
+
+<Aside>This is a work in progress! PRs welcome.</Aside>
+
+While Mighty provides backend adapters for Laravel and Hono, you might want to use another backend.
+
+Mighty provides a Node.js-based adapter interface, making it easy to add support for your favorite backend.
+
+## Backend adapter building pieces
+
+A backend adapter consists of the following building pieces:
+
+- A way to start Mighty's development and production servers (usually by calling Mighty's helper functions).
+- An interface for rendering Astro components from your backend code (usually written in your backend's programming language).
+- Additional helper functions and types to improve developer experience (optional, usually written in JS/TS).
+
+A backend adapter is considered "usable" if it implements the first two building pieces.
+
+<Aside>
+Providing helper functions is recommended, but optional!
+
+Focusing first on making the backend adapter usable is a viable strategy.
+
+</Aside>
+
+## Set up the project structure
+
+First, set up your project structure as follows:
+
+<FileTree>
+- astro
+  - components
+  - layouts
+  - pages
+    - posts
+      - index.astro
+- astro.config.ts
+- tsconfig.astro.json
+</FileTree>
+
+Your project should have at the very least:
+
+- An Astro config file (`astro.config.ts`).
+- A TypeScript config file for Astro components (`tsconfig.astro.json`).
+- A `pages` directory for your components.
+
+## Start Mighty's development and production servers
+
+Mighty provides helper functions to start the development server, build assets, and start the production server:
+
+```ts
+import { dev, build, start } from "@gomighty/core";
+
+// Start the development server
+await dev();
+
+// Build assets
+await build();
+
+// Start the production server
+await start();
+```
+
+All helper functions accept an object with the following options:
+
+```ts
+export type MightyServerOptions = {
+  config?: AstroUserConfig;
+  hooks?: {
+    "mighty:server:start"?: (options: {
+      address: AddressInfo;
+    }) => void | Promise<void>;
+  };
+};
+```
+
+### `config` option
+
+A custom Astro configuration.
+
+You should use this to point to the Astro root [you set up earlier](#set-up-the-project-structure).
+
+This is also useful if you want to automatically provide your own [Astro integration](https://docs.astro.build/en/reference/integrations-reference).
+
+<Aside>
+The configuration from the `config` option is automatically merged with the Astro config file and Mighty's own configuration.
+
+If there is a configuration value conflict, Mighty's configuration overrides the `config` option, which in turn overrides the Astro config file.
+
+</Aside>
+
+### `hooks` option
+
+A series of events to hook into the Mighty pipeline.
+
+Use the `mighty:server:start` hook to get the Mighty server's address.
+
+This is useful when you want to send the server's host and port to your backend.
+
+## Render Astro components from your backend code
+
+We assume your backend has knowledge about Mighty's server host and port (e.g. `http://localhost:4321`).
+
+You can now call the server on the `/render` endpoint to render Astro components:
+
+```ts
+const res = await fetch("http://localhost:4321", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    component: "posts.index",
+    props: { id: 1 },
+    context: { backendVersion: "v1.2.0" },
+  }),
+});
+const astroComponentBody = await res.text();
+```
+
+The `/render` endpoint accepts a JSON body with the following options:
+
+```ts
+export type MightyRenderRequest = {
+  component: string;
+  props?: Record<string, unknown>;
+  context?: Record<string, unknown>;
+};
+```
+
+### `component` option
+
+The name of the Astro component to render, in dot notation.
+
+`posts.index` refers to the following path:
+
+<FileTree>
+- astro
+  - pages
+    - posts
+      - **index.astro**
+</FileTree>
+
+### `props` option
+
+An object containing the props to pass to the Astro component.
+
+These are available as `Astro.props` inside the component.
+
+### `context` option
+
+An object containing additional request data.
+
+This can be used to pass shared data that you want to pass to all components, or backend-related info (e.g. user data).
+
+## Provide helper functions
+
+You might want to provide a way to access data from [the Mighty render context](#context-option).
+
+To do so, you can use Mighty's `getContext` helper function:
+
+```ts
+import { getContext } from "@gomighty/core";
+
+export function getBackendVersion() {
+  const context = getContext<{ backendVersion: string }>();
+  return context.backendVersion;
+}
+```

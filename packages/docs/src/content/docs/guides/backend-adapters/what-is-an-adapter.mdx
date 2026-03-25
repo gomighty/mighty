@@ -1,0 +1,28 @@
+---
+title: What is an adapter?
+description: Understand what Mighty backend adapters are, and how they work to make integrating Astro with your backend seamless.
+sidebar:
+  order: 1
+---
+
+Backend adapters are what connect Mighty to your backend framework. They have two main responsibilities:
+
+- Rendering Astro components on your backend.
+- Providing backend context (request info, user info, etc.) to your Astro components.
+
+While Mighty's [development server](/guides/core-concepts/development-server) and [production server](/guides/core-concepts/production-server) provide core functionality, adapters are highly specific to the backend you are using.
+
+## Available adapters
+
+We officially support the following backend adapters:
+
+- [Laravel](/guides/backend-adapters/laravel)
+- [Hono](/guides/backend-adapters/hono)
+
+## Write your own adapter
+
+If your backend doesn't have an adapter yet, you can write your own!
+
+Mighty provides a unified backend adapter interface, making it easy to implement initial support for other backends, then progressively add features as you go.
+
+Learn how to integrate Mighty with your backend in the [**Write Your Own Adapter**](/guides/backend-adapters/write-your-own-adapter) guide.
