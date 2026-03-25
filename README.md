@@ -1,15 +1,26 @@
-# core
+# Mighty
 
-To install dependencies:
+Monorepo for Mighty packages and docs.
 
-```bash
-bun install
-```
-
-To run:
+## Install
 
 ```bash
-bun run index.ts
+pnpm install
 ```
 
-This project was created using `bun init` in bun v1.2.12. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## Workspace checks
+
+```bash
+pnpm build
+pnpm run typecheck
+pnpm run ci:biome
+pnpm test
+```
+
+## Docs
+
+The docs site lives in [`packages/docs/`](./packages/docs).
+
+```bash
+pnpm --dir packages/docs dev
+```

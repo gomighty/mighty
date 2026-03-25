@@ -1,0 +1,372 @@
+---
+title: Laravel
+description: Install Mighty in your Laravel project, and learn how to render Astro components from your controllers or inside your Blade/Livewire views.
+sidebar:
+  order: 2
+---
+
+import { Aside, FileTree } from "@astrojs/starlight/components";
+
+The Laravel backend adapter integrates Mighty with your Laravel project, allowing you to render Astro components from your controllers or within your Blade/Livewire views.
+
+## Installation
+
+Refer to [the installation guide](/guides/hello-world/installation) to use Mighty in a new project, or an existing one.
+
+[A Laravel starter kit](/guides/hello-world/installation#laravel-starter-kit) for Mighty is also available.
+
+## Getting started
+
+### Project structure
+
+Once you are done setting up Mighty in your Laravel project, you should have the following structure in place:
+
+{/* prettier-ignore */}
+<FileTree>
+- resources
+  - astro
+    - components
+      - Welcome.astro
+    - layouts
+      - Layout.astro
+    - pages
+      - **index.astro**
+- astro.config.ts
+- tsconfig.astro.json
+</FileTree>
+
+<Aside type="caution">
+Mighty will **only** detect and render Astro components inside the `pages` directory.
+
+Components inside other directories (e.g. `components` and `layouts`) will not be detected, but can be used in components inside the `pages` directory.
+
+</Aside>
+
+### Run the development server
+
+To start the development server, run the following command:
+
+```shell
+php artisan mighty:dev
+```
+
+This will start a server that renders Astro components on-demand, with Hot Module Replacement (HMR) included for fast updates.
+
+### Start the production server
+
+Before starting the production server, first build optimized versions of your components:
+
+```shell
+php artisan mighty:build
+```
+
+You can then start the production server with the following command:
+
+```shell
+php artisan mighty:start
+```
+
+This will start a server that either returns static Astro components or renders them on-demand, depending on your rendering strategy.
+
+<Aside>
+You only need to run either the development server or the production server.
+
+When rendering Astro components from Laravel, Mighty will automatically detect which server is running, and serve the appropriate versions of your components.
+
+</Aside>
+
+### Render Astro components from controllers
+
+You can use Astro as a rendering engine for your application by returning Astro components from your controllers.
+
+```php title="app/Http/Controllers/PostController.php" {11-13}
+<?php
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use Mighty\MightyResponse;
+
+class PostController extends Controller
+{
+    public function index(): MightyResponse
+    {
+        return mighty('posts.index', [
+            'posts' => Post:all(),
+        ]);
+    }
+}
+```
+
+This will render the following Astro component and pass it the `posts` prop:
+
+{/* prettier-ignore */}
+<FileTree>
+- resources
+  - astro
+    - pages
+      - posts
+        - **index.astro**
+</FileTree>
+
+You can then use the `posts` prop in your Astro component:
+
+```astro title="resources/astro/pages/posts/index.astro"
+---
+interface Props {
+  posts: { id: number; title: string; content: string }[];
+}
+
+const { posts } = Astro.props;
+---
+
+<ul>
+  {
+    posts.map((post) => (
+      <li>
+        <h2>{post.title}</h2>
+        <p>{post.content}</p>
+      </li>
+    ))
+  }
+</ul>
+```
+
+### Render Astro components inside Blade/Livewire views
+
+You can use Astro inside your Blade/Livewire views, with a syntax similar to rendering Livewire components.
+
+This can be very useful when you need to use UI frameworks for a specific use-case, e.g. React Flow for interactive diagrams.
+
+```blade title="resources/views/index.blade.php" ins={4}
+<mighty:posts.index :posts="$posts">
+<!-- Or, for short -->
+<mighty:posts.index :$posts>
+```
+
+This will render the following Astro component and pass it the `posts` prop:
+
+{/* prettier-ignore */}
+<FileTree>
+- resources
+  - astro
+    - pages
+      - posts
+        - **index.astro**
+</FileTree>
+
+You can then use the `posts` prop in your Astro component:
+
+```astro title="resources/astro/pages/posts/index.astro"
+---
+interface Props {
+  posts: { id: number; title: string; content: string }[];
+}
+
+const { posts } = Astro.props;
+---
+
+<ul>
+  {
+    posts.map((post) => (
+      <li>
+        <h2>{post.title}</h2>
+        <p>{post.content}</p>
+      </li>
+    ))
+  }
+</ul>
+```
+
+### Shared properties
+
+You might want to pass properties to every Astro component, such as the current user or notification content.
+
+To do this, use the `share` method in one of your service providers (typically `AppServiceProvider`):
+
+```php title="AppServiceProvider.php" {22-24}
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\Facades\View;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        // ...
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        mighty()->share(fn () => [
+            'user' => auth()->user(),
+        ]);
+    }
+}
+```
+
+You can use shared properties in your Astro component by using the `shared` function:
+
+```astro
+---
+import { shared } from "@gomighty/laravel";
+
+const { user } = shared<{ user: { id: number; name: string } | null }>();
+---
+
+{user !== null ? `Welcome back, ${user.name}!` : "Please log in!"}
+```
+
+<Aside>
+  We plan to implement type safety for shared properties, similar to what
+  [Hybridly](https://hybridly.dev/) does.
+</Aside>
+
+### Routing
+
+<Aside>
+We plan to have first-class support for routing inside Astro components.
+
+In the meantime, you can use [Ziggy](https://github.com/tighten/ziggy) or [Laravel Wayfinder](https://github.com/laravel/wayfinder/) to retrieve your Laravel routes and controllers from Astro components.
+
+</Aside>
+
+### Using the Astro render context
+
+You can use Astro render context properties, such as `Astro.request`, just like you would in a standard Astro project.
+
+```astro
+---
+interface Props {
+  posts: { id: number; title: string; content: string }[];
+}
+
+const { posts } = Astro.props;
+
+const isBot =
+  Astro.request.headers.get("User-Agent")?.startsWith("curl") ?? false;
+---
+
+{
+  isBot ? (
+    <p>Hey, no scraping!</p>
+  ) : (
+    <ul>
+      {posts.map((post) => (
+        <li>
+          <h2>{post.title}</h2>
+          <p>{post.content}</p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+```
+
+### Laravel-specific utilities
+
+<Aside>
+  This part is a work in progress, as we add more and more utilities!
+</Aside>
+
+In addition to the Astro render context, Mighty provides the following utilities:
+
+- A `user` function for getting the current user:
+
+  ```astro
+  ---
+  import { user } from "@gomighty/laravel";
+
+  const currentUser = user<{ id: number; name: string } | null>(); // or user('guard')
+  ---
+
+  {
+    currentUser !== null
+      ? `Welcome back, ${currentUser.name}!`
+      : "Please log in!"
+  }
+  ```
+
+- A `session` function to get session info:
+
+  ```astro
+  ---
+  import { session } from "@gomighty/laravel";
+
+  const { numberOfProductsInCart } = session<{
+    numberOfProductsInCart: number;
+  }>();
+  // or
+  const numberOfProductsInCart = session<number>("numberOfProductsInCart");
+  ---
+
+  <p>You have {numberOfProductsInCart} products in your cart.</p>
+  ```
+
+  <Aside>First-class support for Astro sessions is on the roadmap!</Aside>
+
+- An `errors` function to get validation errors:
+
+  ```astro
+  ---
+  import { errors } from "@gomighty/laravel";
+
+  const { email: emailError } = errors(); // or errors('errorBag')
+  ---
+
+  <form method="POST" action="/profile">
+    <label>
+      E-mail
+      <input required type="email" name="email" />
+    </label>
+    {emailError && <p>{emailError}</p>}
+  </form>
+  ```
+
+- A `csrfToken` function and a `<CSRF>` component for form submission:
+
+  ```astro
+  ---
+  import { csrfToken, CSRF } from "@gomighty/laravel";
+  ---
+
+  <form method="POST" action="/profile">
+    <input type="hidden" name="_token" value={csrfToken()} />
+    <!-- or... -->
+    <CSRF />
+
+    <label>
+      E-mail
+      <input required type="email" name="email" />
+    </label>
+  </form>
+  ```
+
+- A `<Method>` component for form method spoofing:
+
+  ```astro
+  ---
+  import { CSRF, Method } from "@gomighty/laravel";
+  ---
+
+  <form method="POST" action="/profile">
+    <CSRF />
+    <Method put />
+
+    <label>
+      E-mail
+      <input required type="email" name="email" />
+    </label>
+  </form>
+  ```
+
+## Manual setup
+
+<Aside>Check back later for instructions on setting up Mighty manually!</Aside>

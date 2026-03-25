@@ -47,6 +47,17 @@
           }
         }
       }
+    },
+    {
+      "includes": ["packages/docs/src/styles/custom.css"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnknownProperty": "off",
+            "noUnknownTypeSelector": "off"
+          }
+        }
+      }
     }
   ]
 }

@@ -1,0 +1,113 @@
+---
+title: Roadmap
+description: Learn what Mighty has in store for next versions, including Actions, Sessions and more.
+---
+
+Mighty is very much a work in progress, and is still feature-incomplete.
+
+Here is a peek at some features we plan to implement.
+
+## Actions
+
+Mighty plans to fully support [Astro Actions](https://docs.astro.build/en/guides/actions/).
+
+You will be able to define actions in your backend:
+
+```php {10}
+<?php
+
+namespace App\Actions;
+
+use App\Requests\CreatePostRequest;
+use Mighty\Attributes\Action;
+
+class CreatePostAction
+{
+    #[Action('createPost')]
+    public function handle(CreatePostRequest $request): void
+    {
+        Post::create($request->validated());
+    }
+}
+```
+
+... then use them in your Astro components:
+
+```astro
+---
+import { actions } from "astro:actions";
+
+const result = Astro.getActionResult(actions.createPost);
+const inputErrors = isInputError(result?.error) ? result.error.fields : {};
+---
+
+<form method="POST" action={actions.createPost}>
+  <label>
+    E-mail
+    <input required type="email" name="email" />
+  </label>
+  {inputErrors.email && <p>{inputErrors.email}</p>}
+</form>
+```
+
+## Sessions
+
+Mighty plans to support additional drivers for [Astro Sessions](https://docs.astro.build/en/guides/sessions/).
+
+You will be able to write session keys in your backend:
+
+```php title="app/Http/Controllers/PostController.php" {11}
+<?php
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use Mighty\MightyResponse;
+
+class PostController extends Controller
+{
+    public function index(): MightyResponse
+    {
+        session()->put(['isThisWorking' => true])
+        return mighty('posts.index', [
+            'posts' => Post:all(),
+        ]);
+    }
+}
+```
+
+... then use these keys in your Astro components:
+
+```astro title="resources/astro/pages/posts/index.astro"
+---
+interface Props {
+  posts: { id: number; title: string; content: string }[];
+}
+
+const { posts } = Astro.props;
+
+const isThisWorking = await Astro.session?.get("isThisWorking");
+---
+
+{isThisWorking && <p>Sessions work!</p>}
+
+<ul>
+  {
+    posts.map((post) => (
+      <li>
+        <h2>{post.title}</h2>
+        <p>{post.content}</p>
+      </li>
+    ))
+  }
+</ul>
+```
+
+## SPA Mode
+
+We plan to implement an SPA mode in Mighty, with routing, form handling, and more baked-in.
+
+Mighty will eventually aim to be a drop-in replacement for Inertia.js, with support for more frontend frameworks and deeper integration with the backend.
+
+## File-based Routing
+
+We plan to implement some sort of file-based routing, though we need to iron out the details.

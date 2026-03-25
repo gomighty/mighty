@@ -1,0 +1,235 @@
+---
+title: Hono
+description: Install Mighty in your Hono project, and learn how to render Astro components from your Hono code.
+sidebar:
+  order: 3
+---
+
+import { Aside, FileTree } from "@astrojs/starlight/components";
+import PackageManagerTabs from "@/components/PackageManagerTabs.astro";
+
+The Hono backend adapter integrates Mighty with your Hono project, allowing you to render Astro components from your Hono code.
+
+## Installation
+
+Refer to [the installation guide](/guides/hello-world/installation) to use Mighty in a new project, or an existing one.
+
+## Getting started
+
+### Project structure
+
+Once you are done setting up Mighty in your Hono project, you should have the following structure in place:
+
+{/* prettier-ignore */}
+<FileTree>
+- astro
+  - components
+    - Welcome.astro
+  - layouts
+    - Layout.astro
+  - pages
+    - **index.astro**
+- astro.config.ts
+- tsconfig.astro.json
+</FileTree>
+
+<Aside type="caution">
+Mighty will **only** detect and render Astro components inside the `pages` directory.
+
+Components inside other directories (e.g. `components` and `layouts`) will not be detected, but can be used in components inside the `pages` directory.
+
+</Aside>
+
+### Run the development server
+
+You can run the development server by using the `startServer` function:
+
+```ts {8}
+import { Hono } from "hono";
+import { startServer } from "@gomighty/hono";
+
+const app = new Hono();
+
+// ...
+
+startServer(app);
+```
+
+This will start a server that renders Astro components on-demand, with Hot Module Replacement (HMR) included for fast updates.
+
+The server will only start **in development** (i.e. when `NODE_ENV=development`), and the `startServer` function will do nothing in production.
+
+<Aside>
+When using Hono, Mighty runs the development server in [**middleware mode**](https://vite.dev/config/server-options.html#server-middlewaremode).
+
+This means the development server is not standalone and will not take up a port.
+
+</Aside>
+
+### Build production assets
+
+Before using Mighty in production, first build optimized versions of your components:
+
+{/* prettier-ignore */}
+<PackageManagerTabs>
+  <Fragment slot="npm">
+  ```shell
+  # build assets with npm
+  npx @gomighty/hono build
+  ```
+  </Fragment>
+  <Fragment slot="pnpm">
+  ```shell
+  # build assets with pnpm
+  pnpx @gomighty/hono build
+  ```
+  </Fragment>
+  <Fragment slot="bun">
+  ```shell
+  # build assets with bun
+  bunx @gomighty/hono build
+  ```
+  </Fragment>
+</PackageManagerTabs>
+
+Mighty will now use render optimized Astro components either statically or on-demand, depending on your rendering strategy.
+
+<Aside>
+  When using Hono, you do not need to run a separate production server.
+</Aside>
+
+### Render Astro components from Hono code
+
+You can use Astro as a rendering engine for your application by returning Astro components from your Hono code.
+
+```ts {7-10}
+import { Hono } from "hono";
+import { db } from "./lib/db";
+import { startServer, render } from "@gomighty/hono";
+
+const app = new Hono();
+
+app.get("/", async (c) => {
+  const posts = await db.getPosts();
+  return render(c, "posts.index", { posts });
+});
+
+startServer(app);
+```
+
+This will render the following Astro component and pass it the `posts` prop:
+
+{/* prettier-ignore */}
+<FileTree>
+- astro
+  - pages
+    - posts
+      - **index.astro**
+</FileTree>
+
+You can then use the `posts` prop in your Astro component:
+
+```astro title="resources/astro/pages/posts/index.astro"
+---
+interface Props {
+  posts: { id: number; title: string; content: string }[];
+}
+
+const { posts } = Astro.props;
+---
+
+<ul>
+  {
+    posts.map((post) => (
+      <li>
+        <h2>{post.title}</h2>
+        <p>{post.content}</p>
+      </li>
+    ))
+  }
+</ul>
+```
+
+### Shared properties
+
+You might want to pass properties to every Astro component, such as the current user or notification content.
+
+To do this, use the `share` function in your Hono code:
+
+```ts
+import { Hono } from "hono";
+import { db } from "./lib/db";
+import { startServer, render, share } from "@gomighty/hono";
+
+const app = new Hono();
+
+app.get("/", async (c) => {
+  const posts = await db.getPosts();
+  return render(c, "posts.index", { posts });
+});
+
+startServer(app);
+
+share(app, async (c) => {
+  return {
+    user: db.getUser(),
+  };
+});
+```
+
+You can use shared properties in your Astro component by using the `shared` function:
+
+```astro
+---
+import { shared } from "@gomighty/hono";
+
+const { user } = shared<{ user: { id: number; name: string } | undefined }>();
+---
+
+{user ? `Welcome back, ${user.name}!` : "Please log in!"}
+```
+
+### Using the Astro render context
+
+You can use Astro render context properties, such as `Astro.request`, just like you would in a standard Astro project.
+
+```astro
+---
+interface Props {
+  posts: { id: number; title: string; content: string }[];
+}
+
+const { posts } = Astro.props;
+
+const isBot =
+  Astro.request.headers.get("User-Agent")?.startsWith("curl") ?? false;
+---
+
+{
+  isBot ? (
+    <p>Hey, no scraping!</p>
+  ) : (
+    <ul>
+      {posts.map((post) => (
+        <li>
+          <h2>{post.title}</h2>
+          <p>{post.content}</p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+```
+
+### Hono-specific utilities
+
+<Aside>
+Do you need any Hono-specific utilities?
+
+Let us know by opening an issue or submitting a pull request!
+
+</Aside>
+
+## Manual setup
+
+<Aside>Check back later for instructions on setting up Mighty manually!</Aside>

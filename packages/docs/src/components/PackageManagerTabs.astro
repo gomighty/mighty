@@ -1,0 +1,15 @@
+---
+import { TabItem, Tabs } from "@astrojs/starlight/components";
+---
+
+<Tabs syncKey="package-managers">
+  <TabItem label="npm">
+    <slot name="npm" />
+  </TabItem>
+  <TabItem label="pnpm">
+    <slot name="pnpm" />
+  </TabItem>
+  <TabItem label="bun">
+    <slot name="bun" />
+  </TabItem>
+</Tabs>

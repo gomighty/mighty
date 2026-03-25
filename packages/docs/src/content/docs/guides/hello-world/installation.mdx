@@ -1,0 +1,67 @@
+---
+title: Installation
+description: Learn how to install Mighty in your new or existing project.
+sidebar:
+  order: 3
+---
+
+import { Aside } from "@astrojs/starlight/components";
+import PackageManagerTabs from "@/components/PackageManagerTabs.astro";
+
+<Aside type="caution">
+  This is very likely to change as the project is in a README-driven development
+  phase.
+</Aside>
+
+Ready to take Mighty for a spin?
+
+The easiest way to install Mighty is by using the [`create-mighty`](#install-with-create-mighty) CLI command, which will guide you through the setup process.
+
+If you are using Laravel, a [Laravel starter kit](#laravel-starter-kit) is also available.
+
+## Install with create-mighty
+
+Run the following command in a new or existing project to get started:
+
+{/* prettier-ignore */}
+<PackageManagerTabs>
+  <Fragment slot="npm">
+  ```shell
+  # create a new project with npm
+  npm create mighty@latest
+  ```
+  </Fragment>
+  <Fragment slot="pnpm">
+  ```shell
+  # create a new project with pnpm
+  pnpm create mighty@latest
+  ```
+  </Fragment>
+  <Fragment slot="bun">
+  ```shell
+  # create a new project with bun
+  bun create mighty@latest
+  ```
+  </Fragment>
+</PackageManagerTabs>
+
+For new projects (if no compatible project is found in the current directory), the `create-mighty` CLI command will prompt you to create a new directory and set up a new project.
+
+For existing Laravel and Hono projects, the `create-mighty` CLI command will install the corresponding adapter and make it possible to run Mighty inside your development environment.
+
+## Laravel starter kit
+
+A Laravel starter kit for Mighty is also available through the Laravel installer.
+
+Make sure [the Laravel installer is available](https://laravel.com/docs/12.x/installation#installing-php), then run the command below:
+
+```shell
+laravel new my-app --using=gomighty/laravel-starter-kit
+```
+
+## Manual setup
+
+To manually set up Mighty, refer to the instructions your backend adapter provides:
+
+- [Laravel](/guides/backend-adapters/laravel#manual-setup)
+- [Hono](/guides/backend-adapters/hono#manual-setup)

@@ -1,0 +1,30 @@
+{
+  "name": "@gomighty/docs",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "typecheck": "astro check"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.38.2",
+    "astro": "catalog:",
+    "motion": "^12.23.12",
+    "sharp": "^0.34.2",
+    "starlight-links-validator": "^0.20.1"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2",
+    "prettier-plugin-astro": "0.14.1",
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.9.3"
+  }
+}

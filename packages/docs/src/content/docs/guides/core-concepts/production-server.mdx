@@ -1,0 +1,32 @@
+---
+title: The production server
+description: Learn about Mighty's production server, how it renders optimized Astro components on-demand, and how to run it with your specific backend adapter.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Mighty provides a production server, based on Hono, that renders Astro components on-demand.
+
+<Aside>
+When using Hono, Mighty provides helper functions to render Astro components.
+
+In this case, there is no need to run a separate server.
+
+</Aside>
+
+## How it works
+
+Mighty first builds optimized versions of your components through the Astro build process.
+
+Then, when starting the production server, Mighty:
+
+1. Renders the optimized components.
+1. Provides necessary logic for UI renderers (e.g. React) and styling to work.
+
+In addition, backend adapters may perform additional tasks for better integration, e.g. injecting Astro styles in the `<head>` tag of Blade views (for Laravel).
+
+## Run the production server
+
+To run the production server, refer to the instructions your backend adapter provides:
+
+- [Laravel](/guides/backend-adapters/laravel#start-the-production-server)
