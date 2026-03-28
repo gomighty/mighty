@@ -5,7 +5,7 @@ import type { UnofficialStatusCode } from "hono/utils/http-status";
 import type { MightyMiddlewareHandler } from "./types";
 import { runConnectMiddleware } from "./utils/runConnectMiddleware.ts";
 
-const MIGHTY_DEV_ROOT = "/__MIGHTY_DEV_ADDRESS__";
+const MIGHTY_DEV_ROOT = "/__mighty__";
 
 export function devMiddleware(
   options?: MightyServerOptions,
