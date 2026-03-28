@@ -4,17 +4,15 @@ import type { AstroInlineConfig } from "astro";
 import { mergeConfig } from "astro/config";
 import { toFetchResponse, toReqRes } from "fetch-to-node";
 import { build } from "@/build";
-import { setupDev } from "@/dev/setup";
-import { setupStart } from "@/start/setup";
+import { dev } from "@/dev";
+import { start } from "@/start";
 import type { MightyRenderRequest, MightyServerOptions } from "@/types";
 import { dotStringToPath } from "@/utils/dotStringToPath";
 
 export type DevRenderFunction = (
   req: MightyRenderRequest,
 ) => Promise<{ status: number; content: string }>;
-export type StartRenderFunction = Awaited<
-  ReturnType<typeof setupStart>
->["render"];
+export type StartRenderFunction = Awaited<ReturnType<typeof start>>["render"];
 
 export type GetFromViteMiddlewareFunction = (
   path: string,
@@ -72,7 +70,7 @@ export function getFixture(fixtureName: string): {
         render: rawRender,
         stop: stopDevServer,
         viteMiddleware,
-      } = await setupDev({
+      } = await dev({
         ...params,
         config: mergeConfig<AstroInlineConfig>(
           {
@@ -125,7 +123,7 @@ export function getFixture(fixtureName: string): {
       });
     },
     startProdServer: async (params?: MightyServerOptions) => {
-      const { render } = await setupStart({
+      const { render } = await start({
         config: mergeConfig<AstroInlineConfig>(
           {
             root: fixtureRoot,
