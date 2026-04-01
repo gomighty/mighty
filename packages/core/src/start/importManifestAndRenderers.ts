@@ -4,9 +4,6 @@ import { getBuildPathsFromInlineConfig } from "@/utils/getBuildPathsFromInlineCo
 
 /**
  * Import the manifest and renderers from the Astro build.
- *
- * HACK: We invalidate import caching for both the manifest and renderers,
- * so that tests expecting different manifests do not fail here.
  */
 export async function importManifestAndRenderers(
   config: AstroInlineConfig,
@@ -14,9 +11,7 @@ export async function importManifestAndRenderers(
   const { buildServerPath } = getBuildPathsFromInlineConfig(config);
 
   try {
-    const entryModule = await import(
-      path.join(buildServerPath, `entry.mjs?invalidateCache=${Math.random()}`)
-    );
+    const entryModule = await import(path.join(buildServerPath, "entry.mjs"));
     const manifest: SSRManifest = entryModule.manifest;
     const renderers: SSRLoadedRenderer[] = manifest.renderers ?? [];
     return { manifest, renderers };
