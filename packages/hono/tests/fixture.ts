@@ -94,7 +94,15 @@ export function getFixture(fixtureName: string): {
       const middleware = devMiddleware({
         ...params,
         config: mergeConfig<AstroInlineConfig>(
-          { root: fixtureRoot, logLevel: "warn" },
+          {
+            root: fixtureRoot,
+            logLevel: "warn",
+            vite: {
+              server: {
+                ws: false,
+              },
+            },
+          },
           params?.config ?? {},
         ),
       });

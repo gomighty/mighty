@@ -76,6 +76,11 @@ export function getFixture(fixtureName: string): {
           {
             root: fixtureRoot,
             logLevel: "warn",
+            vite: {
+              server: {
+                ws: false,
+              },
+            },
           },
           params?.config ?? {},
         ),
