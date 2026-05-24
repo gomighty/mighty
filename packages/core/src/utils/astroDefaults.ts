@@ -10,8 +10,8 @@ export function getAstroSampleIntegrationLogger(
 ): AstroIntegrationLogger {
   return {
     options: {
-      dest: {
-        write: () => true,
+      destination: {
+        write: () => {},
       },
       level: "silent",
     },
@@ -21,5 +21,7 @@ export function getAstroSampleIntegrationLogger(
     error: () => {},
     debug: () => {},
     fork: getAstroSampleIntegrationLogger,
+    flush: () => {},
+    close: () => {},
   };
 }

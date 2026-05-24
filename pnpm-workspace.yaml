@@ -1,6 +1,12 @@
 packages:
   - "packages/*"
+allowBuilds:
+  esbuild: true
+  sharp: true
 catalog:
-  astro: "^6.0.4"
-  hono: "^4.9.9"
-  "@hono/node-server": "^1.19.5"
+  astro: "^6.3.7"
+  hono: "^4.12.22"
+  "@hono/node-server": "^2.0.3"
+onlyBuiltDependencies:
+  - esbuild
+  - sharp

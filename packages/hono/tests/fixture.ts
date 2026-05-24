@@ -43,18 +43,29 @@ export function getFixture(fixtureName: string): {
   );
 
   const clean = async (): Promise<void> => {
-    await rm(outDir, { recursive: true, force: true });
+    await rm(outDir, {
+      recursive: true,
+      force: true,
+      maxRetries: 5,
+      retryDelay: 100,
+    });
     await rm(path.join(fixtureRoot, "dist"), {
       recursive: true,
       force: true,
+      maxRetries: 5,
+      retryDelay: 100,
     });
     await rm(path.join(fixtureRoot, ".astro"), {
       recursive: true,
       force: true,
+      maxRetries: 5,
+      retryDelay: 100,
     });
     await rm(path.join(fixtureRoot, "node_modules"), {
       recursive: true,
       force: true,
+      maxRetries: 5,
+      retryDelay: 100,
     });
   };
 
