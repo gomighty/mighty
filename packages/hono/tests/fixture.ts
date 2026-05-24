@@ -1,4 +1,5 @@
-import { rm } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
+import { cpSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { build } from "@gomighty/core/build";
 import type { MightyServerOptions } from "@gomighty/core/types";
@@ -15,6 +16,9 @@ type AppEnv = {
   };
 };
 
+const FIXTURES_DIR = path.join(import.meta.dirname, "..", "fixtures");
+const TMP_DIR = path.join(FIXTURES_DIR, ".tmp");
+
 export function getFixture(fixtureName: string): {
   fixtureRoot: string;
   outDir: string;
@@ -30,44 +34,20 @@ export function getFixture(fixtureName: string): {
   };
   clean: () => Promise<void>;
 } {
-  const fixtureRoot = path.join(
-    import.meta.dirname,
-    "..",
-    "fixtures",
-    fixtureName,
-  );
+  const sourceFixtureRoot = path.join(FIXTURES_DIR, fixtureName);
 
-  const outDir = path.join(
-    fixtureRoot,
-    `dist-${Math.random().toString(36).substring(2, 15)}`,
-  );
+  const uniqueId = randomBytes(6).toString("hex");
+  const fixtureRoot = path.join(TMP_DIR, uniqueId);
+  mkdirSync(TMP_DIR, { recursive: true });
+  cpSync(sourceFixtureRoot, fixtureRoot, { recursive: true });
 
-  const clean = async (): Promise<void> => {
-    await rm(outDir, {
-      recursive: true,
-      force: true,
-      maxRetries: 5,
-      retryDelay: 100,
-    });
-    await rm(path.join(fixtureRoot, "dist"), {
-      recursive: true,
-      force: true,
-      maxRetries: 5,
-      retryDelay: 100,
-    });
-    await rm(path.join(fixtureRoot, ".astro"), {
-      recursive: true,
-      force: true,
-      maxRetries: 5,
-      retryDelay: 100,
-    });
-    await rm(path.join(fixtureRoot, "node_modules"), {
-      recursive: true,
-      force: true,
-      maxRetries: 5,
-      retryDelay: 100,
-    });
-  };
+  const outDir = path.join(fixtureRoot, "dist");
+
+  // Each getFixture() call creates a unique fixtureRoot under fixtures/.tmp/,
+  // so outDir, .astro, dist, and node_modules/.vite are never shared between
+  // tests. The whole .tmp/ directory is wiped before each test run via
+  // globalSetup, so no cleanup is needed.
+  const clean = async (): Promise<void> => {};
 
   return {
     fixtureRoot,

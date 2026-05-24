@@ -9,5 +9,6 @@ export default defineConfig({
       "@tests/": `${path.resolve(import.meta.dirname, "tests")}/`,
     },
     testTimeout: 30000,
+    globalSetup: ["./tests/globalSetup.ts"],
   },
 });
