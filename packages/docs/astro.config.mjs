@@ -42,15 +42,15 @@ export default defineConfig({
       sidebar: [
         {
           label: "Hello, World!",
-          autogenerate: { directory: "guides/hello-world" },
+          items: [{ autogenerate: { directory: "guides/hello-world" } }],
         },
         {
           label: "Core Concepts",
-          autogenerate: { directory: "guides/core-concepts" },
+          items: [{ autogenerate: { directory: "guides/core-concepts" } }],
         },
         {
           label: "Backend Adapters",
-          autogenerate: { directory: "guides/backend-adapters" },
+          items: [{ autogenerate: { directory: "guides/backend-adapters" } }],
         },
         {
           slug: "guides/roadmap",

@@ -67,11 +67,13 @@ export async function dev(
             server.listen = async () => {
               return server;
             };
-            // @ts-expect-error - This is a hack to make Astro work in middleware mode
+            // This is a hack to make Astro work in middleware mode
             server.httpServer = {
               address() {
                 return null;
               },
+              // @ts-expect-error - on() is stubbed for vite's font plugin
+              on() {},
             };
             server.bindCLIShortcuts = () => {};
 

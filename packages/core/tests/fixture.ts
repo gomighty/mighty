@@ -49,14 +49,20 @@ export function getFixture(fixtureName: string): {
     await rm(outDir, {
       recursive: true,
       force: true,
+      maxRetries: 5,
+      retryDelay: 100,
     });
     await rm(path.join(fixtureRoot, ".astro"), {
       recursive: true,
       force: true,
+      maxRetries: 5,
+      retryDelay: 100,
     });
     await rm(path.join(fixtureRoot, "node_modules"), {
       recursive: true,
       force: true,
+      maxRetries: 5,
+      retryDelay: 100,
     });
   };
 
