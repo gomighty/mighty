@@ -1,4 +1,5 @@
-import { rm } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
+import { cpSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import type { AstroInlineConfig } from "astro";
 import { mergeConfig } from "astro/config";
@@ -18,6 +19,9 @@ export type GetFromViteMiddlewareFunction = (
   path: string,
 ) => Promise<Response | undefined>;
 
+const FIXTURES_DIR = path.join(import.meta.dirname, "..", "fixtures");
+const TMP_DIR = path.join(FIXTURES_DIR, ".tmp");
+
 export function getFixture(fixtureName: string): {
   fixtureRoot: string;
   outDir: string;
@@ -33,38 +37,24 @@ export function getFixture(fixtureName: string): {
   }>;
   clean: () => Promise<void>;
 } {
-  const fixtureRoot = path.join(
-    import.meta.dirname,
-    "..",
-    "fixtures",
+  const sourceFixtureRoot = path.join(
+    FIXTURES_DIR,
     ...dotStringToPath(fixtureName),
   );
 
-  const outDir = path.join(
-    fixtureRoot,
-    `dist-${Math.random().toString(36).substring(2, 15)}`,
-  );
+  const uniqueId = randomBytes(6).toString("hex");
+  const fixtureRoot = path.join(TMP_DIR, uniqueId);
+  mkdirSync(TMP_DIR, { recursive: true });
+  cpSync(sourceFixtureRoot, fixtureRoot, { recursive: true });
 
-  const clean = async () => {
-    await rm(outDir, {
-      recursive: true,
-      force: true,
-      maxRetries: 5,
-      retryDelay: 100,
-    });
-    await rm(path.join(fixtureRoot, ".astro"), {
-      recursive: true,
-      force: true,
-      maxRetries: 5,
-      retryDelay: 100,
-    });
-    await rm(path.join(fixtureRoot, "node_modules"), {
-      recursive: true,
-      force: true,
-      maxRetries: 5,
-      retryDelay: 100,
-    });
-  };
+  const outDir = path.join(fixtureRoot, "dist");
+
+  // Each getFixture() call creates a unique fixtureRoot under fixtures/.tmp/,
+  // so outDir, .astro, and node_modules/.vite are never shared between tests.
+  // The whole .tmp/ directory is wiped before each test run via globalSetup,
+  // so no cleanup is needed (and skipping it avoids racing with the vite
+  // optimizer that may still be writing to .vite after viteServer.close()).
+  const clean = async () => {};
 
   const DEV_TEST_ADDRESS = "http://host-placeholder.test";
 
@@ -110,10 +100,7 @@ export function getFixture(fixtureName: string): {
             toFetchResponse(res).then(resolve);
           });
         },
-        stop: async () => {
-          await stopDevServer();
-          await clean();
-        },
+        stop: stopDevServer,
       };
     },
     build: async (params?: MightyServerOptions) => {
@@ -147,9 +134,7 @@ export function getFixture(fixtureName: string): {
 
       return {
         render,
-        stop: async () => {
-          await clean();
-        },
+        stop: async () => {},
       };
     },
     clean,
