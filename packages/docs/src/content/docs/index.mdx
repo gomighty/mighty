@@ -1,15 +1,131 @@
 ---
-title: Welcome to Mighty
-description: Bring your own backend and build Mighty apps with Astro.
+title: Astro, with the backend of your choice
+description: Mighty connects Astro's UI to the backend you already love — Hono, Laravel, or one you write yourself. Render real components from your controllers.
 template: splash
 hero:
-  tagline: Mighty is a framework for building apps with Astro and the backend of your choice.
+  title: 'Bring your<br /><span class="grad-text">own backend.</span>'
+  tagline: 'Mighty connects <b>Astro</b> to the backend you already love — <b>Hono</b>, Laravel, or one you write yourself. Render real components straight from your controllers.'
   actions:
-    - text: Get Started
+    - text: Get started
       link: /guides/hello-world/installation
-      icon: rocket
-    - text: Learn more
-      link: /guides/hello-world/introduction
       icon: right-arrow
-      variant: minimal
+      variant: primary
+    - text: Browse on GitHub
+      link: https://github.com/gomighty/mighty
+      icon: external
+      variant: secondary
 ---
+
+import { Card, CardGrid, LinkButton } from "@astrojs/starlight/components";
+import CodeCards from "@/components/CodeCards.astro";
+import CodeCard from "@/components/CodeCard.astro";
+import HonoLogo from "@/components/HonoLogo.astro";
+import AstroLogo from "@/components/AstroLogo.astro";
+import PackageManagerTabs from "@/components/PackageManagerTabs.astro";
+
+<div class="landing-section">
+
+<span class="eyebrow">How it works</span>
+
+## Two files, end to end
+
+Wire a backend route to an Astro page, hand it typed props, and let Astro render. That is the whole integration.
+
+</div>
+
+<CodeCards>
+  <CodeCard file="src/server.ts">
+    <HonoLogo slot="logo" />
+
+    ```ts frame="none"
+    import { Hono } from "hono";
+    import { mighty } from "@gomighty/hono";
+
+    const app = new Hono();
+    app.use(mighty());
+
+    app.get("/posts", async (c) => {
+      const posts = await db.posts.all();
+      // render an Astro page, pass typed props
+      return c.render({ component: "posts.index", props: { posts } });
+    });
+    ```
+
+  </CodeCard>
+  <CodeCard file="astro/pages/posts/index.astro">
+    <AstroLogo slot="logo" />
+
+    ```astro frame="none"
+    ---
+    interface Props {
+      posts: Post[];
+    }
+
+    const { posts } = Astro.props;
+    ---
+
+    <ul class="feed">
+      {posts.map((post) => (
+        <li>
+          <h2>{post.title}</h2>
+          <p>{post.excerpt}</p>
+        </li>
+      ))}
+    </ul>
+    ```
+
+  </CodeCard>
+</CodeCards>
+
+<div class="landing-section">
+
+<span class="eyebrow">Why Mighty</span>
+
+## Bring your stack. Keep your speed.
+
+</div>
+
+<CardGrid>
+  <Card title="Backend-agnostic" icon="puzzle">
+    Hono today, Laravel next, or write your own adapter against a small,
+    documented surface.
+  </Card>
+  <Card title="Astro-native" icon="astro">
+    A real Astro build — dev server with HMR, a production server, and the full
+    integration ecosystem.
+  </Card>
+  <Card title="End-to-end type safety" icon="approve-check-circle">
+    Page names, props, and request context are typed from controller to
+    component. Mistype a page or change a prop, and TypeScript catches it before
+    you ship.
+  </Card>
+</CardGrid>
+
+<div class="landing-cta">
+
+## Ready to build?
+
+<PackageManagerTabs>
+  <Fragment slot="npm">
+  ```sh
+  npm create mighty@latest
+  ```
+  </Fragment>
+  <Fragment slot="pnpm">
+  ```sh
+  pnpm create mighty@latest
+  ```
+  </Fragment>
+  <Fragment slot="bun">
+  ```sh
+  bun create mighty@latest
+  ```
+  </Fragment>
+</PackageManagerTabs>
+
+<div class="landing-buttons">
+  <LinkButton href="/guides/hello-world/installation" icon="right-arrow">Get started</LinkButton>
+  <LinkButton href="https://github.com/gomighty/mighty" variant="secondary" icon="external">Browse on GitHub</LinkButton>
+</div>
+
+</div>

@@ -1,0 +1,123 @@
+---
+/**
+ * A landing-page "hero" code card: bespoke window chrome (macOS dots + a brand
+ * logo + a filename) wrapping a *real* Expressive Code block (passed as the
+ * default slot — author the fence with `frame="none"` so EC renders just the
+ * highlighted code and this card supplies the frame).
+ *
+ * - `file`   — the filename shown in the title bar.
+ * - `logo`   — a named slot for the brand mark (e.g. <HonoLogo slot="logo" />),
+ *              so each card can own its own logo + theme-variant logic.
+ */
+interface Props {
+  file: string;
+}
+
+const { file } = Astro.props;
+---
+
+<div class="code-card">
+  <div class="code-card__head">
+    <span class="code-card__dots" aria-hidden="true">
+      <span class="dot" style="background:#ff5f57"></span>
+      <span class="dot" style="background:#febc2e"></span>
+      <span class="dot" style="background:#28c840"></span>
+    </span>
+    <span class="code-card__logo" aria-hidden="true"><slot name="logo" /></span>
+    <span class="code-card__file">{file}</span>
+  </div>
+  <div class="code-card__body"><slot /></div>
+</div>
+
+<style>
+  .code-card {
+    position: relative;
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.55);
+    transition:
+      transform 0.4s var(--mty-ease),
+      box-shadow 0.4s var(--mty-ease);
+  }
+
+  /* Brand-gradient border, faded in on hover. */
+  .code-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--mty-grad-soft);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s var(--mty-ease);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .code-card:hover {
+    transform: translateY(-5px);
+  }
+  .code-card:hover::before {
+    opacity: 1;
+  }
+
+  .code-card__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.1rem;
+    border-bottom: 1px solid var(--sl-color-hairline);
+    background: var(--sl-color-black);
+  }
+  .code-card__dots {
+    display: inline-flex;
+    gap: 0.5rem;
+  }
+  .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+  }
+
+  /* Logo: monochrome at rest, full brand color on card hover. */
+  .code-card__logo {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.5rem;
+    filter: grayscale(1) opacity(0.5);
+    transition: filter 0.5s var(--mty-ease);
+  }
+  .code-card:hover .code-card__logo {
+    filter: none;
+  }
+  .code-card__logo :global(svg) {
+    height: 16px;
+    width: auto;
+    display: block;
+  }
+
+  .code-card__file {
+    font-family: var(--__sl-font-mono);
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-4);
+  }
+
+  /* Let the card own the frame: strip EC's border / radius / shadow / margin so
+     the real code block sits flush inside the chrome above. */
+  .code-card__body :global(.expressive-code) {
+    margin: 0;
+  }
+  .code-card__body :global(.expressive-code .frame) {
+    box-shadow: none;
+  }
+  .code-card__body :global(.expressive-code pre) {
+    border: 0;
+    border-radius: 0;
+  }
+</style>
