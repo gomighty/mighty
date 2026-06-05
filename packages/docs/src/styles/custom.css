@@ -1,22 +1,333 @@
+/* =============================================================================
+   Mighty docs theme — a CSS-first re-skin on stock Starlight 0.39.
+
+   The brand is expressed by remapping Starlight's own `--sl-color-*` tokens,
+   plus a small set of bespoke `--mty-*` tokens (the gradient + the magenta
+   highlight) that Starlight has no equivalent for. The neutral palette is left
+   untouched on purpose: Starlight 0.39's stock hue-224 dark/light neutrals are
+   exactly what the prototype targets.
+
+   Starlight ships all of its own rules inside `@layer starlight.*`, and custom
+   CSS is imported unlayered — so every override below wins the cascade without
+   needing to out-specify anything.
+   ============================================================================= */
+
 :root {
   --sl-nav-gap: 1rem;
-  --accent-color: 335, 72%, 54%;
 
-  --overlay-color: hsla(var(--accent-color), 0.2);
+  /* ---- Brand palette (bespoke — no Starlight equivalent) ---- */
+  --mty-magenta: #de367b;
+  --mty-magenta-hot: #ff4d92;
+  --mty-indigo: #3f5efb;
+  --mty-indigo-soft: #7c8cff;
+
+  --mty-grad: linear-gradient(
+    125deg,
+    var(--mty-magenta) 0%,
+    #a548c4 48%,
+    var(--mty-indigo) 100%
+  );
+  --mty-grad-soft: linear-gradient(
+    125deg,
+    var(--mty-magenta-hot),
+    var(--mty-indigo-soft)
+  );
+
+  /* Display typeface — applied to headings, the brand wordmark, and the hero.
+     Body and code stay on Starlight's fast system stacks. */
+  --mty-font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
+
+  --mty-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ---- Accent → indigo (dark) ----
+     Remaps Starlight's hue-224 blue accent to the brand indigo. In dark mode
+     `--sl-color-text-accent` resolves to `--sl-color-accent-high`, so that is
+     the soft indigo used for links, the active sidebar entry, FileTree
+     highlights, the active code tab, etc. */
+  --sl-color-accent-low: hsl(230, 56%, 21%);
+  --sl-color-accent: var(--mty-indigo);
+  --sl-color-accent-high: var(--mty-indigo-soft);
 }
 
-[data-has-hero] .page {
-  background:
-    linear-gradient(215deg, var(--overlay-color), transparent 40%),
-    radial-gradient(var(--overlay-color), transparent 40%) no-repeat -60vw -40vh
-    / 105vw 200vh,
-    radial-gradient(var(--overlay-color), transparent 65%) no-repeat 50%
-    calc(100% + 20rem) / 60rem 30rem;
+/* ---- Accent → indigo (light) ----
+   A darker indigo so accents clear WCAG AA on white (#3b45d8 on #fff ≈ 6.9:1).
+   In light mode `--sl-color-text-accent` resolves to `--sl-color-accent`. */
+:root[data-theme="light"] {
+  --sl-color-accent-low: hsl(236, 70%, 91%);
+  --sl-color-accent: #3b45d8;
+  --sl-color-accent-high: hsl(236, 64%, 30%);
 }
 
-:root[data-theme="dark"] {
-  --overlay-color: hsla(var(--accent-color), 0.5);
+/* =============================================================================
+   Typography — display serif on headings + the brand wordmark
+   ============================================================================= */
+
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6),
+h1#_top,
+.site-title {
+  font-family: var(--mty-font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.015em;
 }
+
+/* =============================================================================
+   Prose accents
+   ============================================================================= */
+
+/* Links: indigo at rest (via --sl-color-text-accent), magenta-hot on hover. */
+.sl-markdown-content a:hover:not(:where(.not-content *)) {
+  color: var(--mty-magenta-hot);
+}
+
+/* List markers pick up the magenta highlight. */
+.sl-markdown-content li::marker {
+  color: var(--mty-magenta-hot);
+}
+
+/* =============================================================================
+   Sidebar — current entry
+   Stock Starlight paints the active entry as a solid `--sl-color-text-accent`
+   pill. Re-skin it to a soft indigo tint with normal text color. Only the
+   sidebar uses `aria-current="page"`, so this is safe to target globally.
+   ============================================================================= */
+
+a[aria-current="page"],
+a[aria-current="page"]:hover,
+a[aria-current="page"]:focus {
+  color: var(--sl-color-white);
+  background-color: color-mix(in srgb, var(--mty-indigo) 13%, transparent);
+}
+
+/* =============================================================================
+   Table of contents — active entry gets the magenta pop
+   ============================================================================= */
+
+starlight-toc a[aria-current="true"] {
+  color: var(--mty-magenta-hot);
+}
+/* The mobile TOC marks the active entry with a trailing dot. */
+starlight-toc a[aria-current="true"]::after {
+  background-color: var(--mty-magenta-hot);
+}
+
+/* =============================================================================
+   <Aside> — re-skin the `note` variant only (indigo). Other variants keep
+   their semantic colors. `--sl-color-text-accent` auto-adapts per theme, so the
+   note reads correctly in both light and dark.
+   ============================================================================= */
+
+.starlight-aside--note {
+  --sl-color-asides-text-accent: var(--sl-color-text-accent);
+  --sl-color-asides-border: var(--sl-color-text-accent);
+  background-color: color-mix(in srgb, var(--sl-color-accent) 8%, transparent);
+}
+
+/* =============================================================================
+   <FileTree> — highlighted file becomes a brand-gradient pill (stock Starlight
+   fills it with the flat accent color).
+   ============================================================================= */
+
+starlight-file-tree .highlight {
+  color: #fff;
+  background: var(--mty-grad);
+  box-shadow: 0 4px 14px -6px
+    color-mix(in srgb, var(--mty-magenta) 70%, transparent);
+}
+starlight-file-tree .highlight svg.tree-icon {
+  fill: #fff;
+}
+
+/* =============================================================================
+   <Tabs> — active tab indicator → magenta-hot (used by the install block).
+   ============================================================================= */
+
+.tab [role="tab"][aria-selected="true"] {
+  --sl-tab-color-border: var(--mty-magenta-hot);
+}
+
+/* =============================================================================
+   Expressive Code — frame cosmetics that complement the config styleOverrides
+   (radius/shadow/border live in astro.config). A gentle border lift on hover.
+   ============================================================================= */
+
+.expressive-code .frame {
+  transition: border-color 0.3s var(--mty-ease);
+}
+.expressive-code:hover .frame {
+  border-color: var(--sl-color-gray-4);
+}
+
+/* =============================================================================
+   Small global helpers — used by the landing MDX (and reusable anywhere).
+   ============================================================================= */
+
+/* Gradient-filled inline text (e.g. the hero headline accent word). */
+.grad-text {
+  background: var(--mty-grad-soft);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Eyebrow — a mono, uppercase section kicker with a leading gradient tick. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--__sl-font-mono);
+  font-size: var(--sl-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+}
+.eyebrow::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: var(--mty-grad-soft);
+}
+
+/* =============================================================================
+   Landing page (splash template only, scoped via the `data-has-hero` attribute
+   Starlight sets on <html> for hero pages — so in-docs LinkButtons, Cards, and
+   CardGrids keep Starlight's stock treatment).
+   ============================================================================= */
+
+/* ---- Buttons: gradient primary + ghost secondary ---- */
+[data-has-hero] .sl-link-button.primary {
+  border: 1px solid transparent;
+  background: var(--mty-grad);
+  color: #fff;
+  box-shadow:
+    0 6px 26px -8px color-mix(in srgb, var(--mty-magenta) 60%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition:
+    transform 0.25s var(--mty-ease),
+    box-shadow 0.3s var(--mty-ease);
+}
+[data-has-hero] .sl-link-button.primary:hover {
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 40px -10px color-mix(in srgb, var(--mty-magenta) 75%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+[data-has-hero] .sl-link-button.secondary {
+  border: 1px solid var(--sl-color-gray-5);
+  background: var(--sl-color-gray-6);
+  color: var(--sl-color-white);
+  transition:
+    transform 0.25s var(--mty-ease),
+    border-color 0.3s,
+    background 0.3s;
+}
+[data-has-hero] .sl-link-button.secondary:hover {
+  transform: translateY(-2px);
+  border-color: var(--mty-indigo-soft);
+  background: var(--sl-color-gray-5);
+}
+
+/* ---- Section intros + final CTA ---- */
+[data-has-hero] .landing-section,
+[data-has-hero] .landing-cta {
+  max-width: 46rem;
+  margin-inline: auto;
+  margin-block: clamp(3.5rem, 7vw, 6rem) 0;
+  text-align: center;
+}
+[data-has-hero] .landing-section h2,
+[data-has-hero] .landing-cta h2 {
+  margin-top: 0.6rem;
+  font-size: clamp(1.9rem, 4vw, 2.85rem);
+  line-height: 1.08;
+}
+[data-has-hero] .section-lede {
+  margin-top: 0.85rem;
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-lg);
+}
+
+/* Install block — constrain + center inside the CTA. */
+[data-has-hero] .landing-cta starlight-tabs {
+  display: block;
+  max-width: 34rem;
+  margin: 1.75rem auto 2rem;
+  text-align: start;
+}
+[data-has-hero] .landing-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* ---- Feature cards: restyle the stock Starlight <Card>/<CardGrid> ---- */
+@media (min-width: 50rem) {
+  [data-has-hero] .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+[data-has-hero] .card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--sl-color-white) 2.5%, transparent);
+  transition:
+    transform 0.4s var(--mty-ease),
+    background 0.4s,
+    border-color 0.4s;
+}
+/* Gradient hover border (mask trick). */
+[data-has-hero] .card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--mty-grad-soft);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s var(--mty-ease);
+  pointer-events: none;
+}
+[data-has-hero] .card:hover {
+  transform: translateY(-4px);
+  background: color-mix(in srgb, var(--sl-color-white) 5%, transparent);
+}
+[data-has-hero] .card:hover::before {
+  opacity: 1;
+}
+/* Stack the icon chip above the title text. */
+[data-has-hero] .card .title {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  font-size: var(--sl-text-lg);
+}
+[data-has-hero] .card .icon {
+  /* content-box so the padding forms a chip *around* the 1.35rem glyph rather
+     than eating into it (the svg is box-sizing: border-box by default). */
+  box-sizing: content-box;
+  font-size: 1.35rem;
+  padding: 0.6rem;
+  border-radius: 0.7rem;
+  color: var(--sl-color-text-accent);
+  border: 1px solid var(--sl-color-hairline);
+  background: color-mix(in srgb, var(--sl-color-white) 4%, transparent);
+}
+[data-has-hero] .card .body {
+  color: var(--sl-color-gray-3);
+}
+
+/* =============================================================================
+   View transitions — preserve Starlight's default + the logo-flip transition.
+   ============================================================================= */
 
 @view-transition {
   navigation: auto;

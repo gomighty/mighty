@@ -9,7 +9,10 @@ const PAGE_TITLE_ID = "_top";
 ---
 
 <div class="hero">
-  <MightyLogo class="mighty-logo" width="400" height="400" />
+  <div class="hero-emblem">
+    <div class="glow-ring" aria-hidden="true"></div>
+    <MightyLogo class="mighty-logo" width="400" height="400" />
+  </div>
   <div class="sl-flex stack">
     <div class="sl-flex copy">
       <h1 id={PAGE_TITLE_ID} data-page-title set:html={title} />
@@ -48,23 +51,44 @@ const PAGE_TITLE_ID = "_top";
   @layer starlight.core {
     .hero {
       display: grid;
+      grid-template-columns: 1fr;
       align-items: center;
-      gap: 1rem;
-      padding-bottom: 1rem;
+      gap: 2rem;
+      padding-block: clamp(2rem, 6vw, 4rem);
     }
 
-    .hero > .mighty-logo,
-    .hero > .hero-html {
-      object-fit: contain;
-      width: min(70%, 20rem);
+    /* Emblem: the brand logomark behind a soft blurred glow-ring. */
+    .hero-emblem {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .glow-ring {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--mty-grad);
+      width: min(58%, 230px);
+      aspect-ratio: 1;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      filter: blur(40px);
+      opacity: 0.24;
+      pointer-events: none;
+    }
+    .hero-emblem > .mighty-logo {
+      position: relative;
+      width: min(62%, 230px);
       height: auto;
-      margin-inline: auto;
+      filter: drop-shadow(0 30px 60px rgb(from var(--mty-indigo) r g b / 0.35));
     }
 
     .stack {
       flex-direction: column;
       gap: clamp(1.5rem, calc(1.5rem + 1vw), 2rem);
       text-align: center;
+      align-items: center;
     }
 
     .copy {
@@ -78,46 +102,63 @@ const PAGE_TITLE_ID = "_top";
     }
 
     h1 {
-      font-size: clamp(
-        var(--sl-text-3xl),
-        calc(0.25rem + 5vw),
-        var(--sl-text-6xl)
-      );
-      line-height: var(--sl-line-height-headings);
+      font-family: var(--mty-font-display);
+      font-optical-sizing: auto;
+      font-size: clamp(2.75rem, calc(0.25rem + 6vw), 5.25rem);
+      line-height: 1;
+      letter-spacing: -0.025em;
       font-weight: 600;
       color: var(--sl-color-white);
+    }
+    h1 :global(em) {
+      font-style: italic;
+      font-weight: 500;
     }
 
     .tagline {
       font-size: clamp(
         var(--sl-text-base),
-        calc(0.0625rem + 2vw),
+        calc(0.0625rem + 1.5vw),
         var(--sl-text-xl)
       );
-      color: var(--sl-color-gray-2);
+      color: var(--sl-color-gray-3);
+    }
+    .tagline :global(b) {
+      color: var(--sl-color-white);
+      font-weight: 600;
     }
 
     .actions {
-      gap: 1rem 2rem;
+      gap: 1rem;
       flex-wrap: wrap;
       justify-content: center;
     }
 
     @media (min-width: 50rem) {
       .hero {
-        grid-template-columns: 7fr 4fr;
-        gap: 3%;
-        padding-block: clamp(2.5rem, calc(1rem + 10vmin), 10rem);
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: clamp(2rem, 5vw, 4.5rem);
+        padding-block: clamp(3rem, calc(1rem + 8vmin), 8rem);
       }
 
-      .hero > .mighty-logo,
-      .hero > .hero-html {
+      .hero > .hero-emblem {
         order: 2;
-        width: min(100%, 25rem);
+      }
+      .hero-emblem > .mighty-logo {
+        width: min(85%, 320px);
+      }
+      .glow-ring {
+        width: 118%;
+        left: auto;
+        top: auto;
+        transform: none;
+        filter: blur(70px);
+        opacity: 0.38;
       }
 
       .stack {
         text-align: start;
+        align-items: flex-start;
       }
 
       .copy {
@@ -128,6 +169,11 @@ const PAGE_TITLE_ID = "_top";
         justify-content: flex-start;
       }
     }
+  }
+
+  /* The blurred brand blob needs less punch over a white canvas. */
+  :global([data-theme="light"]) .glow-ring {
+    opacity: 0.2;
   }
 </style>
 

@@ -1,0 +1,23 @@
+---
+/**
+ * Two-up grid wrapper for the landing-page <CodeCard>s. Collapses to a single
+ * column below Starlight's primary layout breakpoint (50rem).
+ */
+---
+
+<div class="code-cards"><slot /></div>
+
+<style>
+  .code-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-block: 2.5rem;
+  }
+
+  @media (min-width: 50rem) {
+    .code-cards {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
